@@ -3,13 +3,13 @@
 ## 1. Overview
 
 - **What are you planning to build?**
-  - Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT using a TURN server. The actual implementation of the protocol will be given to our customer, Capt Burn, USMC at MARFORCYBER.
+  - Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be given to our customer, Capt Burn, USMC at MARFORCYBER.
   
 - **What problem will it solve?**
-  - Our product will support the needs of our customer.
+  - Our product will support MARFORCYBER in their Research and Development needs. Our implementation of the TURN Protocol with authentication and encryption features will support MARFORCYBER in research that they would not be able to do without our work and commitment to the project. Our Command Line Interface will make it so that our customer can easily use our product solo if they choose to do so.
 
 - **Why is it important?**
-  - Our product will support the needs of our customer.
+  - Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. The need that we are meeting with our product is not a manufactured, but one that is 
 
 - **High-Level Diagram (OV-1)**
   - ![TURN Net Diagram](TURN_Diagram.png)
@@ -17,18 +17,18 @@
 ## 2. Market Research/Lit Review
 
 - **Existing Processes**
-  - Our capstone will either be its own entity or our implementation of TURN with added features important to our customer will be added to an already existing tool.
+  - Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
 
 - **Market Research**
-  - The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary, which is needed by our customer. 
+  - The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
 
 - **Discovery Insights**
-  - Share any relevant findings from the discovery phase that informed your design choices.
+  - The design of our implementation will be based on the TURN protocol and most of our research will be done through the RFCs and similar open source work done. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly.
 
 ## 3. Proposed Design and Architecture
 
 - **User Types/Personas**
-  - Identify and describe each type of user who will interact with the system. Include key characteristics and needs of each user type.
+  - Capt Burn is our customer and user. He will use our research and product to add on to his own work at MARFORCYBER. We will be writing our product in Python and focus on networking between Linux machines, which is what our customer asked from us.
 
 - **System Design**
   - Explain how your proposed system will address the identified problem. Describe the core functionalities and how they will work together to solve the problem.
@@ -48,21 +48,23 @@
   - Identify potential risks that could impede the project’s success. For each risk, propose possible mitigation strategies. Capture these as stories (user stories, task stories, etc.).
 
 - **Key Faculty Involvement**
-  - List faculty members who are knowledgeable about the topic and who may be able to provide advice or guidance.
+  - Networking: LCDR Downs
+  - Authentication: Professor Brown
+  - General Development: Capt Burn
 
 ## 5. Admin/Fine Print
 
 - **GFI/GFE (Government-Furnished Information/Equipment)**
-  - Detail any resources you need, such as government-provided equipment, information, or datasets.
+  - None
 
 - **Customer Meeting Requirements/Plan**
   - Outline a meeting schedule or plan for engaging with your customer during development. Highlight key touchpoints for feedback.
 
 - **Acceptance Window**
-  - Specify the time frame within which your system or project will be delivered to the customer for final review and acceptance.
+  - The final version of our Capstone project will be complete by April.
 
 - **Code Delivery**
-  - Describe how and where the final code will be delivered (e.g., through a repository, directly to a customer, etc.).
+  - The final version of our Capstone project will be delivered to our customer through our repository. Capt Burn is a member of our GitHub repository so he is constantly aware of our progress.
 
 - **Usage License**
   - The software developed as part of the capstone course becomes
