@@ -9,7 +9,7 @@
   - Our product will support MARFORCYBER in their Research and Development needs. Our implementation of the TURN Protocol with authentication and encryption features will support MARFORCYBER in research that they would not be able to do without our work and commitment to the project. Our Command Line Interface will make it so that our customer can easily use our product solo if they choose to do so.
 
 - **Why is it important?**
-  - Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. The need that we are meeting with our product is not a manufactured, but one that is 
+  - Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. This tool is made to ameliorate a deficicency in utilities that supports the larger MARFORCE cyber mission.
 
 - **High-Level Diagram (OV-1)**
 
