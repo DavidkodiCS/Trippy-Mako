@@ -1,10 +1,8 @@
-# Meeting Notes
+# Scrum 0: Individual Write-Ups on TURN Knowledge, Libraries, and Implementation
 
-## Week 1: Individual Write-Ups on TURN Knowledge, Libraries, and Implementation
+## Team Contributions
 
-### Team Contributions
-
-#### David
+### David
 
 - **Documentation**: Use Sphinx to document code.
 - **TURN Protocol**: Focus on TURN in Client-Server models.
@@ -26,7 +24,7 @@
   - Create a third VM (vm2) to act as the TURN server using `python3 -m http.server 8000` for basic HTTP requests.
   - Explore options for a TURN-like server with more advanced functionality.
 
-#### Notes from VirtualBox Setup
+### Notes from VirtualBox Setup
 
 - **VMs & Network Setup**:
   - 5 VMs in total with 3 virtual networks (Host-Only Networks).
@@ -51,7 +49,7 @@
 
 ---
 
-#### Meris
+### Meris
 
 - **TURN Overview**:
   - TURN (Traversal Using Relays around NAT) servers facilitate connections between hosts when STUN fails.
@@ -71,7 +69,7 @@
 
 ---
 
-#### Charlie
+### Charlie
 
 - **TURN Overview**:
   - TURN facilitates communication when direct paths between hosts fail due to NAT configurations.
