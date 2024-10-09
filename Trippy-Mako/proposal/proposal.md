@@ -12,7 +12,8 @@
   - Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. The need that we are meeting with our product is not a manufactured, but one that is 
 
 - **High-Level Diagram (OV-1)**
-  - ![TURN Net Diagram](TURN_Diagram.png)
+
+![TURN Net Diagram](TURN_Diagram.png)
 
 ## 2. Market Research/Lit Review
 
@@ -31,10 +32,10 @@
   - Capt Burn is our customer and user. He will use our research and product to add on to his own work at MARFORCYBER. We will be writing our product in Python and focus on networking between Linux machines, which is what our customer asked from us.
 
 - **System Design**
-  - Explain how your proposed system will address the identified problem. Describe the core functionalities and how they will work together to solve the problem.
+  - Our implementation of the TURN protocol and authentication method will work together seamlessly. From the user's point of view the CLI Tool will be simple and easy to use. Configuration will be akin to configuring an exploit in Metasploit, for example.
 
 - **System Architecture**
-  - Provide a detailed breakdown of the system components, including both software and hardware (if applicable). Consider including diagrams or visual representations of how components interact.
+  - See OV-1 for an example of the system architecture. No hardware is needed for this capstone as everything will be virtualized.
 
 ## 4. Project Management
 
