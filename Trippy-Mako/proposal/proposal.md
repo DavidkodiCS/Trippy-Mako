@@ -60,9 +60,84 @@
 | 9      | 2 weeks  | 2024-03-02 | 2024-03-15 | CLI Tool Development | Basic CLI functionality | Not Started |
 | 10     | 1 week   | 2024-03-16 | 2024-03-22 | Documentation | Finishing documentation that was worked on throughout the capstone | Not Started |
 
-
 - **Product Backlog**
-  - List the high-priority features, functionalities, and tasks that need to be completed for the project. Prioritize by order of importance.
+
+## Priority 1: TURN Protocol Implementation
+
+1. **Implement TURN Protocol (Part 1)**
+   - Sending an Allocate Request
+   - Receiving an Allocate Request
+   - Receiving an Allocate Success Response
+   - Receiving an Allocate Error Response
+   - Sending a Refresh Request
+   - Receiving a Refresh Request
+
+2. **Implement TURN Protocol (Part 2)**
+   - Receiving a Refresh Response
+   - Forming a CreatePermission Request
+   - Receiving a CreatePermission Request
+   - Receiving a CreatePermission Response
+   - Forming a Send Indication
+   - Receiving a Send Indication
+
+3. **Implement TURN Protocol (Part 3)**
+   - Receiving a UDP Datagram
+   - Receiving a Data Indication
+   - Sending a ChannelBind Request
+   - Receiving a ChannelBind Response
+
+4. **Implement TURN Protocol (Part 4)**
+   - Format ChannelData Message
+   - Sending a ChannelData Message
+   - Receiving a ChannelData Message
+   - Relaying Data from the Peer
+
+## Priority 2: Authentication
+
+1. **TLS and Tunneling**
+   - Implement TLS protocols to secure data transmission.
+   - Configure and manage tunneling mechanisms for secure communication.
+
+2. **Forge Certificates**
+   - Create and validate certificates for secure communication.
+   - Ensure server and client certificate validation processes are in place.
+
+3. **Server and Client Certificates**
+   - Set up the server and client certificates for secure interactions.
+   - Test the certificates' functionality.
+
+4. **Trust Anchor: OpenSSH (Python Library)**
+   - Implement OpenSSH library in the authentication flow.
+   - Integrate with existing security frameworks.
+
+## Priority 3: Merge Authentication and TURN Protocol
+
+1. **Merge Authentication and TURN Protocol**
+   - Integrate Authentication with TURN Protocol functionality.
+   - Ensure seamless operation between the Authentication process and TURN server.
+
+## Priority 4: CLI Tool Development
+
+1. **Basic CLI Functionality**
+    - Implement core CLI commands to interact with the system.
+    - Ensure commands can trigger the main features like TURN and Authentication.
+    - Add error handling and user feedback.
+
+## Lower Priority Tasks: Infrastructure Setup & Documentation
+
+1. **Set Up Python Environment**
+    - Install and configure necessary libraries for development.
+    - Set up environment for testing and main codebase.
+
+2. **Virtual Box Testing Environment Setup**
+    - Set up 5 VMs and 3 Vnets.
+    - Configure VyOS.
+    - Implement infrastructure using Terraform.
+
+3. **Documentation**
+    - Consolidate and finalize documentation.
+    - Ensure documentation reflects the work done throughout the project.
+    - Create guides for installation, setup, and usage.
 
 - **Risk Mitigation**
   - Identify potential risks that could impede the project’s success. For each risk, propose possible mitigation strategies. Capture these as stories (user stories, task stories, etc.).
