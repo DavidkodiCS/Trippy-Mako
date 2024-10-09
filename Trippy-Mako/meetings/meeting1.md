@@ -48,7 +48,7 @@ This project focuses on developing a CLI tool for the TURN protocol with the pot
 
 ### Key Ideas
 
-- **Explore the Wireguard Protocol**: 
+- **Explore the Wireguard Protocol**:
   - Unlike TURN servers, this protocol uses VPN servers as intermediaries.
   - **Potential Action**: Add this as another feature of the tool.
 
