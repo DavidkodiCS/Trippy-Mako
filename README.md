@@ -16,3 +16,4 @@ TURN Protocol CLI Tool
 2. [Capstone Proposal](Trippy-Mako/proposal/proposal.md)
 3. [TM Style Guide](https://github.com/DavidkodiCS/Trippy-Mako/blob/main/Trippy-Mako-StyleGuide.md)
 4. [Brainstorming](https://docs.google.com/document/d/1IeNRIVarfN5WBRGMrVxdDZGXDCPgenVMWErjJEkWA20/edit?usp=sharing)
+5. [Poster](https://docs.google.com/presentation/d/1Ua0MMuqRZ-b5kbvC48WoUsahLcg4EEjAxT-er4XbvGA/edit?usp=sharing)
