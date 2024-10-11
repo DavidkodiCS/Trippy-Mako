@@ -146,7 +146,7 @@
 - **Key Faculty Involvement**
   - Networking: LCDR Downs
   - Authentication: Professor Brown
-  - General Development: Capt Burn
+  - General Development: Capt Burn (MARFORCYBER)
 
 ## 5. Admin/Fine Print
 
