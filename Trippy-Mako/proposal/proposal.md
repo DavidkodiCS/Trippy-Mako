@@ -18,18 +18,18 @@
 ## 2. Market Research/Lit Review
 
 - **Existing Processes**
-  - Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
+  - Currently the customer has no tool similar to the one we are creating. They have identified TURN as a useful protocol for their R&D needs and require a tool that implments the protocol in a way that is accessable. Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
 
 - **Market Research**
-  - The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
+  - There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
 
 - **Discovery Insights**
-  - The design of our implementation will be based on the TURN protocol and most of our research will be done through the RFCs and similar open source work done. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly. Our CLI tool will be based on tools like Metasploit 
+  - In our research we found two primary objectives we need to accomplish. First is implementing the TURN and STUN protocols in accordance with the applicable RFCs. We hope to accomplish this by assembling packets using various python networking libraries like dpkt and scapy. The second objective is to implement a secure authentication method for the protocol. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly. Our ultimate goal is that the CLI tool will be operate similar to tools like Metasploit.
 
 ## 3. Proposed Design and Architecture
 
 - **User Types/Personas**
-  - Capt Burn is our customer and user. He will use our research and product to add on to his own work at MARFORCYBER. We will be writing our product in Python and focus on networking between Linux machines, which is what our customer asked from us.
+  - Capt Burn is our customer and user. He will use our research and product to supplment his own work at MARFORCYBER. In our primary inteviews with the customer we discussed different user stories and settled on some core elements of our protduct. The plan is to write our product in Python and focus on networking between Linux machines.
 
 - **System Design**
   - Our implementation of the TURN protocol and authentication method will work together seamlessly. From the user's point of view the CLI Tool will be simple and easy to use. Configuration will be akin to configuring an exploit in Metasploit, for example.
