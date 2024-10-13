@@ -1,6 +1,6 @@
 # Capstone Proposal
 
-## 1. Overview
+## Overview
 
 - **What are you planning to build?**
   - Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be given to our customer, Capt Burn, USMC at MARFORCYBER.
@@ -15,7 +15,7 @@
 
 ![TURN Net Diagram](TURN_Diagram.png)
 
-## 2. Market Research/Lit Review
+## Market Research/Lit Review
 
 - **Existing Processes**
   - Currently the customer has no tool similar to the one we are creating. They have identified TURN as a useful protocol for their R&D needs and require a tool that implments the protocol in a way that is accessable. Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
@@ -26,7 +26,7 @@
 - **Discovery Insights**
   - In our research we found two primary objectives we need to accomplish. First is implementing the TURN and STUN protocols in accordance with the applicable RFCs. We hope to accomplish this by assembling packets using various python networking libraries like dpkt and scapy. The second objective is to implement a secure authentication method for the protocol. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly. Our ultimate goal is that the CLI tool will be operate similar to tools like Metasploit.
 
-## 3. Proposed Design and Architecture
+## Proposed Design and Architecture
 
 - **User Types/Personas**
   - Capt Burn is our customer and user. He will use our research and product to supplment his own work at MARFORCYBER. In our primary inteviews with the customer we discussed different user stories and settled on some core elements of our protduct. The plan is to write our product in Python and focus on networking between Linux machines.
@@ -37,7 +37,7 @@
 - **System Architecture**
   - See OV-1 for an example of the system architecture. No hardware is needed for this capstone as everything will be virtualized.
 
-## 4. Project Management
+## Project Management
 
 - **Preliminary Release Plan**
 
@@ -159,7 +159,7 @@
   - Authentication: Professor Brown
   - General Development: Capt Burn (MARFORCYBER)
 
-## 5. Admin/Fine Print
+## Admin/Fine Print
 
 - **GFI/GFE (Government-Furnished Information/Equipment)**
   - None
