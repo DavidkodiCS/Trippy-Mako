@@ -63,7 +63,7 @@
 
 - **Product Backlog**
 
-## Priority 1: TURN Protocol Implementation
+### Priority 1: TURN Protocol Implementation
 
 1. **Implement TURN Protocol (Part 1)**
    - Sending an Allocate Request
@@ -93,7 +93,7 @@
    - Receiving a ChannelData Message
    - Relaying Data from the Peer
 
-## Priority 2: Authentication
+### Priority 2: Authentication
 
 1. **TLS and Tunneling**
    - Implement TLS protocols to secure data transmission.
@@ -111,20 +111,20 @@
    - Implement OpenSSH library in the authentication flow.
    - Integrate with existing security frameworks.
 
-## Priority 3: Merge Authentication and TURN Protocol
+### Priority 3: Merge Authentication and TURN Protocol
 
 1. **Merge Authentication and TURN Protocol**
    - Integrate Authentication with TURN Protocol functionality.
    - Ensure seamless operation between the Authentication process and TURN server.
 
-## Priority 4: CLI Tool Development
+### Priority 4: CLI Tool Development
 
 1. **Basic CLI Functionality**
     - Implement core CLI commands to interact with the system.
     - Ensure commands can trigger the main features like TURN and Authentication.
     - Add error handling and user feedback.
 
-## Lower Priority Tasks: Infrastructure Setup & Documentation
+### Lower Priority Tasks: Infrastructure Setup & Documentation
 
 1. **Set Up Python Environment**
     - Install and configure necessary libraries for development.
@@ -140,10 +140,13 @@
     - Ensure documentation reflects the work done throughout the project.
     - Create guides for installation, setup, and usage.
 
-- **Risk Mitigation**
-  - Identify potential risks that could impede the project’s success. For each risk, propose possible mitigation strategies. Capture these as stories (user stories, task stories, etc.).
+## **Risk Mitigation**
+  - Complexity of TURN
+    - Our research into the protocol must be in depth so we are not surprised by friction in our TURN scrums.
+  - Merging of Authentication and TURN
+    - Our implementation of TURN and authentication feature must be able to work together to securely communicate bewteen the client, server, and peer(s).
 
-- **Key Faculty Involvement**
+## **Key Faculty Involvement**
   - Networking: LCDR Downs
   - Authentication: Professor Brown
   - General Development: Capt Burn (MARFORCYBER)
