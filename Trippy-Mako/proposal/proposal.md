@@ -43,7 +43,7 @@
 
 | Sprint | Duration | Start Date | End Date | Goals | Deliverables | Status |
 |--------|----------|------------|----------|-------|--------------|--------|
-| 1      | 2 weeks  | 2024-10-21 | 2024-11-03 | Set Up Python Environment | Environment Setup for Testing and Development | Not Started |
+| 1      | 2 weeks  | 2024-10-21 | 2024-11-03 | Set Up Python Environment | Environment Setup for Testing and Development | Finished |
 |        |          |            |           | Subitems: | Testing, Libraries, Main | |
 | 2      | 3 weeks  | 2024-11-04 | 2024-11-24 | Virtual Box Testing Environment Setup | VyOS Configuration, 5 VMs and 3 Vnets Setup, Terraform | Not Started |
 |        |          |            |           | Subitems: | 5vms, 3 Vnets Manual, Terraform, VyOS | |
