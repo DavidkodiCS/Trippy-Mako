@@ -6,3 +6,5 @@
     - Could be useful for an extra feature if we have time.
 
 3. [RFC 5389 - STUN 101](https://datatracker.ietf.org/doc/html/rfc5389)
+4. [RFC 7525 - Recommendations for Secure Use of TLS and DTLS](https://datatracker.ietf.org/doc/html/rfc7525)
+5. [RFC 6062 - TCP Allocations in TURN](https://datatracker.ietf.org/doc/html/rfc6062)
