@@ -16,5 +16,11 @@
 - Client must then keep the request alive so it must periodically send a **Refresh Request** to the server.
   - Refresh function is used instead of Allocate again to let the client know if the allocation *vanishes*.
 - Default lifetime of an Allocation is 10 minutes.
-  - 
 - Delete allocations by sending a refresh with a lifetime of 0.
+- **5-tuple**: (client IP address and port, server IP address and port, and transport protocol (currently one of UDP, TCP, DTLS/UDP, or TLS/TCP))
+  - To create a second allocation the client must use a new host address or port.
+- When the client makes a successful allocate request the TURN server will respond with it's IP and port (TURN Server Transport Address).
+- Server requires that all requests be authenticated using **STUN's long-term credential mechanism**.
+
+## 3.3 Permissions
+
