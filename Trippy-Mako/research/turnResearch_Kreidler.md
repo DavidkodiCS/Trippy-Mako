@@ -29,3 +29,23 @@
 - Client can install or refresh a permission using either a CreatePermission request or a ChannelBind request.
 - Within the context of an allocation. Adding/Expiring in one allocation doesn't affect others.
 - **I don't think we really have to worry about Permissions too much right away.**
+- *The TURN server will only forward traffic to its client from peers that match an existing permission.* (might be important)
+
+## 5 General Behavior
+
+- TURN is an extension to STUN
+
+## 6 Allocations
+
+## 7 Creating an Allocation
+
+## 7.1 Sending an Allocate Request
+
+Assume this is a function
+Parameters: Client transport address, Client port, server transport address, server port, transport protocol?
+
+1. Choose host transport address (Client): Allow OS to choose unused port.
+2. Choose a transport protocol: RECOMMENDED to pick UDP since that is what most TURN servers use but see 3.1 to use other protocols. We will want our information to be encrypted across the line so we will need to work around any issues here. Our implementation of authentication must comply with TURN/STUN but still be effective.
+3. Client picks a server transport address (TURN server public IP) For now we can just assume the user will know the address and input it in using our CLI tool.
+4. Include REQUESTED-TRANSPORT attribute (for now always assume UDP. This is not the transport protocol specified in the 5-tuple)
+5. 
