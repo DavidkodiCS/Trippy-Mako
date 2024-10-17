@@ -24,3 +24,8 @@
 
 ## 3.3 Permissions
 
+- TURN permissions mimic the address-restricted filtering mechanism of NATs that comply with [RFC4787](https://datatracker.ietf.org/doc/html/rfc4787)
+- Permissions: 0 or more. Each one is associated with an IP and lifetime.
+- Client can install or refresh a permission using either a CreatePermission request or a ChannelBind request.
+- Within the context of an allocation. Adding/Expiring in one allocation doesn't affect others.
+- **I don't think we really have to worry about Permissions too much right away.**
