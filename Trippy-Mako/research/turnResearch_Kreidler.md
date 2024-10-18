@@ -48,4 +48,7 @@ Parameters: Client transport address, Client port, server transport address, ser
 2. Choose a transport protocol: RECOMMENDED to pick UDP since that is what most TURN servers use but see 3.1 to use other protocols. We will want our information to be encrypted across the line so we will need to work around any issues here. Our implementation of authentication must comply with TURN/STUN but still be effective.
 3. Client picks a server transport address (TURN server public IP) For now we can just assume the user will know the address and input it in using our CLI tool.
 4. Include REQUESTED-TRANSPORT attribute (for now always assume UDP. This is not the transport protocol specified in the 5-tuple)
-5. 
+5. Let's just go with IPv4 for now.
+6. Client can ask server to change the initial lifetime of an allocation but the server will ignore it if it is less than the default (5 mins?)
+
+- Various attributes: REQUESTED-ADDRESS-FAMILY attribute, RESERVATION-TOKEN attribute, DONT-FRAGMENT, EVEN-PORT.
