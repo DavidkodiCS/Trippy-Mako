@@ -24,10 +24,16 @@ Channels use an altetrnative packet format known as the "ChannelData message" wh
 
 To bind chanels to peers a client seds a ChannelBind request to the sever with an unbound chnell number and the transport address of the peer. Channel bindings last for 10 minutes unles refrenshed, longer than the permission lifetime. Once bound a client can use ChannelData messages to tsend the server data. The server can also relay data the opposite direction using a ChannelDatamessage.
 
-
 Once a channel is bound the client can send either ChannelData messages or Send indications. Once a channel is bound the server however will always use ChannelData messages.
 
 ### 3.6 Unprivalaged TURN Servers
 
+TURN uses unprivilaged TURN servers which is a design decision to allow them to be used easily for peer-to-peer communication
 
+This results in the fillowing impications for data relayed by a turn server
+
+- The value of the Diffserv field may not be preserved across the server;
+- The Time to Live (TTL) field may be reset, rather than decremented, across the server;
+- The Explicit Congestion Notification (ECN) field may be reset by the server;
+- There is no end-to-end fragmentation since the packet is reassembled at the server.
 
