@@ -18,7 +18,16 @@ Send and Data indications cannot be authenticated allowing an attacker to send b
 
 ### 3.5 Channels
 
+Channels are an alternative to the send mechanism. Channels have less overhead than the send mechanism.
+
+Channels use an altetrnative packet format known as the "ChannelData message" which has a 4-byte header knows as a channel number that is bound to a specific peer and servs as a shorthand for a peer's host transport address.
+
+To bind chanels to peers a client seds a ChannelBind request to the sever with an unbound chnell number and the transport address of the peer. Channel bindings last for 10 minutes unles refrenshed, longer than the permission lifetime. Once bound a client can use ChannelData messages to tsend the server data. The server can also relay data the opposite direction using a ChannelDatamessage.
+
+
+Once a channel is bound the client can send either ChannelData messages or Send indications. Once a channel is bound the server however will always use ChannelData messages.
 
 ### 3.6 Unprivalaged TURN Servers
+
 
 
