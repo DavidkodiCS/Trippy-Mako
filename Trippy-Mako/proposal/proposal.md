@@ -3,13 +3,13 @@
 ## Overview
 
 - **What are you planning to build?**
-  - Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be given to our customer, Capt Burn, USMC at MARFORCYBER.
+Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be given to our customer, Capt Burn, USMC at MARFORCYBER.
   
 - **What problem will it solve?**
-  - Our product will support MARFORCYBER in their Research and Development needs. Our implementation of the TURN Protocol with authentication and encryption features will support MARFORCYBER in research that they would not be able to do without our work and commitment to the project. Our Command Line Interface will make it so that our customer can easily use our product solo if they choose to do so.
+Our product will support MARFORCYBER in their Research and Development needs. Our implementation of the TURN Protocol with authentication and encryption features will support MARFORCYBER in research that they would not be able to do without our work and commitment to the project. Our Command Line Interface will make it so that our customer can easily use our product solo if they choose to do so.
 
 - **Why is it important?**
-  - Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. This tool is made to ameliorate a deficicency in utilities that supports the larger MARFORCE cyber mission.
+Our product will directly support current research and development needs of MARFORCYBER. The product that our customer is asking for as well as our research done on the TURN protocol and authentication from client to peer(s) is directly supporting the mission of MARFORCYBER. This tool is made to ameliorate a deficicency in utilities that supports the larger MARFORCE cyber mission.
 
 - **High-Level Diagram (OV-1)**
 
@@ -18,24 +18,24 @@
 ## Market Research/Lit Review
 
 - **Existing Processes**
-  - Currently the customer has no tool similar to the one we are creating. They have identified TURN as a useful protocol for their R&D needs and require a tool that implments the protocol in a way that is accessable. Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
+Currently the customer has no tool similar to the one we are creating. They have identified TURN as a useful protocol for their R&D needs and require a tool that implments the protocol in a way that is accessable. Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
 
 - **Market Research**
-  - There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
+There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
 
 - **Discovery Insights**
-  - In our research we found two primary objectives we need to accomplish. First is implementing the TURN and STUN protocols in accordance with the applicable RFCs. We hope to accomplish this by assembling packets using various python networking libraries like dpkt and scapy. The second objective is to implement a secure authentication method for the protocol. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly. Our ultimate goal is that the CLI tool will be operate similar to tools like Metasploit.
+In our research we found two primary objectives we need to accomplish. First is implementing the TURN and STUN protocols in accordance with the applicable RFCs. We hope to accomplish this by assembling packets using various python networking libraries like dpkt and scapy. The second objective is to implement a secure authentication method for the protocol. In order to achieve secure authentication we will do research on TLS and Certifications. The final result will simply be a merge of both implementations that should work together seamlessly. Our ultimate goal is that the CLI tool will be operate similar to tools like Metasploit.
 
 ## Proposed Design and Architecture
 
 - **User Types/Personas**
-  - Capt Burn is our customer and user. He will use our research and product to supplment his own work at MARFORCYBER. In our primary inteviews with the customer we discussed different user stories and settled on some core elements of our protduct. The plan is to write our product in Python and focus on networking between Linux machines.
+Capt Burn is our customer and user. He will use our research and product to supplment his own work at MARFORCYBER. In our primary inteviews with the customer we discussed different user stories and settled on some core elements of our protduct. The plan is to write our product in Python and focus on networking between Linux machines.
 
 - **System Design**
-  - Our implementation of the TURN protocol and authentication method will work together seamlessly. From the user's point of view the CLI Tool will be simple and easy to use. Configuration will be akin to configuring an exploit in Metasploit, for example.
+Our implementation of the TURN protocol and authentication method will work together seamlessly. From the user's point of view the CLI Tool will be simple and easy to use. Configuration will be akin to configuring an exploit in Metasploit, for example.
 
 - **System Architecture**
-  - See OV-1 for an example of the system architecture. No hardware is needed for this capstone as everything will be virtualized.
+See OV-1 for an example of the system architecture. No hardware is needed for this capstone as everything will be virtualized.
 
 ## Project Management
 
@@ -164,19 +164,19 @@
 ## Admin/Fine Print
 
 - **GFI/GFE (Government-Furnished Information/Equipment)**
-  - None
+None
 
 - **Customer Meeting Requirements/Plan**
-  - Outline a meeting schedule or plan for engaging with your customer during development. Highlight key touchpoints for feedback.
+Outline a meeting schedule or plan for engaging with your customer during development. Highlight key touchpoints for feedback.
 
 - **Acceptance Window**
-  - The final version of our Capstone project will be complete by April.
+The final version of our Capstone project will be complete by April.
 
 - **Code Delivery**
-  - The final version of our Capstone project will be delivered to our customer through our repository. Capt Burn is a member of our GitHub repository so he is constantly aware of our progress.
+The final version of our Capstone project will be delivered to our customer through our repository. Capt Burn is a member of our GitHub repository so he is constantly aware of our progress.
 
 - **Usage License**
-  - The software developed as part of the capstone course becomes
+The software developed as part of the capstone course becomes
 property of the DoD. The Computer Science Department does not assume any
 responsibility for maintaining the software produced for any customer of the capstone
 project. The customer may use the software within the context of their USNA affiliation,
