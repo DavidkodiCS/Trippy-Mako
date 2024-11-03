@@ -36,7 +36,7 @@ Similar to TURN, Wireguard encapsulates IP packets over UDP. The user then adds 
   
 There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest complete solution to this project would be Tailscale. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices.
 
-The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary, rather than Virtual Private Networks. Just like Tailscale our product will rely on the the STUN and ICE protocols, which are the foundational layers to the TURN protocol. 
+The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary, rather than Virtual Private Networks. Just like Tailscale our product will rely on the the STUN and ICE protocols, which are the foundational layers to the TURN protocol. Although more commercial products are mostly moving towards the use of Virtual Private Networks, TURN servers are still very much in use today. All WebRTC Applications need a server to relay tasks between peers and TURN servers are the primary solution to this is a TURN server. Currently, MARFORCYBER needs research and development work done in this area of networking since the primary focus right now is on VPNs. Our capstone will fill in that gap and directly support the mission of MARFORCYBER.
 
 - **Discovery Insights**
   
