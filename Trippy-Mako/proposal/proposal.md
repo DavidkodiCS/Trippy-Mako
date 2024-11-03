@@ -25,8 +25,18 @@ Our product will directly support current research and development needs of MARF
 Currently the customer has no tool similar to the one we are creating. They have identified TURN as a useful protocol for their R&D needs and require a tool that implments the protocol in a way that is accessable. Our capstone will be delivered to our customer as a CLI tool but our implementation of TURN will be delivered separately for the customer to continue working on it. As of right now our customer will take our tool but it is highly likely that they will use our implementation to add to already existing research.
 
 - **Market Research**
+
+- Tailscale
   
-There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices. The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary.
+There are many multimedia applications of the TURN protocol for P2P networking for peers behind NAT. The closest solution to this project would be Tailscale, which uses the wireguard protocol. Tailscale is a VPN service that allows any device you own to become accessible anywhere in the world through a secure VPN acting as an intermediary between the two devices.
+
+- Wireguard
+
+Tailscale makes use of the Wireguard protocol, which is an open source encrypted networking protocol. Wireguard is labeled as a general purpose Virtual Private Network that is cross platform and considered an extremely simple, while safe solution to networking needs. The protocol can be implemented in under 4,000 lines of code making it much smaller and faster than OpenVPN or OpenSSL, which are similar services.
+
+Similar to TURN, Wireguard encapsulates IP packets over UDP. The user then adds a simple network interface and configures Wireguard with their private key and their peers public keys. Then the packet transfer process can begin. This process is meant to be as simple and easy to use as SSH.
+
+  The goal of our capstone is to provide a very similar product that uses TURN Servers as an intermediary, rather than Virtual Private Networks.
 
 - **Discovery Insights**
   
@@ -152,18 +162,22 @@ See OV-1 for an example of the system architecture. No hardware is needed for th
 ## **Risk Mitigation**
 
 Complexity of TURN
+
   - Our research into the protocol must be in depth so we are not surprised by friction in our TURN scrums.
   - Merging of Authentication and TURN.
-    - Our implementation of TURN and authentication feature must be able to work together to securely communicate bewteen the client, server, and peer(s).
+    - Our implementation of TURN and authentication feature must be able to work together to securely communicate between the client, server, and peer(s).
   
 Documentation
+
   - Each feature must be properly documented for us and our customer.
   - Each part of the TURN protocol builds upon each other so understanding the code that someone else potentially wrote for the previous part is vital to this capstone's success.
 
 Virtual Network
+
   - Proper set up of our virtual network, as shown in OV-1, will be crucial to the testing of our product.
 
 Testing
+
   - Every function of every feature must be thoroughly tested.
   - Making use of pytest and other automatic testing suites will ensure that each piece is properly working down the line and that there are no surprises towards the end of the release plan.
 
