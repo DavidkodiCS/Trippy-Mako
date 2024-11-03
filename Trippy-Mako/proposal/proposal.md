@@ -26,6 +26,10 @@ Currently the customer has no tool similar to the one we are creating. They have
 
 - **Market Research**
 
+- TURN/STUN
+
+In a typical setting, TURN (Traversal Using Relays around NAT) servers are used to make connections between hosts when the connection to a STUN (Session Traversal Utilities for NAT) server fails. The context in which these servers are typically used is called WebRTC (Web Real-Time Connection), which is a peer-to-peer connection between two web hosts. The STUN and TURN protocols are used by servers in facilitating the “handshake” between the two peers to ensure a connection has been made.  The STUN server will attempt to identify the IPs of each host to connect them, but if that fails, the TURN server is used as a backup. The TURN server does this by relaying information between two parties instead of establishing a direct route for passing information between hosts. In our project, we want to prioritize using the TURN server instead to abstract the source of the connection. 
+
 - Wireguard
 
 Tailscale makes use of the Wireguard protocol, which is an open source encrypted networking protocol. Wireguard is labeled as a general purpose Virtual Private Network that is cross platform and considered an extremely simple, while safe solution to networking needs. The protocol can be implemented in under 4,000 lines of code making it much smaller and faster than OpenVPN or OpenSSL, which are similar services. Wireguard also uses advanced cryptography protocols like the Noise framework, Curve25519, ChaCha20, Poly1305, and more.
