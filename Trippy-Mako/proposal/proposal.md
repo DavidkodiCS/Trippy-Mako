@@ -13,6 +13,7 @@ Our product directly supports MARFORCYBER's ongoing research and development nee
 
 **High-Level Diagram (OV-1)**  
 ![TURN Net Diagram](production_diagram.png)
+This diagram depicts a high level overview of how of the TURN protocol works. At the production stage the client would utilize our CLI tool to easily communicate with a peer through a TURN server on the Internet.
 
 ## Market Research/Lit Review
 
