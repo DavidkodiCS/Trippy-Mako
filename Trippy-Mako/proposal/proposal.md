@@ -16,7 +16,7 @@ Our product will directly support current research and development needs of MARF
 
 - **High-Level Diagram (OV-1)**
 
-![TURN Net Diagram](TURN_Diagram.png)
+![TURN Net Diagram](production_diagram.png)
 
 ## Market Research/Lit Review
 
