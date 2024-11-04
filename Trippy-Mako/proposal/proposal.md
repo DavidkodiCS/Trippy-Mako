@@ -58,7 +58,9 @@ Our implementation of the TURN protocol and authentication method will work toge
 
 - **System Architecture**
   
-See OV-1 for an example of the system architecture. No hardware is needed for this capstone as everything will be virtualized.
+Test architecture is visualized in the detail diagram below:
+![TURN Test Net Diagram](TURN_Diagram.png)
+
 
 ## Project Management
 
