@@ -168,9 +168,11 @@ Testing
 
 ## **Key Faculty Involvement**
 
-Networking: LCDR Downs
-Authentication: Professor Brown
-General Development: Capt Burn (MARFORCYBER)
+**Networking:** LCDR Downs
+
+**Authentication:** Professor Brown
+
+**General Development:** Capt Burn (MARFORCYBER)
 
 ## Admin/Fine Print
 
