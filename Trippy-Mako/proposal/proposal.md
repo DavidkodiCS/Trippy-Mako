@@ -27,7 +27,7 @@ Our product will support MARFORCYBER in their Research and Development needs. Ou
 **Why is it important?**  
 Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead.
 
-Additionally, our capstone will have a classified portion to it that will include hours of work in the SCIF to produce extra features relevant to the classified mission set of MARFORCYBER
+Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
 **High-Level Diagram (OV-1)**  
 ![TURN Net Diagram](production_diagram.png)
