@@ -22,10 +22,12 @@ Our team will build a Command Line Interface Tool that implements the TURN proto
 This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
 **What problem will it solve?**  
-Our product will support MARFORCYBER in their Research and Development needs. By implementing the TURN Protocol with authentication and encryption features, we will enable MARFORCYBER to conduct research that would otherwise be difficult to achieve. The CLI tool will make it straightforward for the customer to use independently.
+Our product will support MARFORCYBER in their Research and Development needs. Our customer needs a standalone binary, not tied to any major libraries that accomplished the task of allowing a user to utilize the TURN protocol through a CLI in order to send a payload or create a TCP connection that produces a shell, albeit an unconventional use of TURN. Our customer specifically asked for security features such as payload encryption and password protection that would make having our own codebase much more practical than a WebRTC implementation, for example. The CLI tool will make it straightforward for the customer to use independently and expedite current research being done at MARFORCYBER.
 
 **Why is it important?**  
-Our product directly supports MARFORCYBER's ongoing research and development needs. The tool and accompanying research on the TURN protocol and secure client-to-peer authentication will advance MARFORCYBER's mission, addressing current deficiencies in supporting utilities.
+Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead.
+
+Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
 **High-Level Diagram (OV-1)**  
 ![TURN Net Diagram](production_diagram.png)
