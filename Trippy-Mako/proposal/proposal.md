@@ -51,10 +51,20 @@ Our research highlights two primary objectives: implementing the TURN/STUN proto
 
 ### Similar Libraries
 
+[Coturn](https://github.com/coturn/coturn)
+[RTCTunnel: Building a WebRTC Proxy with Go (explains link below)](https://www.doxsey.net/blog/rtctunnel--building-a-webrtc-proxy-with-go/)
+[Network tunnels over WebRTC](https://github.com/rtctunnel/rtctunnel)
+[Archived Project for TURN SSH (Directs users to link above)](https://github.com/nobonobo/ssh-p2p)
+[Pure Go implementation of the WebRTC API](https://github.com/pion/webrtc)
+
 ### STUN Overview
 
+MERIS THIS WOULD BE A GOOD SECTION TO ADD TO!! :D
 ### TURN Overview
-[Source](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+[CloudFlare TURN expl ****](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+
+## TURN Implimentations/ Real Life Usages
+[WebRTC](https://webrtc.org/)
 
 
 ## Proposed Design and Architecture
