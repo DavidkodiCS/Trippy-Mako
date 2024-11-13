@@ -49,6 +49,14 @@ Tailscale, a VPN service, securely connects devices globally by acting as an int
 **Discovery Insights**  
 Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
 
+### Similar Libraries
+
+### STUN Overview
+
+### TURN Overview
+[Source](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+
+
 ## Proposed Design and Architecture
 
 **User Types/Personas**  
