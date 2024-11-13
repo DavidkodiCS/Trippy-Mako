@@ -3,7 +3,23 @@
 ## Overview
 
 **What are you planning to build?**  
-Our team will build a Command Line Interface Tool that implements the TURN protocol. This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER.
+Our team will build a Command Line Interface Tool that implements the TURN protocol, using RFC 8656 as our main source of documentation. This project consists of several main parts:
+
+1. Command Line Interface: This tool will allow a user to use several commands such as,
+
+  **configure**: Allows the user to enter in the TURN Server's public facing IP address, associated port number, as well as the user's desired protocol to use, and authentication measures. Different settings could affect the speed and size of the packets being sent across the network, which may be important to the user.
+
+  **connect**: Allows the user to initiate a TCP connection over through the TURN server to establish a more permanent connection a peer, like a secure shell.
+
+  **send**: Allows the user to send a payload using the specified protocol specified in the configuration stage.
+
+  The tool will check the specified configuration during an action and, if it is incorrect, will highlight to the user what is incorrect and will prompt the user to make the changes with suggestions.
+
+2. TURN Implementation:
+
+  Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include STUN and the ICE protocol. We will not be using a python library, such as aiortc, due to the requests of our customer. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
+
+This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
 **What problem will it solve?**  
 Our product will support MARFORCYBER in their Research and Development needs. By implementing the TURN Protocol with authentication and encryption features, we will enable MARFORCYBER to conduct research that would otherwise be difficult to achieve. The CLI tool will make it straightforward for the customer to use independently.
