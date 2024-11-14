@@ -20,7 +20,7 @@ Our team will build a Command Line Interface Tool that implements the TURN proto
 
 2. TURN Implementation:
 
-  Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include STUN and the ICE protocol. We will not be using a python library, such as aiortc, due to the requests of our customer. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
+  Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include the STUN protocol. We will not be using a python library, such as aiortc, due to the requests of our customer and the fact that this is not intended to be a WebRTC application. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
 
 This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
@@ -30,7 +30,7 @@ Our product will support MARFORCYBER in their Research and Development needs. Ou
 
 **Why is it important?** ✅
 
-Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead.
+Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead. 
 
 Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
@@ -47,6 +47,19 @@ Currently, our customer does not have any research or development efforts focuse
 
 **TURN/STUN**  
 In typical settings, TURN (Traversal Using Relays around NAT) servers are used when connections to STUN (Session Traversal Utilities for NAT) servers fail. TURN operates in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
+
+**Additional Knowledge of Protocols used in TURN**
+
+|TURN client to TURN server	| TURN server to peer |
+|--------|----------|
+|UDP |	UDP |
+| TCP |	UDP | 
+|TLS-over-TCP |	UDP |
+|DTLS-over-UDP |	UDP |
+
+[100ms](https://www.100ms.live/blog/webrtc-turn-server#transport-protocols)
+
+We will utilize standard Transport protocols to communicate with the peer through the TURN server. The challenge that will will face depending on the network of the peer and the feature that the user wants to use i.e. send, proxy, or connect, is that we will need to create a TCP tunnel from the TURN server to the peer rather than UDP, which is what TURN is typically used for. (Most WebRTC implementations, for example, are used for audio and video RTC)
 
 **WebRTC**
 
