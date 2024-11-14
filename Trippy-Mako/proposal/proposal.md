@@ -54,9 +54,14 @@ Our research highlights two primary objectives: implementing the TURN/STUN proto
 ### Similar Libraries
 
 [Coturn](https://github.com/coturn/coturn)
+This is an implementation of a TURN server that uses STUN. It can be spun up and used as a server to communicate from clients to peers. One notable thing about this library is that it allows the server to use "client-to-TURN-server protocols" which is remencent of how we would like to create a TCP connection via the server in our CLI. One way it is different is it appears that this server is primarily implemented to be a part of an ICE solution rather than a TURN solution.
+
 [RTCTunnel: Building a WebRTC Proxy with Go (explains link below)](https://www.doxsey.net/blog/rtctunnel--building-a-webrtc-proxy-with-go/)
 [Network tunnels over WebRTC](https://github.com/rtctunnel/rtctunnel)
+This application is an implmentation of WebRTC which take advantage of different NAT traversal solutions. The difference between this approach and what we are doing is that in this approach the author has taken advantage of a pre built library for their NAT traversal. We plan on making our own NAT traversal solution based entirely around TURN and no other traversal solutions. In this project the author then took that solution and built a TCP proxy over it. In our solution we will do a similar thing but we hope to do an ssh type proxy via a known TURN server at the application layer. One thing this project highlights that will be important to for us is the one-to-many relationship of TCP. This allows the TURN server to communicate from one client to a single peer or many at once. This project is also a great example of how an implemented NAT traversal solution would function for an application like ours. Overall this library is great for getting a real example of how NAT solutions can be practically used.
+
 [Archived Project for TURN SSH (Directs users to link above)](https://github.com/nobonobo/ssh-p2p)
+
 [Pure Go implementation of the WebRTC API](https://github.com/pion/webrtc)
 [gortc (STUN Library)](https://github.com/gortc/stun)
 [processone (STUN and TURN library for Erlang/Elixir)](https://github.com/processone/stun)
