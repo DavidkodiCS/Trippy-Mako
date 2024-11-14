@@ -59,16 +59,25 @@ Our research highlights two primary objectives: implementing the TURN/STUN proto
 [Archived Project for TURN SSH (Directs users to link above)](https://github.com/nobonobo/ssh-p2p)
 [Pure Go implementation of the WebRTC API](https://github.com/pion/webrtc)
 [gortc (STUN Library)](https://github.com/gortc/stun)
+
+# gortc is an implementation of the STUN protocol written in the go language. It supports TURN extensions for TCP allocations as well as the STUN protocol according to the STUN RFC (5389). There is a separate repository for a TURN implementation at gortc/turn that is based on TURN RFC 5766. These implementations essentially facilitate connections with their respective server types. Creating a connection with a TURN server in a similar fashion will be a part of the tool we are making.
+
 [processone (STUN and TURN library for Erlang/Elixir)](https://github.com/processone/stun)
+
+# This library is a basic implementation of the STUN and TURN protocols as they work together in the WebRTC context. The STUN server obtains a desired IP of a peer, and the TURN server works on top of that to relay traffic if an IP is unavailable. The library is written in Erlang and requires no external dependencies from other languages to use. We will only be using a TURN server with our tool, so it differs from the classic peer-to-peer use cases that STUN and TURN are typically associated with.
 
 ### STUN Overview
 
 [STUN Article on Medium](https://medium.com/@jamesbordane57/stun-server-what-is-session-traversal-utilities-for-nat-8a82d561533a)
 
+# This is an article that explains the STUN protocol in a more easily-digestible format. It enumerates a lot of the underlying networking concepts behind STUN, such as what a peer-to-peer connection is, how Network Address Translation works, and the limitation of the number of IPs in existence. It explains what the STUN server does on a step-by-step level to transmit data between peers in a number of different formats, such as UDP and TCP. It also mentions how the TURN and ICE protocols relate. This article is a helpful one-stop-shop other than the RFCs that we can reference as we need to review terms and concepts.
+
 ### TURN Overview
 
 [CloudFlare TURN expl ****](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
 [Microsoft Learn on TURN](https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-turn/bf1e2a02-4f6e-4975-b83c-74018546b387)
+
+# This is an article on extensions created by Microsoft for the TURN protocol. Along with the technical details on the extension like change tracking and product behavior, it includes a nice explanation of how TURN works, specifically the flow of TURN messages. It also includes an informative section on authentication, which may provide us one option we could use for authenticating payloads. We do not plan to use this extension, but it gives a good framework to go off of when building payloads.
 
 ### TURN Implementations/ Real Life Usages
 
