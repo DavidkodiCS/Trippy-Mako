@@ -39,10 +39,12 @@ This diagram depicts a high level overview of how of the TURN protocol works. At
 Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
 
 **Market Research**  
+
 **TURN/STUN**  
 In typical settings, TURN (Traversal Using Relays around NAT) servers are used when connections to STUN (Session Traversal Utilities for NAT) servers fail. TURN operates in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
 
 **WebRTC**
+
 WebRTC (Real-Time Communication) is an open source project that implements various protocols to include TURN in order to achieve real-time audio and/or video communication from one peer to another. Other uses of WebRTC include streaming video and audio as well as file sharing. WebRTC provides the tools for developers to establish the connection between peers. In other words, the developer still needs to figure out how to implement the library. After the implementation of WebRTC's suite of protocols and API (for javascript) is complete the Real-Time Transport Protocol is used to transmit audio and/or data. 
 
 A WebRTC agent is comprised of many protocols to include ICE, STUN, and TURN. It is an all-encompassing product with the primary purposes of establishing audio and video streams. An implementation of WebRTC is beyond the scope of what our customer is asking for and would not solve the ask of a standalone binary with the flexibility to meet the very specific requirements of the project, which is secure file transfer and a secure TCP connection from client to peer through a TURN server. The difference between our product and WebRTC is that our customer will not need to do any implementation on launch and it is specifically tailored to the needs mentioned above.
@@ -51,6 +53,7 @@ A WebRTC agent is comprised of many protocols to include ICE, STUN, and TURN. It
 - [WebRTC - 2](https://webrtcforthecurious.com/docs/01-what-why-and-how/)
 
 **aioRTC**
+
 The aioRTC library on github is a WebRTC implementation and Object RTC API, which is used with WebRTC to make RTC applications for the web. AioRTC essentially WebRTC for the beginner. It simplifies the process of achieving the exchange of audio, video, and data channels. Some features include DTLS key and certificate generation, SCTP implementation sending and receiving of audio and video, data channels, etc. AioRTC functions similarly to the WebRTC API and provides a developer with a suite of Python classes and functions that make it easier for a developer to achieve RTC. We will not use this library to complete our project because it is once again out of the scope of what the customer needs. The goal of this project is not to create a TURN protocol suite but rather tool that allows a user to achieve a secure connection to a peer through a TURN server with the simple configuration of several settings through our CLI.
 
 - [aioRTC](https://github.com/aiortc/aiortc)
@@ -77,24 +80,24 @@ Our research highlights two primary objectives: implementing the TURN/STUN proto
 [Pure Go implementation of the WebRTC API](https://github.com/pion/webrtc)
 [gortc (STUN Library)](https://github.com/gortc/stun)
 
-# gortc is an implementation of the STUN protocol written in the go language. It supports TURN extensions for TCP allocations as well as the STUN protocol according to the STUN RFC (5389). There is a separate repository for a TURN implementation at gortc/turn that is based on TURN RFC 5766. These implementations essentially facilitate connections with their respective server types. Creating a connection with a TURN server in a similar fashion will be a part of the tool we are making.
+gortc is an implementation of the STUN protocol written in the go language. It supports TURN extensions for TCP allocations as well as the STUN protocol according to the STUN RFC (5389). There is a separate repository for a TURN implementation at gortc/turn that is based on TURN RFC 5766. These implementations essentially facilitate connections with their respective server types. Creating a connection with a TURN server in a similar fashion will be a part of the tool we are making.
 
 [processone (STUN and TURN library for Erlang/Elixir)](https://github.com/processone/stun)
 
-# This library is a basic implementation of the STUN and TURN protocols as they work together in the WebRTC context. The STUN server obtains a desired IP of a peer, and the TURN server works on top of that to relay traffic if an IP is unavailable. The library is written in Erlang and requires no external dependencies from other languages to use. We will only be using a TURN server with our tool, so it differs from the classic peer-to-peer use cases that STUN and TURN are typically associated with.
+This library is a basic implementation of the STUN and TURN protocols as they work together in the WebRTC context. The STUN server obtains a desired IP of a peer, and the TURN server works on top of that to relay traffic if an IP is unavailable. The library is written in Erlang and requires no external dependencies from other languages to use. We will only be using a TURN server with our tool, so it differs from the classic peer-to-peer use cases that STUN and TURN are typically associated with.
 
 ### STUN Overview
 
 [STUN Article on Medium](https://medium.com/@jamesbordane57/stun-server-what-is-session-traversal-utilities-for-nat-8a82d561533a)
 
-# This is an article that explains the STUN protocol in a more easily-digestible format. It enumerates a lot of the underlying networking concepts behind STUN, such as what a peer-to-peer connection is, how Network Address Translation works, and the limitation of the number of IPs in existence. It explains what the STUN server does on a step-by-step level to transmit data between peers in a number of different formats, such as UDP and TCP. It also mentions how the TURN and ICE protocols relate. This article is a helpful one-stop-shop other than the RFCs that we can reference as we need to review terms and concepts.
+This is an article that explains the STUN protocol in a more easily-digestible format. It enumerates a lot of the underlying networking concepts behind STUN, such as what a peer-to-peer connection is, how Network Address Translation works, and the limitation of the number of IPs in existence. It explains what the STUN server does on a step-by-step level to transmit data between peers in a number of different formats, such as UDP and TCP. It also mentions how the TURN and ICE protocols relate. This article is a helpful one-stop-shop other than the RFCs that we can reference as we need to review terms and concepts.
 
 ### TURN Overview
 
 [CloudFlare TURN expl ****](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
 [Microsoft Learn on TURN](https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-turn/bf1e2a02-4f6e-4975-b83c-74018546b387)
 
-# This is an article on extensions created by Microsoft for the TURN protocol. Along with the technical details on the extension like change tracking and product behavior, it includes a nice explanation of how TURN works, specifically the flow of TURN messages. It also includes an informative section on authentication, which may provide us one option we could use for authenticating payloads. We do not plan to use this extension, but it gives a good framework to go off of when building payloads.
+This is an article on extensions created by Microsoft for the TURN protocol. Along with the technical details on the extension like change tracking and product behavior, it includes a nice explanation of how TURN works, specifically the flow of TURN messages. It also includes an informative section on authentication, which may provide us one option we could use for authenticating payloads. We do not plan to use this extension, but it gives a good framework to go off of when building payloads.
 
 ### TURN Implementations/ Real Life Usages
 
