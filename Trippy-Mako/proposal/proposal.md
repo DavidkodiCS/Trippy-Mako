@@ -89,10 +89,6 @@ Tailscale, a VPN service, securely connects devices globally by acting as an int
 
 The main difference between our product and the combination of Tailscale and Wireguard is that we are very explicitly not using VPNs. The need from our customer is to create the desired features of our tool using a TURN server as an intermediary between the client and peer. We did get some inspiration from Tailscale since it provides the user with an interactive shell to the various peers that are associated with the client. We plan on accomplishing this same task through a TURN server, which is not a conventional use of TURN but one that is possible. 
 
-**Discovery Insights**  [X] [X] [X]
-
-Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
-
 ### Similar Libraries
 
 [Coturn](https://github.com/coturn/coturn)
@@ -140,6 +136,14 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 [STUNTMAN Tool](https://www.stunprotocol.org/)
 [JSTUN Tool](https://jstun.javawi.de/)
 [STUN Client](https://www.codeproject.com/Articles/18492/STUN-Client)
+
+## Discovery Insights  [X] [X] [X]
+
+1. CLI Tool
+
+  The design of the user interface is a deceivingly simple part of the project. The goal of the tool is to make it as simple as possible for the user to establish a connection to the TURN server and communicate with the peer. As explained in our market research, Metasploit, is a good example of a tool that is easy to use and configure. A user guide and explanation of TURN and the various actions a user can choose from is crucial to this part of the project. 
+
+Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
 
 ## Proposed Design and Architecture
 
@@ -261,7 +265,7 @@ The test architecture is visualized in the detailed diagram below:
     - Ensure documentation reflects the work done throughout the project.
     - Create guides for installation, setup, and usage.
 
-## **Risk Mitigation**
+## **Risk Mitigation** ✅
 
 Complexity of TURN
 
