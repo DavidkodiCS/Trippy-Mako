@@ -42,6 +42,14 @@ Currently, our customer does not have any research or development efforts focuse
 **TURN/STUN**  
 In typical settings, TURN (Traversal Using Relays around NAT) servers are used when connections to STUN (Session Traversal Utilities for NAT) servers fail. TURN operates in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
 
+**WebRTC**
+WebRTC (Real-Time Communication) is an open source project that implements various protocols to include TURN in order to achieve real-time audio and/or video communication from one peer to another. Other uses of WebRTC include streaming video and audio as well as file sharing. WebRTC provides the tools for developers to establish the connection between peers. In other words, the developer still needs to figure out how to implement the library. After the implementation of WebRTC's suite of protocols and API (for javascript) is complete the Real-Time Transport Protocol is used to transmit audio and/or data. 
+
+A WebRTC agent is comprised of many protocols to include ICE, STUN, and TURN. It is an all-encompassing product with the primary purposes of establishing audio and video streams. An implementation of WebRTC is beyond the scope of what our customer is asking for and would not solve the ask of a standalone binary with the flexibility to meet the very specific requirements of the project, which is secure file transfer and a secure TCP connection from client to peer through a TURN server. The difference between our product and WebRTC is that our customer will not need to do any implementation on launch and it is specifically tailored to the needs mentioned above.
+
+- [WebRTC - 1](https://restream.io/learn/what-is/webrtc/)
+- [WebRTC - 2](https://webrtcforthecurious.com/docs/01-what-why-and-how/)
+
 **Wireguard**  
 Tailscale utilizes the Wireguard protocol, known for being lightweight, secure, and cross-platform. Wireguard's concise implementation (under 4,000 lines of code) ensures efficiency and speed compared to alternatives like OpenVPN. It encapsulates IP packets over UDP and uses advanced cryptography like Curve25519 and ChaCha20, offering simplicity comparable to SSH.
 
