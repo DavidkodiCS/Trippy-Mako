@@ -149,7 +149,7 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
 3. Authentication
 
-  
+  A requirement of this project is for traffic to be encrypted from the client to peer across the TURN server. Talking with Professor Brown gave us good insight on how to achieve this through creating a certificate on the client side that the server can accept over a TLS connection facilitated by OpenSSH.
 
 ## Proposed Design and Architecture
 
