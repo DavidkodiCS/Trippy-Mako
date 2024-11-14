@@ -141,9 +141,15 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
 1. CLI Tool
 
-  The design of the user interface is a deceivingly simple part of the project. The goal of the tool is to make it as simple as possible for the user to establish a connection to the TURN server and communicate with the peer. As explained in our market research, Metasploit, is a good example of a tool that is easy to use and configure. A user guide and explanation of TURN and the various actions a user can choose from is crucial to this part of the project. 
+  The design of the user interface is a deceivingly simple part of the project. The goal of the tool is to make it as simple as possible for the user to establish a connection to the TURN server and communicate with the peer. As explained in our market research, Metasploit, is a good example of a tool that is easy to use and configure. A user guide and explanation of TURN and the various actions a user can choose from is crucial to this part of the project.
 
-Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
+2. TURN
+
+  This project is not intended to be a WebRTC application and, therefore, will not be using any python libraries that provide a WebRTC API. We will focus on using the struct python module for to build packets and the socket module to do low level network communication. These two modules will allow us to implement TURN while giving us the flexibility we need to meet the needs of the customer. 
+
+3. Authentication
+
+  
 
 ## Proposed Design and Architecture
 
