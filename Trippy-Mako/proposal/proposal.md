@@ -268,11 +268,11 @@ Outline a meeting schedule or plan for engaging with your customer during develo
   
 The final version of our Capstone project will be complete by April.
 
-**Code Delivery**
+**Code Delivery** ✅
   
-Every version of our Capstone project will be delivered to our customer through our repository every two weeks. Capt Burn is a member of our GitHub repository so he is constantly aware of our progress.
+Every version of our Capstone project will be delivered to our customer through our repository every two weeks. Capt Burn is a member of our GitHub repository so he is constantly able to track our progress.
 
-**Usage License**
+**Usage License** ✅
   
 The software developed as part of the capstone course becomes
 property of the DoD. The Computer Science Department does not assume any
