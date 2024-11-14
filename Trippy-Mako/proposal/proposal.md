@@ -74,9 +74,14 @@ Our research highlights two primary objectives: implementing the TURN/STUN proto
 ### Similar Libraries
 
 [Coturn](https://github.com/coturn/coturn)
+This is an implementation of a TURN server that uses STUN. It can be spun up and used as a server to communicate from clients to peers. One notable thing about this library is that it allows the server to use "client-to-TURN-server protocols" which is remencent of how we would like to create a TCP connection via the server in our CLI. One way it is different is it appears that this server is primarily implemented to be a part of an ICE solution rather than a TURN solution.
+
 [RTCTunnel: Building a WebRTC Proxy with Go (explains link below)](https://www.doxsey.net/blog/rtctunnel--building-a-webrtc-proxy-with-go/)
 [Network tunnels over WebRTC](https://github.com/rtctunnel/rtctunnel)
+This application is an implmentation of WebRTC which take advantage of different NAT traversal solutions. The difference between this approach and what we are doing is that in this approach the author has taken advantage of a pre built library for their NAT traversal. We plan on making our own NAT traversal solution based entirely around TURN and no other traversal solutions. In this project the author then took that solution and built a TCP proxy over it. In our solution we will do a similar thing but we hope to do an ssh type proxy via a known TURN server at the application layer. One thing this project highlights that will be important to for us is the one-to-many relationship of TCP. This allows the TURN server to communicate from one client to a single peer or many at once. This project is also a great example of how an implemented NAT traversal solution would function for an application like ours. Overall this library is great for getting a real example of how NAT solutions can be practically used.
+
 [Archived Project for TURN SSH (Directs users to link above)](https://github.com/nobonobo/ssh-p2p)
+
 [Pure Go implementation of the WebRTC API](https://github.com/pion/webrtc)
 [gortc (STUN Library)](https://github.com/gortc/stun)
 
@@ -94,7 +99,9 @@ This is an article that explains the STUN protocol in a more easily-digestible f
 
 ### TURN Overview
 
-[CloudFlare TURN expl ****](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+[CloudFlare TURN explanation](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+This article goes over key concepts for to know for TURN, how TURN works, TURN vs VPNs, and why TURN is useful. TURN is an extension of the STUN protocol. Some of the key concepts of using TURN are TURN Server, TURN Client, Allocation, and Relayed transport address. The TURN server is the server that relays packets between client and peer. The TURN client is an application or device that uses TURN to communcate with another device or application. Allocation is when the TURN server reserves an IP and port unique to a clint. Relayed transport address is the IP address and port reserved on the TURN server that others can use to send to the TURN client. The basic steps of TURN are client requests allocation, TURN server creates allocation, client gives relayed address to peers. When peers send data to the address the server can forward it to the client and vice versa. The article specifically points out that **even though they operate similarily, TURN is not a VPN.** VPNs operate at the network layr and route all traffic from all applications through a server between devices but it is not a NAT traversal solution like TURN. TURN is specifically for real-time communication and operates at the application layer, only affecting traffic for the applciations that use it. This is crirical to our project because TURN is a NAT traversal solution and our customer is most interested in it because of its benefits of firewall bypassing and consistent ponnectivity. Many libraries that people would assume are for TURN are acutally for other protocols like ICE and use a TURN as a backup. In our project the customer knows they will have a TURN server so using these libraries is idiotic and doesn't make any sense in any from at all because TURN is the last option they use.
+
 [Microsoft Learn on TURN](https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-turn/bf1e2a02-4f6e-4975-b83c-74018546b387)
 
 This is an article on extensions created by Microsoft for the TURN protocol. Along with the technical details on the extension like change tracking and product behavior, it includes a nice explanation of how TURN works, specifically the flow of TURN messages. It also includes an informative section on authentication, which may provide us one option we could use for authenticating payloads. We do not plan to use this extension, but it gives a good framework to go off of when building payloads.
