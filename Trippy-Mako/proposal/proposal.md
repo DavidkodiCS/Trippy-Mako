@@ -2,7 +2,8 @@
 
 ## Overview
 
-**What are you planning to build?**  
+**What are you planning to build?** ✅
+
 Our team will build a Command Line Interface Tool that implements the TURN protocol, using RFC 8656 as our main source of documentation. This project consists of several main parts:
 
 1. Command Line Interface: This tool will allow a user to use several commands such as,
@@ -15,21 +16,25 @@ Our team will build a Command Line Interface Tool that implements the TURN proto
 
   The tool will check the specified configuration during an action and, if it is incorrect, will highlight to the user what is incorrect and will prompt the user to make the changes with suggestions.
 
+  **proxy**: Using this command will allow the user to create what is essentially an open tunnel to the peer through the TURN server to send data through that the peer will then send to other devices in the network. The tool will listen on a port and provide an interface for the user to send the payload through the tunnel.
+
 2. TURN Implementation:
 
   Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include STUN and the ICE protocol. We will not be using a python library, such as aiortc, due to the requests of our customer. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
 
 This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
-**What problem will it solve?**  
+**What problem will it solve?** ✅
+
 Our product will support MARFORCYBER in their Research and Development needs. Our customer needs a standalone binary, not tied to any major libraries that accomplished the task of allowing a user to utilize the TURN protocol through a CLI in order to send a payload or create a TCP connection that produces a shell, albeit an unconventional use of TURN. Our customer specifically asked for security features such as payload encryption and password protection that would make having our own codebase much more practical than a WebRTC implementation, for example. The CLI tool will make it straightforward for the customer to use independently and expedite current research being done at MARFORCYBER.
 
-**Why is it important?**  
+**Why is it important?** ✅
+
 Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead.
 
 Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
-**High-Level Diagram (OV-1)**  
+**High-Level Diagram (OV-1)** ✅
 ![TURN Net Diagram](production_diagram.png)
 This diagram depicts a high level overview of how of the TURN protocol works. At the production stage, the client would utilize our CLI tool to easily communicate with a peer through a TURN server on the Internet.
 
@@ -60,15 +65,19 @@ The aioRTC library on github is a WebRTC implementation and Object RTC API, whic
 - [ORTC](https://ortc.org/)
 
 **Wireguard**  
+
 Tailscale utilizes the Wireguard protocol, known for being lightweight, secure, and cross-platform. Wireguard's concise implementation (under 4,000 lines of code) ensures efficiency and speed compared to alternatives like OpenVPN. It encapsulates IP packets over UDP and uses advanced cryptography like Curve25519 and ChaCha20, offering simplicity comparable to SSH.
 
 **Tailscale**  
+
 Tailscale, a VPN service, securely connects devices globally by acting as an intermediary. Similar to our project, Tailscale falls back on STUN and ICE protocols when establishing connections. Our goal is to develop a TURN-based solution instead, filling MARFORCYBER's current research needs.
 
 **Wireguard and Tailscale**
+
 The main difference between our product and the combination of Tailscale and Wireguard is that we are very explicitly not using VPNs. The need from our customer is to create the desired features of our tool using a TURN server as an intermediary between the client and peer. We did get some inspiration from Tailscale since it provides the user with an interactive shell to the various peers that are associated with the client. We plan on accomplishing this same task through a TURN server, which is not a conventional use of TURN but one that is possible. 
 
-**Discovery Insights**  
+**Discovery Insights**  [X] [X] [X]
+
 Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
 
 ### Similar Libraries
@@ -121,19 +130,27 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
 ## Proposed Design and Architecture
 
-**User Types/Personas**  
+**User Types/Personas** ✅
 Capt Burn, our customer, will use the tool to support MARFORCYBER's operations. Through interviews, we defined user stories and determined that the tool should be developed in Python, targeting Linux systems for peer-to-peer networking.
 
-**System Design**  
-The CLI tool will present a simple configuration interface, drawing on usability parallels with Metasploit. Our TURN protocol implementation will be tightly integrated with authentication to ensure cohesive functionality.
+**System Design** [X]
+![CLI](cli_diagram.png)
+The CLI tool will support multiple features for the user to seamlessly...
 
-**System Architecture**  
+present a simple configuration interface, drawing on usability parallels with Metasploit. Our TURN protocol implementation will be tightly integrated with authentication to ensure cohesive functionality.
+
+    Metasploit: A tool used by cybercriminals as well as ethical hackers/pentesters to discover vulnerabilities on networks. Metasploit has a robust CLI with many features to aid the pentester. One such feature that is relevant to our project is the ability for a user to choose a specific payload and then configure the settings of the operation within seconds.
+
+[Metasploit](https://www.varonis.com/blog/what-is-metasploit#:~:text=The%20Metasploit%20framework%20is%20a,used%20with%20most%20operating%20systems.)
+
+**System Architecture**  ✅
+
 The test architecture is visualized in the detailed diagram below:  
 ![TURN Test Net Diagram](TURN_Diagram.png)
 
 ## Project Management
 
-### Preliminary Release Plan
+### Preliminary Release Plan [X]
 
 | Sprint | Duration | Start Date | End Date | Goals | Deliverables | Status |
 |--------|----------|------------|----------|-------|--------------|--------|
@@ -155,7 +172,7 @@ The test architecture is visualized in the detailed diagram below:
 | 9      | 2 weeks  | 2024-03-02 | 2024-03-15 | CLI Tool Development | Basic CLI Functionality | Not Started |
 | 10     | 1 week   | 2024-03-16 | 2024-03-22 | Documentation | Finalize Documentation from Capstone Work | Not Started |
 
-### Product Backlog
+### Product Backlog [X]
 
 **Priority 1: TURN Protocol Implementation**
 
@@ -253,7 +270,7 @@ Testing
   - Every function of every feature must be thoroughly tested.
   - Making use of pytest and other automatic testing suites will ensure that each piece is properly working down the line and that there are no surprises towards the end of the release plan.
 
-## **Key Faculty Involvement**
+## **Key Faculty Involvement** ✅
 
 **Networking:** LCDR Downs
 
@@ -263,15 +280,15 @@ Testing
 
 ## Admin/Fine Print
 
-**GFI/GFE (Government-Furnished Information/Equipment)**
+**GFI/GFE (Government-Furnished Information/Equipment)** ✅
   
 None
 
-**Customer Meeting Requirements/Plan**
+**Customer Meeting Requirements/Plan** ✅
   
-Outline a meeting schedule or plan for engaging with your customer during development. Highlight key touchpoints for feedback.
+We will meet with our customer every two weeks, ideally at the end of every sprint. 1/C Kreidler will be the primary POC between the group and Capt Burn to facilitate continuous communication.
 
-**Acceptance Window**
+**Acceptance Window** ✅
   
 The final version of our Capstone project will be complete by April.
 
