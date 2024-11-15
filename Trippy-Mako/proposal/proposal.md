@@ -20,7 +20,7 @@ Our team will build a Command Line Interface Tool that implements the TURN proto
 
 2. TURN Implementation:
 
-  Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include the STUN protocol. We will not be using a python library, such as aiortc, due to the requests of our customer and the fact that this is not intended to be a WebRTC application. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
+  Our implementation of the TURN protocol will be derived directly from our research on RFC 8656 and the various RFCs that support TURN to include the STUN protocol. Our implementation will focus on security to ensure that all traffic from the client to the peer through the TURN server is encrypted. We will not be using a python library, such as aiortc, due to the requests of our customer and the fact that this is not intended to be a WebRTC application. We want the autonomy to implement our own features without being tied to a huge library and build up our **trusted** codebase as we see fit.
 
 This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
