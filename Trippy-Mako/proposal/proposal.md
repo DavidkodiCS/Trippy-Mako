@@ -92,10 +92,12 @@ The main difference between our product and the combination of Tailscale and Wir
 ### Similar Libraries
 
 [Coturn](https://github.com/coturn/coturn)
+
 This is an implementation of a TURN server that uses STUN. It can be spun up and used as a server to communicate from clients to peers. One notable thing about this library is that it allows the server to use "client-to-TURN-server protocols" which is remencent of how we would like to create a TCP connection via the server in our CLI. One way it is different is it appears that this server is primarily implemented to be a part of an ICE solution rather than a TURN solution.
 
 [RTCTunnel: Building a WebRTC Proxy with Go (explains link below)](https://www.doxsey.net/blog/rtctunnel--building-a-webrtc-proxy-with-go/)
 [Network tunnels over WebRTC](https://github.com/rtctunnel/rtctunnel)
+
 This application is an implmentation of WebRTC which take advantage of different NAT traversal solutions. The difference between this approach and what we are doing is that in this approach the author has taken advantage of a pre built library for their NAT traversal. We plan on making our own NAT traversal solution based entirely around TURN and no other traversal solutions. In this project the author then took that solution and built a TCP proxy over it. In our solution we will do a similar thing but we hope to do an ssh type proxy via a known TURN server at the application layer. One thing this project highlights that will be important to for us is the one-to-many relationship of TCP. This allows the TURN server to communicate from one client to a single peer or many at once. This project is also a great example of how an implemented NAT traversal solution would function for an application like ours. Overall this library is great for getting a real example of how NAT solutions can be practically used.
 
 [Archived Project for TURN SSH (Directs users to link above)](https://github.com/nobonobo/ssh-p2p)
@@ -118,6 +120,7 @@ This is an article that explains the STUN protocol in a more easily-digestible f
 ### TURN Overview
 
 [CloudFlare TURN explanation](https://developers.cloudflare.com/calls/turn/what-is-turn/#:~:text=TURN%20works%20similar%20to%20a,and%20operate%20in%20distinct%20ways.)
+
 This article goes over key concepts for to know for TURN, how TURN works, TURN vs VPNs, and why TURN is useful. TURN is an extension of the STUN protocol. Some of the key concepts of using TURN are TURN Server, TURN Client, Allocation, and Relayed transport address. The TURN server is the server that relays packets between client and peer. The TURN client is an application or device that uses TURN to communcate with another device or application. Allocation is when the TURN server reserves an IP and port unique to a clint. Relayed transport address is the IP address and port reserved on the TURN server that others can use to send to the TURN client. The basic steps of TURN are client requests allocation, TURN server creates allocation, client gives relayed address to peers. When peers send data to the address the server can forward it to the client and vice versa. The article specifically points out that **even though they operate similarily, TURN is not a VPN.** VPNs operate at the network layr and route all traffic from all applications through a server between devices but it is not a NAT traversal solution like TURN. TURN is specifically for real-time communication and operates at the application layer, only affecting traffic for the applciations that use it. This is crirical to our project because TURN is a NAT traversal solution and our customer is most interested in it because of its benefits of firewall bypassing and consistent ponnectivity. Many libraries that people would assume are for TURN are acutally for other protocols like ICE and use a TURN as a backup. In our project the customer knows they will have a TURN server so using these libraries is idiotic and doesn't make any sense in any from at all because TURN is the last option they use.
 
 [Microsoft Learn on TURN](https://learn.microsoft.com/en-us/openspecs/office_protocols/ms-turn/bf1e2a02-4f6e-4975-b83c-74018546b387)
@@ -127,15 +130,28 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 ### TURN Implementations/ Real Life Usages
 
 [WebRTC](https://webrtc.org/)
+
+This is the official WebRTC website that goes over what their code does, including how it interfaces with a TURN server. We are not interested in using WebRTC for our project and will be using a TURN server in a different way from WebRTC. As explained further above, WebRTC's main purpose is to provide high-quality streaming and video/audio communication. Our tool will be used for the transmission of data from files; therefore, we have no need for WebRTC's capability. To ensure the modularity of our tool, we will be creating our own interface that communicates with the TURN server. The only purpose of this link is to identify the existence of WebRTC.
+
 [AnyConnect](https://anyconnect.com/stun-turn-ice/)
+
+AnyConnect is an application similar to WebRTC that also handles video and audio transmission. This link goes to their official site. This site goes more into what STUN, TURN, ICE, and NAT are than the WebRTC site, which can be useful for our purposes. However, as with WebRTC, we have no use for the interface that AnyConnect provides. This link is simply to show that AnyConnect is on the market.
+
 [TURN server implemented in Rust](https://crates.io/crates/turn-server)
+
+This is a link to a download of a TURN server written in Rust. The software is described as being most compatible with WebRTC, so this would likely not be the best reference for us to test our tool on. This link serves as an example of something that is related to the tool we are building in concept but is not a tool that interfaces with a known TURN server through configuration like Trippy-Mako.
+
 [eturnal TURN Server](https://eturnal.net/)
+
+eturnal is a configurable TURN server that works with Unix or Windows and, much like the other examples above, is made for applications like WebRTC. It has a nice authentication mechanism with passwords that we could potentially reference for our tool, and many of the configuration options may be beneficial to look at as well. We will, of course, not use this tool ourselves for the same reasons given in the descriptions of the other applications and servers: we want to implement this ourselves to ensure modularity and trust from our customer.
 
 ### STUN Implementations
 
 [STUNTMAN Tool](https://www.stunprotocol.org/)
 [JSTUN Tool](https://jstun.javawi.de/)
 [STUN Client](https://www.codeproject.com/Articles/18492/STUN-Client)
+
+The above tools are for simple STUN server communication. Referencing them will not be exceedingly useful in our case given that we are not dealing solely with STUN and focusing on both STUN and TURN (with an emphasis on TURN, of course). These references are here to show more of a difference between what we are building and what exists. We are making a tool that technically communicates with a STUN server, but it does so with TURN overlayed throughout the whole process. These tools focus on sending packets through an established connection to a peer while we are connecting two peers to a server and transfering files.
 
 ## Discovery Insights  [X]
 
