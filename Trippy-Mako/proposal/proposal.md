@@ -170,6 +170,8 @@ The CLI tool will support multiple features for the user to connect to present a
 The test architecture is visualized in the detailed diagram below:  
 ![TURN Test Net Diagram](TURN_Diagram.png)
 
+Testing will be a crucial part of our work. The diagram shows how we will create two networks behind symmetric NATs. The idea is to create a contained testing environment at first before we move onto spinning up a TURN server on the Internet.
+
 ## Project Management ✅
 
 ### Preliminary Release Plan
