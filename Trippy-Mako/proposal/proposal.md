@@ -26,11 +26,11 @@ This tool will allow users to send and receive data to another computer behind a
 
 **What problem will it solve?**
 
-Our product will support MARFORCYBER in their Research and Development needs. Our customer needs a standalone binary, not tied to any major libraries that accomplished the task of allowing a user to utilize the TURN protocol through a CLI in order to send a payload or create a TCP connection that produces a shell, albeit an unconventional use of TURN. Our customer specifically asked for security features such as payload encryption and password protection that would make having our own codebase much more practical than a WebRTC implementation, for example. The CLI tool will make it straightforward for the customer to use independently and expedite current research being done at MARFORCYBER.
+Our product will support MARFORCYBER in meeting its Research and Development requirements. The customer requires a standalone binary, independent of major libraries, that enables users to leverage the TURN protocol through a command-line interface (CLI) to either send a payload or establish a TCP connection providing shell access—an innovative use of TURN. Specifically, the customer requested security features like payload encryption and password protection, making a dedicated codebase more practical than a WebRTC-based implementation. This CLI tool will simplify independent usage for the customer and accelerate ongoing research efforts at MARFORCYBER.
 
 **Why is it important?**
 
-Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead. 
+Our product will integrate directly with the customer’s ongoing research and development efforts upon launch. The customer requires a flexible, lightweight solution—one that cannot be achieved through WebRTC or Wireguard implementations due to the need for specific, mission-critical features. They are looking for a trusted codebase that meets these requirements without unnecessary overhead.
 
 Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
