@@ -137,7 +137,7 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 [JSTUN Tool](https://jstun.javawi.de/)
 [STUN Client](https://www.codeproject.com/Articles/18492/STUN-Client)
 
-## Discovery Insights  [X] [X] [X]
+## Discovery Insights  [X]
 
 1. CLI Tool
 
@@ -145,7 +145,7 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
 2. TURN
 
-  This project is not intended to be a WebRTC application and, therefore, will not be using any python libraries that provide a WebRTC API. We will focus on using the struct python module for to build packets and the socket module to do low level network communication. These two modules will allow us to implement TURN while giving us the flexibility we need to meet the needs of the customer. 
+  This project is not intended to be a WebRTC application and, therefore, will not be using any python libraries that provide a WebRTC API. We will focus on using the struct python module for to build packets and the socket module to do low level network communication. These two modules will allow us to implement TURN while giving us the flexibility we need to meet the needs of the customer.
 
 3. Authentication
 
@@ -154,11 +154,12 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 ## Proposed Design and Architecture
 
 **User Types/Personas** ✅
+
 Capt Burn, our customer, will use the tool to support MARFORCYBER's operations. Through interviews, we defined user stories and determined that the tool should be developed in Python, targeting Linux systems for peer-to-peer networking.
 
 **System Design** [X]
 ![CLI](cli_diagram.png)
-The CLI tool will support multiple features for the user to seamlessly...
+The CLI tool will support multiple features for the user to connect to 
 
 present a simple configuration interface, drawing on usability parallels with Metasploit. Our TURN protocol implementation will be tightly integrated with authentication to ensure cohesive functionality.
 
