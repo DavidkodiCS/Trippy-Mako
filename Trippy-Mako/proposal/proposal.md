@@ -276,23 +276,26 @@ The test architecture is visualized in the detailed diagram below:
 
 Complexity of TURN
 
-  - Our research into the protocol must be in depth so we are not surprised by friction in our TURN scrums.
-  - Merging of Authentication and TURN.
-    - Our implementation of TURN and authentication feature must be able to work together to securely communicate between the client, server, and peer(s).
+- Our research into the protocol must be in depth so we are not surprised by friction in our TURN scrums.
+
+- Merging of Authentication and TURN.
+  - Our implementation of TURN and authentication feature must be able to work together to securely communicate between the client, server, and peer(s).
   
 Documentation
 
-  - Each feature must be properly documented for us and our customer.
-  - Each part of the TURN protocol builds upon each other so understanding the code that someone else potentially wrote for the previous part is vital to this capstone's success.
+- Each feature must be properly documented for us and our customer.
+
+- Each part of the TURN protocol builds upon each other so understanding the code that someone else potentially wrote for the previous part is vital to this capstone's success.
 
 Virtual Network
 
-  - Proper set up of our virtual network, as shown in OV-1, will be crucial to the testing of our product.
+- Proper set up of our virtual network, as shown in the System Architecture Diagram, will be crucial to the testing of our product.
 
 Testing
 
-  - Every function of every feature must be thoroughly tested.
-  - Making use of pytest and other automatic testing suites will ensure that each piece is properly working down the line and that there are no surprises towards the end of the release plan.
+- Every function of every feature must be thoroughly tested.
+
+- Making use of pytest and other automatic testing suites will ensure that each piece is properly working down the line and that there are no surprises towards the end of the release plan.
 
 ## **Key Faculty Involvement** ✅
 
