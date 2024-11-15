@@ -302,25 +302,25 @@ Testing
 
 **General Development:** Capt Burn (MARFORCYBER)
 
-## Admin/Fine Print
+## Admin/Fine Print ✅
 
-**GFI/GFE (Government-Furnished Information/Equipment)** ✅
+**GFI/GFE (Government-Furnished Information/Equipment)**
   
 None
 
-**Customer Meeting Requirements/Plan** ✅
+**Customer Meeting Requirements/Plan**
   
 We will meet with our customer every two weeks, ideally at the end of every sprint. 1/C Kreidler will be the primary POC between the group and Capt Burn to facilitate continuous communication.
 
-**Acceptance Window** ✅
+**Acceptance Window**
   
 The final version of our Capstone project will be complete by April.
 
-**Code Delivery** ✅
+**Code Delivery**
   
 Every version of our Capstone project will be delivered to our customer through our repository every two weeks. Capt Burn is a member of our GitHub repository so he is constantly able to track our progress.
 
-**Usage License** ✅
+**Usage License**
   
 The software developed as part of the capstone course becomes
 property of the DoD. The Computer Science Department does not assume any
