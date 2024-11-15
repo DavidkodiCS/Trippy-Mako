@@ -1,8 +1,8 @@
-# Capstone Proposal
+# Proposal: MARFORCYBER TURN Protocol CLI Tool
 
-## Overview
+## Overview ✅
 
-**What are you planning to build?** ✅
+**What are you planning to build?**
 
 Our team will build a Command Line Interface Tool that implements the TURN protocol, using RFC 8656 as our main source of documentation. This project consists of several main parts:
 
@@ -24,21 +24,21 @@ Our team will build a Command Line Interface Tool that implements the TURN proto
 
 This tool will allow users to send and receive data to another computer behind a NAT with a TURN server acting as an intermediary. The actual implementation of the protocol will be provided to our customer, Capt Burn, USMC at MARFORCYBER. Our tool will assist MARFORCYBER in current research and development needs by providing them with a standalone binary that can accomplish this task rather than a library that they would have to implement themselves.
 
-**What problem will it solve?** ✅
+**What problem will it solve?**
 
 Our product will support MARFORCYBER in their Research and Development needs. Our customer needs a standalone binary, not tied to any major libraries that accomplished the task of allowing a user to utilize the TURN protocol through a CLI in order to send a payload or create a TCP connection that produces a shell, albeit an unconventional use of TURN. Our customer specifically asked for security features such as payload encryption and password protection that would make having our own codebase much more practical than a WebRTC implementation, for example. The CLI tool will make it straightforward for the customer to use independently and expedite current research being done at MARFORCYBER.
 
-**Why is it important?** ✅
+**Why is it important?**
 
 Our product will be directly implemented with current research and development efforts by our customer on launch. Our customer needs a flexible and lightweight product that a WebRTC implementation or Wireguard implementation cannot accomplish due to the need to add special features important to the mission. Our customer is specifically looking for a trusted codebase supports their needs without any extra overhead. 
 
 Additionally, our capstone will have a classified portion to it that will include work in the SCIF with our customer to produce extra features relevant to the classified mission set of MARFORCYBER.
 
-**High-Level Diagram (OV-1)** ✅
+**High-Level Diagram (OV-1)**
 ![TURN Net Diagram](production_diagram.png)
 This diagram depicts a high level overview of how of the TURN protocol works. At the production stage, the client would utilize our CLI tool to easily communicate with a peer through a TURN server on the Internet.
 
-## Market Research/Lit Review
+## Market Research/Lit Review [X] [X]
 
 **Existing Processes**  
 Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
@@ -151,54 +151,64 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
   A requirement of this project is for traffic to be encrypted from the client to peer across the TURN server. Talking with Professor Brown gave us good insight on how to achieve this through creating a certificate on the client side that the server can accept over a TLS connection facilitated by OpenSSH.
 
-## Proposed Design and Architecture
+## Proposed Design and Architecture ✅
 
-**User Types/Personas** ✅
+**User Types/Personas**
 
 Capt Burn, our customer, will use the tool to support MARFORCYBER's operations. Through interviews, we defined user stories and determined that the tool should be developed in Python, targeting Linux systems for peer-to-peer networking.
 
-**System Design** [X]
+**System Design**
 ![CLI](cli_diagram.png)
-The CLI tool will support multiple features for the user to connect to 
-
-present a simple configuration interface, drawing on usability parallels with Metasploit. Our TURN protocol implementation will be tightly integrated with authentication to ensure cohesive functionality.
+The CLI tool will support multiple features for the user to connect to present a simple configuration interface, drawing on usability parallels with Metasploit. Our TURN protocol implementation will be tightly integrated with authentication to ensure cohesive functionality.
 
     Metasploit: A tool used by cybercriminals as well as ethical hackers/pentesters to discover vulnerabilities on networks. Metasploit has a robust CLI with many features to aid the pentester. One such feature that is relevant to our project is the ability for a user to choose a specific payload and then configure the settings of the operation within seconds.
 
 [Metasploit](https://www.varonis.com/blog/what-is-metasploit#:~:text=The%20Metasploit%20framework%20is%20a,used%20with%20most%20operating%20systems.)
 
-**System Architecture**  ✅
+**System Architecture**
 
 The test architecture is visualized in the detailed diagram below:  
 ![TURN Test Net Diagram](TURN_Diagram.png)
 
-## Project Management
+## Project Management ✅
 
-### Preliminary Release Plan [X]
+### Preliminary Release Plan
 
-| Sprint | Duration | Start Date | End Date | Goals | Deliverables | Status |
-|--------|----------|------------|----------|-------|--------------|--------|
-| 1      | 2 weeks  | 2024-10-21 | 2024-11-03 | Set Up Python Environment | Environment Setup for Testing and Development | Finished |
-|        |          |            |           | Subitems: Testing, Libraries, Main | | |
-| 2      | 3 weeks  | 2024-11-04 | 2024-11-24 | Virtual Box Testing Environment Setup | VyOS Configuration, 5 VMs and 3 Vnets Setup, Terraform | Not Started |
-|        |          |            |           | Subitems: 5 VMs, 3 Vnets Manual, Terraform, VyOS | | |
-| 3      | 4 weeks  | 2024-11-25 | 2024-12-22 | Authentication | TLS and Certificates | Not Started |
-|        |          |            |           | Subitems: TLS and Tunneling, Forge Certificates, Server and Client Certificates, Trust Anchor: OpenSSH (Python library) | | |
-| 4      | 2 weeks  | 2024-12-23 | 2024-01-05 | Implement TURN Protocol (Part 1) | Allocate Request/Response Handling, Refresh Request Handling | Not Started |
-|        |          |            |           | Subitems: Sending/Receiving Allocate Requests and Responses | | |
-| 5      | 2 weeks  | 2024-01-06 | 2024-01-19 | Implement TURN Protocol (Part 2) | CreatePermission Request/Response Handling, Send Indication | Not Started |
-|        |          |            |           | Subitems: Refresh Request Handling, CreatePermission Handling | | |
-| 6      | 2 weeks  | 2024-01-20 | 2024-02-02 | Implement TURN Protocol (Part 3) | ChannelBind Request/Response, Data Relaying | Not Started |
-|        |          |            |           | Subitems: Send/Receive Indications, UDP Datagram Handling | | |
-| 7      | 2 weeks  | 2024-02-03 | 2024-02-16 | Implement TURN Protocol (Part 4) | ChannelData Message Handling | Not Started |
-|        |          |            |           | Subitems: Formatting and Relaying ChannelData Messages | | |
-| 8      | 2 weeks  | 2024-02-17 | 2024-03-01 | Merge Authentication and TURN Protocol | Integration of Authentication and TURN Features | Not Started |
-| 9      | 2 weeks  | 2024-03-02 | 2024-03-15 | CLI Tool Development | Basic CLI Functionality | Not Started |
-| 10     | 1 week   | 2024-03-16 | 2024-03-22 | Documentation | Finalize Documentation from Capstone Work | Not Started |
+| Sprint | Duration | Start Date  | End Date    | Goals                                    | Deliverables                                     | Status     |
+|--------|----------|-------------|-------------|------------------------------------------|--------------------------------------------------|------------|
+| 1      | 2 weeks  | 2024-10-21  | 2024-11-03  | Set Up Python Environment                | Environment Setup for Testing and Development    | Finished   |
+| 2      | 2 weeks  | 2024-11-17  | 2024-11-30  | CLI Tool Skeleton                        | Core CLI structure, basic configuration system   | Not Started |
+|        |          |             |             |                                          | Commands for triggering main features (TURN, Auth)|            |
+|        |          |             |             |                                          | Error handling, user feedback, help command      |            |
+|        |          |             |             | Subitems: Testing and Feedback of Design       |                                                  |            |
+| 3      | 3 weeks  | 2024-12-01  | 2024-12-21  | Virtual Box Testing Environment Setup    | VyOS Configuration, 5 VMs and 3 Vnets Setup, Terraform | Not Started |
+|        |          |             |             | Subitems: 5 VMs, 3 Vnets Manual, Terraform, VyOS |                     |            |
+| 4      | 4 weeks  | 2024-12-22  | 2025-01-18  | Authentication                           | TLS and Certificates                            | Not Started |
+|        |          |             |             | Subitems: TLS and Tunneling, Forge Certificates, Server and Client Certificates, Trust Anchor: OpenSSH (Python library) | | |
+| 5      | 2 weeks  | 2025-01-19  | 2025-02-01  | Implement TURN Protocol (Part 1)         | Allocate Request/Response Handling, Refresh Request Handling | Not Started |
+|        |          |             |             | Subitems: Sending/Receiving Allocate Requests and Responses | | |
+| 6      | 2 weeks  | 2025-02-02  | 2025-02-15  | Implement TURN Protocol (Part 2)         | CreatePermission Request/Response Handling, Send Indication | Not Started |
+|        |          |             |             | Subitems: Refresh Request Handling, CreatePermission Handling | | |
+| 7      | 2 weeks  | 2025-02-16  | 2025-03-01  | Implement TURN Protocol (Part 3)         | ChannelBind Request/Response, Data Relaying | Not Started |
+|        |          |             |             | Subitems: Send/Receive Indications, UDP Datagram Handling | | |
+| 8      | 2 weeks  | 2025-03-02  | 2025-03-15  | Implement TURN Protocol (Part 4)         | ChannelData Message Handling | Not Started |
+|        |          |             |             | Subitems: Formatting and Relaying ChannelData Messages | | |
+| 9      | 2 weeks  | 2025-03-16  | 2025-03-29  | Merge Authentication and TURN Protocol   | Integration of Authentication and TURN Features | Not Started |
+| 10     | 2 weeks  | 2025-03-30  | 2025-04-12  | CLI Tool Development                     | Basic CLI Functionality | Not Started |
+| 11     | 1 week   | 2025-04-13  | 2025-04-19  | Documentation                            | Finalize Documentation from Capstone Work | Not Started |
 
-### Product Backlog [X]
+### Product Backlog
 
-**Priority 1: TURN Protocol Implementation**
+### Priority 1: CLI Tool Development (Skeleton)
+
+- Bringing the skeleton of our tool to life will help to integrate our functionality into the user interface.
+- Design structure of core CLI commands to interact with the system.
+- Ensure commands can trigger the main features like TURN and Authentication when they are completed.
+- Add a proper configuration menu system for each command to make the process as seamless and easy to use as Metasploit, for example.
+- Add error handling and user feedback.
+- Add a help command that explains what each command does and the necessary elements that the user will have to (or have the option of configuring)
+
+### Priority 2: TURN Protocol Implementation
 
 **Implement TURN Protocol (Part 1)**  
 
@@ -214,6 +224,7 @@ The test architecture is visualized in the detailed diagram below:
 - Sending/Receiving Indications
 
 **Implement TURN Protocol (Part 3)**  
+
 - Handling UDP Datagrams and Data Indications
 - Sending/Receiving ChannelBind Requests and Responses
 
@@ -223,7 +234,15 @@ The test architecture is visualized in the detailed diagram below:
 - Sending/Receiving ChannelData Messages
 - Relaying Peer Data
 
-**Priority 2: Authentication**
+## Priority 3: Tool Commands
+
+- Use our implementation of TURN to allow the user to:
+  - Send data to the peer
+  - Establish a TCP connection to the peer to get a shell
+  - Have the tool listen on a port to act as a proxy between it, the TURN server, and the client.
+  - Ensure that the configuration for each command is seamless and easy to use for the user.
+
+## Priority 4: Authentication
 
 **TLS and Tunneling**  
 
@@ -242,19 +261,12 @@ The test architecture is visualized in the detailed diagram below:
 
 - Integrate OpenSSH in the authentication flow
 
-**Priority 3: Merge Authentication and TURN Protocol**
+## Priority 5: Merge Authentication and TURN Protocol**
 
 **Merge Authentication and TURN Protocol**  
 
 - Integrate authentication with TURN protocol
 - Ensure cohesive operation between components
-
-### Priority 4: CLI Tool Development
-
-1. **Basic CLI Functionality**
-    - Implement core CLI commands to interact with the system.
-    - Ensure commands can trigger the main features like TURN and Authentication.
-    - Add error handling and user feedback.
 
 ### Lower Priority Tasks: Infrastructure Setup & Documentation
 
