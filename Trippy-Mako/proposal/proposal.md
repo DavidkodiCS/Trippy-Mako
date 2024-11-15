@@ -141,15 +141,15 @@ This is an article on extensions created by Microsoft for the TURN protocol. Alo
 
 1. CLI Tool
 
-  The design of the user interface is a deceivingly simple part of the project. The goal of the tool is to make it as simple as possible for the user to establish a connection to the TURN server and communicate with the peer. As explained in our market research, Metasploit, is a good example of a tool that is easy to use and configure. A user guide and explanation of TURN and the various actions a user can choose from is crucial to this part of the project.
+The design of the user interface is a deceivingly simple part of the project. The goal of the tool is to make it as simple as possible for the user to establish a connection to the TURN server and communicate with the peer. As highlighted in our market research, Metasploit is a good example of a tool that is easy to use and configure. A user guide and explanation of TURN and the various actions a user can choose from is crucial to this part of the project.
 
 2. TURN
 
-  This project is not intended to be a WebRTC application and, therefore, will not be using any python libraries that provide a WebRTC API. We will focus on using the struct python module for to build packets and the socket module to do low level network communication. These two modules will allow us to implement TURN while giving us the flexibility we need to meet the needs of the customer.
+This project is not intended to function as a WebRTC application and, therefore, will avoid using any Python libraries that provide a WebRTC API. Instead, we will use the `struct` module to build packets and the `socket` module for low-level network communication. These modules allow us to implement TURN effectively while providing the flexibility needed to meet the customer’s requirements.
 
 3. Authentication
 
-  A requirement of this project is for traffic to be encrypted from the client to peer across the TURN server. Talking with Professor Brown gave us good insight on how to achieve this through creating a certificate on the client side that the server can accept over a TLS connection facilitated by OpenSSH.
+A key requirement of this project is to encrypt traffic between the client and peer through the TURN server. A discussion with Professor Brown provided valuable insights on how to achieve this by creating a client-side certificate that the server can accept over a TLS connection, facilitated by OpenSSH.
 
 ## Proposed Design and Architecture ✅
 
