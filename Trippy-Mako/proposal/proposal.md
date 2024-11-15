@@ -41,7 +41,7 @@ This diagram depicts a high level overview of how of the TURN protocol works. At
 ## Market Research/Lit Review
 
 **Existing Processes**
-Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
+Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed.
 
 **Market Research**  
 
