@@ -38,7 +38,7 @@ Additionally, our capstone will have a classified portion to it that will includ
 ![TURN Net Diagram](production_diagram.png)
 This diagram depicts a high level overview of how of the TURN protocol works. At the production stage, the client would utilize our CLI tool to easily communicate with a peer through a TURN server on the Internet.
 
-## Market Research/Lit Review [X]
+## Market Research/Lit Review
 
 **Existing Processes**
 Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
