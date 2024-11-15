@@ -40,13 +40,25 @@ This diagram depicts a high level overview of how of the TURN protocol works. At
 
 ## Market Research/Lit Review [X] [X]
 
-**Existing Processes**  
+**Existing Processes**
 Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
 
 **Market Research**  
 
 **TURN/STUN**  
-In typical settings, TURN (Traversal Using Relays around NAT) servers are used when connections to STUN (Session Traversal Utilities for NAT) servers fail. TURN operates in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
+
+The base implementation of our project revolves around the TURN and STUN protocols. The STUN (Session Traversal Utilities for NAT) protocol is a tool to be used by a NAT traversal solution. Endpoints in a network can use this tool to do things like identify their IP address and port allocated to themselves by the NAT. The TURN protocol (Traversal Using Relays around NAT) is a NAT traversal solution built on top of STUN packets. A NAT traversal solution typically extends STUN. In the case of TURN STUN is extended to communicated with a public facing TURN server that relays packets between the two at a high-bandwith cost.
+
+It is most common that TURN is a last resort nat traversal solution due to its high bandwidth cost on the server. Most implementations are centered around a separate NAT traversal solution, ICE, and use TURN as a backup.
+
+A common usage of TURN is in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection via ICE is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
+
+While WebRTC is one usage of TURN it fails in our case because this implementation is centered around UDP transmission of packets. While this is great for web conferencing where individual packets are not critical. In our project we hope to Utilize TURN for file transmission and SSH connection where a stronger TCP connection throught the client-server-peer chain would be optimal. In this solution TURN would serve as the primary NAT traversal solution as it is more reliable than ICE and our customer expects to have a server that can handle the extra overhead.
+
+[STUN RFC](https://datatracker.ietf.org/doc/html/rfc8489)
+
+[TURN RFC](https://datatracker.ietf.org/doc/html/rfc8656)
+
 
 **Additional Knowledge of Protocols used in TURN**
 
