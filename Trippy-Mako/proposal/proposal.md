@@ -153,7 +153,7 @@ eturnal is a configurable TURN server that works with Unix or Windows and, much 
 
 The above tools are for simple STUN server communication. Referencing them will not be exceedingly useful in our case given that we are not dealing solely with STUN and focusing on both STUN and TURN (with an emphasis on TURN, of course). These references are here to show more of a difference between what we are building and what exists. We are making a tool that technically communicates with a STUN server, but it does so with TURN overlayed throughout the whole process. These tools focus on sending packets through an established connection to a peer while we are connecting two peers to a server and transfering files.
 
-## Discovery Insights  [X]
+## Discovery Insights ✅
 
 1. CLI Tool
 
