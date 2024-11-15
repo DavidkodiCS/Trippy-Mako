@@ -1,6 +1,6 @@
 # Proposal: MARFORCYBER TURN Protocol CLI Tool
 
-## Overview ✅
+## Overview
 
 **What are you planning to build?**
 
@@ -38,7 +38,7 @@ Additionally, our capstone will have a classified portion to it that will includ
 ![TURN Net Diagram](production_diagram.png)
 This diagram depicts a high level overview of how of the TURN protocol works. At the production stage, the client would utilize our CLI tool to easily communicate with a peer through a TURN server on the Internet.
 
-## Market Research/Lit Review [X] [X]
+## Market Research/Lit Review [X]
 
 **Existing Processes**  
 Currently, our customer does not have any research or development efforts focused on our topic. While TURN has been identified as a useful protocol, a tailored tool that implements it in an accessible way is needed. Although our primary deliverable will be a CLI tool, the TURN protocol implementation will be shared with the customer to integrate into existing research initiatives.
@@ -48,7 +48,7 @@ Currently, our customer does not have any research or development efforts focuse
 **TURN/STUN**  
 In typical settings, TURN (Traversal Using Relays around NAT) servers are used when connections to STUN (Session Traversal Utilities for NAT) servers fail. TURN operates in WebRTC (Web Real-Time Communication) environments, acting as a relay when a direct peer-to-peer connection is not possible. The TURN server relays information between peers, bypassing direct host-to-host communication.
 
-**Additional Knowledge of Protocols used in TURN**
+**Standard Transfer Protocols used in TURN**
 
 |TURN client to TURN server	| TURN server to peer |
 |--------|----------|
@@ -59,7 +59,7 @@ In typical settings, TURN (Traversal Using Relays around NAT) servers are used w
 
 [100ms](https://www.100ms.live/blog/webrtc-turn-server#transport-protocols)
 
-We will utilize standard Transport protocols to communicate with the peer through the TURN server. The challenge that will will face depending on the network of the peer and the feature that the user wants to use i.e. send, proxy, or connect, is that we will need to create a TCP tunnel from the TURN server to the peer rather than UDP, which is what TURN is typically used for. (Most WebRTC implementations, for example, are used for audio and video RTC)
+We will use standard transport protocols to communicate with the peer through the TURN server. The challenge we may face, depending on the peer's network and the feature the user wants to use (e.g. send, proxy, or connect), is that we’ll need to establish a TCP tunnel from the TURN server to the peer, rather than using UDP, which is the typical protocol for TURN. This approach differs from most WebRTC implementations, which are generally optimized for real-time audio and video communication.
 
 **WebRTC**
 
@@ -153,7 +153,7 @@ eturnal is a configurable TURN server that works with Unix or Windows and, much 
 
 The above tools are for simple STUN server communication. Referencing them will not be exceedingly useful in our case given that we are not dealing solely with STUN and focusing on both STUN and TURN (with an emphasis on TURN, of course). These references are here to show more of a difference between what we are building and what exists. We are making a tool that technically communicates with a STUN server, but it does so with TURN overlayed throughout the whole process. These tools focus on sending packets through an established connection to a peer while we are connecting two peers to a server and transfering files.
 
-## Discovery Insights ✅
+## Discovery Insights
 
 1. CLI Tool
 
@@ -167,7 +167,7 @@ This project is not intended to function as a WebRTC application and, therefore,
 
 A key requirement of this project is to encrypt traffic between the client and peer through the TURN server. A discussion with Professor Brown provided valuable insights on how to achieve this by creating a client-side certificate that the server can accept over a TLS connection, facilitated by OpenSSH.
 
-## Proposed Design and Architecture ✅
+## Proposed Design and Architecture
 
 **User Types/Personas**
 
@@ -188,7 +188,7 @@ The test architecture is visualized in the detailed diagram below:
 
 Testing will be a crucial part of our work. The diagram shows how we will create two networks behind symmetric NATs. The idea is to create a contained testing environment at first before we move onto spinning up a TURN server on the Internet.
 
-## Project Management ✅
+## Project Management
 
 ### Preliminary Release Plan
 
@@ -302,7 +302,7 @@ Testing will be a crucial part of our work. The diagram shows how we will create
     - Ensure documentation reflects the work done throughout the project.
     - Create guides for installation, setup, and usage.
 
-## **Risk Mitigation** ✅
+## **Risk Mitigation**
 
 **Complexity of TURN**
 
@@ -327,7 +327,7 @@ Testing will be a crucial part of our work. The diagram shows how we will create
 
 - Making use of pytest and other automatic testing suites will ensure that each piece is properly working down the line and that there are no surprises towards the end of the release plan.
 
-## **Key Faculty Involvement** ✅
+## **Key Faculty Involvement**
 
 **Networking:** LCDR Downs
 
@@ -335,7 +335,7 @@ Testing will be a crucial part of our work. The diagram shows how we will create
 
 **General Development:** Capt Burn (MARFORCYBER)
 
-## Admin/Fine Print ✅
+## Admin/Fine Print
 
 **GFI/GFE (Government-Furnished Information/Equipment)**
   
