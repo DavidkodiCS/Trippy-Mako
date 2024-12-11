@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+import configparser
+
+#User Configurations
+config = configparser.ConfigParser()
+config.read('configs.ini')
 
 ##Command Functions
 def help():
@@ -7,6 +12,20 @@ def help():
             print(f.read())
     except FileNotFoundError:
         print("Error: Welcome file not found...")  
+        
+def configure():
+    pass
+
+def connect():
+    pass
+
+def sendPayload():
+    pass
+
+def proxy():
+    pass
+
+
 
 
 ##Main Functions
@@ -27,6 +46,12 @@ def trippyMako():
             break
         elif command == 'help':
             help()
+        elif command == 'configure':
+            configure()
+        elif command == 'send':
+            sendPayload()
+        elif command == 'proxy':
+            proxy()
             
         
 

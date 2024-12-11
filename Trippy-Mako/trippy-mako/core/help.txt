@@ -1,3 +1,9 @@
+Command List:
+1. configure
+2. connect
+3. send
+4. proxy
+
 configure: Allows the user to enter in the TURN Server's public facing IP address, 
 associated port number, as well as the user's desired protocol to use, and 
 authentication measures. Different settings could affect the speed and size of 
