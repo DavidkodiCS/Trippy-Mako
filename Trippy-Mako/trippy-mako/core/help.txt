@@ -1,5 +1,10 @@
 Command List:
-1. configure
+1. config
+    a. create
+    b. remove
+    c. edit
+    d. list
+    e. options
 2. connect
 3. send
 4. proxy
