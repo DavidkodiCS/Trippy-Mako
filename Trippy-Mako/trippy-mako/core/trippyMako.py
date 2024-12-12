@@ -74,7 +74,7 @@ def addConfig():
     configuration[name]['turnPort'] = turnPort
     configuration[name]['protocol'] = protocol
     
-    with open("configs.ini", 'a') as configfile:
+    with open("configs.ini", 'w') as configfile:
         configuration.write(configfile)
     
     print("Configuration successfully added!")
@@ -150,7 +150,7 @@ def trippyMako():
 if __name__ == "__main__":
     # User Configurations
     configuration = configparser.ConfigParser()
-    #configuration.read("configs.ini")
+    configuration.read("configs.ini")
     
     welcome()
     trippyMako()
