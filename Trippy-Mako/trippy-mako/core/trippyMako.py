@@ -4,10 +4,6 @@
 import configparser
 import turnTM
 
-# User Configurations
-configuration = configparser.ConfigParser()
-configuration.read("configs.ini")
-
 ## Command Functions ##
 def help():
     try:
@@ -77,6 +73,9 @@ def addConfig():
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
     configuration[name]['protocol'] = protocol
+    
+    with open("configs.ini", 'a') as configfile:
+        configuration.write(configfile)
     
     print("Configuration successfully added!")
         
@@ -149,5 +148,9 @@ def trippyMako():
 
 ## MAIN ##
 if __name__ == "__main__":
+    # User Configurations
+    configuration = configparser.ConfigParser()
+    #configuration.read("configs.ini")
+    
     welcome()
     trippyMako()
