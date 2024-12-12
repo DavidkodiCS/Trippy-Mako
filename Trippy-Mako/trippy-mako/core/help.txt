@@ -1,13 +1,14 @@
 Command List:
-1. config
-    a. create
-    b. remove
-    c. edit
-    d. list
-    e. options
-2. connect
-3. send
-4. proxy
+> config
+    > create
+    > remove
+    > edit
+    > list
+    > display
+    > exit
+> connect
+> send
+> proxy
 
 configure: Allows the user to enter in the TURN Server's public facing IP address, 
 associated port number, as well as the user's desired protocol to use, and 
