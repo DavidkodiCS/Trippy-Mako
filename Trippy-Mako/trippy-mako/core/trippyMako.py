@@ -13,6 +13,7 @@ def help():
         print("Error: Welcome file not found...")
 
 
+## Configuration Menu ##
 def config():
     print("Configuration Menu")
     configOptions()
@@ -56,6 +57,8 @@ def proxy():
 def addConfig():
     name = input("Enter configuration name: ")
     
+    # search for the entered name and notify the 
+    # user if it already exists
     while configuration.has_section(name):
         print("Configuration name already exists.\nWould you like to 'edit' the existing config or 'create' a new one?")
         command = input("config > ")
@@ -64,11 +67,13 @@ def addConfig():
             return
         elif command == 'create':
             name = input("Enter configuration name: ")
-            
+
+    # enter other details about server configuration    
     turnIP = input("Enter TURN server IP address: ")
     turnPort = input("Enter TURN server port number: ")
     protocol = input("Enter desired protocol: ")
-            
+
+    # add configuration to the file 
     configuration.add_section(name)
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
@@ -80,7 +85,7 @@ def addConfig():
     print("Configuration successfully added!")
         
 
-
+## Remove Configuration From File ##
 def removeConfig():
     listConfig()
     remove = input("Choose section to remove: ")
@@ -99,7 +104,8 @@ def editConfig():
     configuration[edit]['protocol'] = protocol
     
     print("Configuration successfully edited!")
-    
+
+## Display A Configuration ##  
 def displayConfig():
     listConfig()
     display = input("Choose configuration to display: ")
@@ -125,7 +131,7 @@ def welcome():
         print("Error: Welcome file not found...")
     print("Type help to see the available commands or exit to quit...\n\n")
 
-
+## Main Menu ##
 def trippyMako():
     while True:
         command = input("\n> ").strip()
@@ -145,13 +151,19 @@ def trippyMako():
             case _:
                 print("Unrecognized Command...")
 
-
-## MAIN ##
-if __name__ == "__main__":
+## Load Configuration File ##
+def configSetup():
     # User Configurations
+    global configuration
     configuration = configparser.ConfigParser()
     configuration.read("configs.ini")
-    
+
+## MAIN ##
+def main():
+    configSetup()
     welcome()
     trippyMako()
-    
+
+## Run Main Function ##
+if __name__ == "__main__":
+    main()
