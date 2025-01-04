@@ -33,7 +33,7 @@ def config():
                 editConfig()
             case "list":
                 listConfig()
-            case "options":
+            case "help":
                 configOptions()
             case "display":
                 displayConfig()
@@ -94,14 +94,32 @@ def removeConfig():
     print("Configuration successfully removed!")
 
 
-##NOT DONE YET##
+## Edit Configuration ##
 def editConfig():
-    listConfig()
-    edit = input("Choose section to edit: ")
-    
-    configuration[edit]['turnIP'] = turnIP
-    configuration[edit]['turnPort'] = turnPort
-    configuration[edit]['protocol'] = protocol
+    while True:
+        listConfig()
+        edit = input("Choose configuration to edit: ")
+        print("Sections:\nturnIP\nturnPort\nprotocol")
+        section = input("Choose section to edit: ")
+
+        match section:
+            case "turnIP":
+                configuration[edit]['turnIP'] = input("New turnIp: ")
+            case "turnPort":
+                configuration[edit]['turnPort'] = input("New turnPort: ")
+            case "protocol":
+                configuration[edit]['protocol'] = input("New protocol: ")
+            case _:
+                print("Invalid Section...")
+
+        with open("configs.ini", 'w') as configfile:
+            configuration.write(configfile)
+
+        cont = input("Would you like to continue editing? (y/n)")
+        if cont == "y":
+            continue
+        elif cont == "n":
+            break
     
     print("Configuration successfully edited!")
 
@@ -119,7 +137,7 @@ def listConfig():
 
 
 def configOptions():
-    print("> create\n> remove\n> edit\n> list\n> display\n> exit\n")
+    print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
 
 
 ## Main Functions ##
