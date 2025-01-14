@@ -10,28 +10,22 @@
 
 ## Sprint Backlogs (Feature to Task Breakdown)
 
-### Sprint backlog for Core CLI structure, basic configuration system
+### Sprint backlog for TURN Features
 
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-
-### Sprint backlog for Commands for triggering main features (TURN, Auth)
-
-| Task | Est Hours | Actual Hours | Assigned | Status |
-|------|-----------|--------------|----------|--------|
-|   connect, send, proxy   |           |              |    Kreidler      |    Complete    |
-|
+|   Structure of STUN Packets   |     2      |              |          |        | 
+|   Sending an Allocate Request   |      1.5     |              |          |        |
+|   Receiving an Allocate Success Response   |     2      |              |          |        |
+|   Receiving Error Responses   |      2     |              |          |        |
+|   Sending a Refresh Request   |     1.5      |              |          |        |
+|   Receiving a Refresh Response   |     1      |              |          |        |
+| Receiving other Error messages |  1 |     |     |
 
 ### Sprint backlog for Error handling, user feedback, help command
 
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
-|   Begin Documentation of Command Usage   |     0.5     |       0.5       |    Kreidler      |    Complete    |
-|   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
-|   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
-|
+|   Documentation of TURN Features (Create Allocation / Send Refresh)   |           |              |          |        |
+|   PyTest for all build methods   |     1.5      |              |          |        |
+|      |           |              |          |        |
