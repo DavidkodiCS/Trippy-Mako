@@ -1,4 +1,4 @@
-# Sprint 2
+# Sprint 3
 
 ## Features to be accomplished during this sprint
 
@@ -19,29 +19,19 @@
 |      |           |              |          |        |
 |      |           |              |          |        |
 |      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
 
 ### Sprint backlog for Commands for triggering main features (TURN, Auth)
 
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
+|   connect, send, proxy   |           |              |    Kreidler      |    Complete    |
+|
 
 ### Sprint backlog for Error handling, user feedback, help command
 
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
-|      |           |              |          |        |
+|   Begin Documentation of Command Usage   |     0.5     |       0.5       |    Kreidler      |    Complete    |
+|   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
+|   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
+|
