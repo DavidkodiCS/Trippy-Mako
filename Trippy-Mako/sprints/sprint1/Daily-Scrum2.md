@@ -1,4 +1,4 @@
-# Daily Scrum 14JAN2025
+# Daily Scrum 14JAN25
 
 This should be a relatively short document
 
