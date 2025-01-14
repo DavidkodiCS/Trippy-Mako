@@ -21,9 +21,9 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 ## Meris
 
 1. What have you done since last meeting?
-   - I made the slideshow for class, created a Sprint Backlog template, and wrote another test.
+   - I created a testing framework for our project.
 3. What will you accomplish today / until the next daily scrum?
-   - I will take the feedback we receive from the Sprint Review and write any more tests needed.
+   - I will continue writing tests as more features are outlined.
 5. What impediments or obstacles are in your way?
    - none
 7. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
