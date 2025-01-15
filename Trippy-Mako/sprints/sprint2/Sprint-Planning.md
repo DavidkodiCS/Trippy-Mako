@@ -37,3 +37,5 @@
 |   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
 |   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
 |
+| Tests for Basic Navigation |  |  | Larkins | Complete |
+| Tests for Configurations |  |  | Larkins | 75% |
