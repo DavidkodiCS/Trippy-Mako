@@ -17,7 +17,6 @@ In terms of tasks there basically should be three types of tasks. I have listed 
 1. Testing tasks: Think of this like making a submit system for this feature. When we write our coding tasks (described below) we know they're done if we can pass all of the tests made. There should be one testing task for each coding task we have.
 2. Coding tasks: These tasks will concern the actual code that will ultimately run when we run the CLI. There basically should be an equal number of coding and testing tasks. If it seems like it will be trivial to write a testing task for a coding task then that coding task is too small. If you can't imagine how to write a test for a coding task then that coding task should decomposed.
 3. Scrum tasks: These tasks will be the most annoying to get done but we need to do them and LIH. This includes but is not limited to things like scheduling a meeting with the customer, the customer meeting itself, the sprint planning meeting, preparing the class presentation, etc.
-4. **BONUS:** Downs also wants documentation tasks! This would be like the opposite of testing tasks. Once the coding is done and coding is running well we need a task that basically says to write it all down.
 
 ### Sprint backlog for feature one selected during this sprint
 
