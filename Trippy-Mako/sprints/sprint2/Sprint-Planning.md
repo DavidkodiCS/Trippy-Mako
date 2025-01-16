@@ -27,7 +27,6 @@
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
 |   connect, send, proxy   |           |              |    Kreidler      |    Complete    |
-|
 
 ### Sprint backlog for Error handling, user feedback, help command
 
@@ -36,6 +35,5 @@
 |   Begin Documentation of Command Usage   |     0.5     |       0.5       |    Kreidler      |    Complete    |
 |   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
 |   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
-|
-| Tests for Basic Navigation |  |  | Larkins | Complete |
-| Tests for Configurations |  |  | Larkins | 75% |
+| Tests for Basic Navigation | 1 | 1 | Larkins | Complete |
+| Tests for Configurations | 1 | 1 | Larkins | 75% |
