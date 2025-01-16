@@ -1,14 +1,17 @@
-# Sprint 1 Report 09DEC24-16DEC24 : CLI Tool Skeleton
+# Sprint 2 Report: CLI Skeleton
 
 ## Features developed and demoed during the Sprint Review
 
-Francesconi: CLI ini file managment
-Kreidler: Core CLI Skeleton
-Merris: Tests for Skeleton
+### Features Developed and Demoed:
+
+- Testing for basic navigation through CLI and configuration features / .ini file management for configuration features : Francesconi / Larkins
+
+- Core CLI Skeleton and configuration features : Kreidler
 
 ## Accepted Features
 
-Email to customer TBA
+All feautures for this sprint have been accepted after demo. There are a couple bugs that were found in testing. Fixes for these bugs have been added to the product backlog.
+
 
 ## Stories/features added to the backlog since the last Sprint Review Email
 
