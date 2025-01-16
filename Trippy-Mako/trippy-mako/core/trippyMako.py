@@ -90,6 +90,9 @@ def removeConfig():
     listConfig()
     remove = input("Choose section to remove: ")
     configuration.remove_section(remove)
+
+    with open("configs.ini", 'w') as configfile:
+        configuration.write(configfile)
     
     print("Configuration successfully removed!")
 

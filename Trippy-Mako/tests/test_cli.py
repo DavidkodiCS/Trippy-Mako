@@ -60,8 +60,6 @@ def test_displayConfig():
     'Protocol: TCP',
     ]
 
-# this test fails because the remove function does not work
-# properly
 def test_removeConfig():
     set_keyboard_input(['myConfig'])
     trippyMako.removeConfig()
