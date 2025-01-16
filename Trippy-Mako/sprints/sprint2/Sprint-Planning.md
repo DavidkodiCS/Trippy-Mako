@@ -36,4 +36,9 @@
 |   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
 |   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
 | Tests for Basic Navigation | 1 | 1 | Larkins | Complete |
-| Tests for Configurations | 1 | 1 | Larkins | 75% |
+| Add Configuration Test | .25 | .25 | Larkins | Complete |
+| Remove Configuration Test | .25 | .25 | Larkins | Complete |
+| Edit Configuration Test | .25 | | | |
+| Display Configuration Test | .25 | | | |
+| Exit Test | | | | |
+| Run Program Then Exit Test | | | | |
