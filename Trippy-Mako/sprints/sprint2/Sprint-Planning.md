@@ -39,6 +39,6 @@
 | Add Configuration Test | .25 | .25 | Larkins | Complete |
 | Remove Configuration Test | .25 | .25 | Larkins | Complete |
 | Edit Configuration Test | .25 | | | |
-| Display Configuration Test | .25 | | | |
+| Display Configuration Test | .25 | 1 | Larkins | Complete |
 | Exit Test | | | | |
 | Run Program Then Exit Test | | | | |

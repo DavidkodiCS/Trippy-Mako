@@ -51,13 +51,13 @@ def test_addConfig():
 
 def test_displayConfig():
     set_keyboard_input(['myConfig', '0.0.0.0', '999', 'TCP'])
-    configs = 
     trippyMako.displayConfig()
+    list = ['myConfig']
     output = get_display_output()
-    assert output == [f"{configs}", 'Choose configuration to display: ',
-    'TURN IP: ',
-    'TURN Port: ',
-    'Protocol: ',
+    assert output == [ list, 'Choose configuration to display: ',
+    'TURN IP: 0.0.0.0',
+    'TURN Port: 999',
+    'Protocol: TCP',
     ]
 
 # this test fails because the remove function does not work
