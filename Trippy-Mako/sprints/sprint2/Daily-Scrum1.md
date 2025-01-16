@@ -1,9 +1,5 @@
 # Daily Scrum 08JAN25
 
-This should be a relatively short document
-
-This will be filled out by us when we meet in person or over Google Meet. Basically it will just list all four of us and then have the scrum questions listed under our names so we can fill them in. I put an example below:
-
 ## Charlie
 
 1. What have you done since last meeting?
