@@ -49,6 +49,17 @@ def test_addConfig():
     'Enter desired protocol: ', 
     'Configuration successfully added!']
 
+def test_displayConfig():
+    set_keyboard_input(['myConfig', '0.0.0.0', '999', 'TCP'])
+    configs = 
+    trippyMako.displayConfig()
+    output = get_display_output()
+    assert output == [f"{configs}", 'Choose configuration to display: ',
+    'TURN IP: ',
+    'TURN Port: ',
+    'Protocol: ',
+    ]
+
 # this test fails because the remove function does not work
 # properly
 def test_removeConfig():
