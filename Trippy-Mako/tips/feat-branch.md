@@ -1,7 +1,3 @@
-Here's a step-by-step guide to create a new feature branch in Git, work on it, and then merge it back to the `main` branch:
-
----
-
 ### **Step 1: Create a New Feature Branch**
 1. **Ensure You Are on the `main` Branch:**
    ```bash
@@ -84,5 +80,3 @@ Here's a step-by-step guide to create a new feature branch in Git, work on it, a
    ```
 
 --- 
-
-Let me know if you need further clarification!
