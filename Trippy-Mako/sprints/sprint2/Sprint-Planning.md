@@ -35,10 +35,20 @@
 |   Begin Documentation of Command Usage   |     0.5     |       0.5       |    Kreidler      |    Complete    |
 |   Menu Navigation   |     0.25      |       0.25       |     Kreidler     |    Complete    |
 |   Configuration Navigation   |     0.5      |       1.0       |     Kreidler     |    90% Complete    |
-| Tests for Basic Navigation | 1 | 1 | Larkins | Complete |
-| Add Configuration Test | .25 | .25 | Larkins | Complete |
-| Remove Configuration Test | .25 | .25 | Larkins | Complete |
-| Edit Configuration Test | .25 | | | |
-| Display Configuration Test | .25 | 1 | Larkins | Complete |
-| Exit Test | | | | |
-| Run Program Then Exit Test | | | | |
+| Tests for Basic Navigation | 1 | 4 | Larkins | Complete |
+| Add Configuration Test | .5 | .5 | Larkins | Complete |
+| Remove Configuration Test | .5 | .5 | Larkins | Complete |
+| Edit Configuration Test | .5 | | | |
+| Display Configuration Test | .5 | 1 | Larkins | Complete |
+| Exit Test | .5 | | | |
+| Run Program Then Exit Test | .5 | | | |
+
+### Sprint backlog for general teamwork tasks
+
+| Task | Est Hours | Actual Hours | Assigned | Status |
+|------|-----------|--------------|----------|--------|
+| Sprint Review | 1 | 1 | Larkins, Kreidler, Francesconi | Complete |
+| Scrum Documentation |  |  | Francesconi | Complete |
+| IC480 Slideshow | 1 | 1 | Larkins | Complete |
+| Burndown Template | 1 | 1 | Larkins | Complete |
+| SME Meeting w/ Capt Burn | 1 | 1 | Larkins, Kreidler | Complete |
