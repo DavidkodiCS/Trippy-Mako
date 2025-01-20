@@ -3,6 +3,7 @@ sys.path.insert(1, '../trippy-mako/core')
 import trippyMako
 import builtins
 import os 
+import pytest
 
 # source for first four functions: https://www.youtube.com/watch?v=tBAj2FqgIwg
 # these functions simulate input and output
@@ -29,6 +30,7 @@ def set_keyboard_input(mocked_inputs):
     mock_input_output_start()
     input_values = mocked_inputs
 
+# tests help menu
 def test_help(capsys):
     trippyMako.help()
     out, err = capsys.readouterr()
@@ -36,6 +38,7 @@ def test_help(capsys):
     assert out != 'Error: Welcome file not found...\n'
     assert err == ''
 
+# adds a mock configuration to a fake config file
 def test_addConfig():
     global fileSize
     fileSize = os.path.getsize("configs.ini")
@@ -49,8 +52,9 @@ def test_addConfig():
     'Enter desired protocol: ', 
     'Configuration successfully added!']
 
+# displays mock config
 def test_displayConfig():
-    set_keyboard_input(['myConfig', '0.0.0.0', '999', 'TCP'])
+    set_keyboard_input(['myConfig'])
     trippyMako.displayConfig()
     list = ['myConfig']
     output = get_display_output()
@@ -60,7 +64,33 @@ def test_displayConfig():
     'Protocol: TCP',
     ]
 
+# edits the IP address of the mock config
+def test_editConfig():
+    set_keyboard_input(['myConfig', 'turnIP', '0.0.0.1', 'n'])
+    trippyMako.editConfig()
+    set_keyboard_input(['myConfig'])
+    trippyMako.displayConfig()
+    list2 = ['myConfig']
+    output = get_display_output()
+    assert output == [ list2, 'Choose configuration to display: ',
+    'TURN IP: 0.0.0.1',
+    'TURN Port: 999',
+    'Protocol: TCP',
+    ]
+
+# removes the configuration from the file
 def test_removeConfig():
     set_keyboard_input(['myConfig'])
     trippyMako.removeConfig()
     assert os.path.getsize("configs.ini") == fileSize
+
+# tests that exit functions don't cause program crash after 
+# running configuration options
+def test_exitAfter():
+    set_keyboard_input(['exit'])
+    trippyMako.config()
+    set_keyboard_input(['exit'])
+    trippyMako.trippyMako()
+    output = get_display_output()
+
+    assert output == ['\n> ', 'Exiting...']

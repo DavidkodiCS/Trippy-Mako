@@ -38,10 +38,10 @@
 | Tests for Basic Navigation | 1 | 4 | Larkins | Complete |
 | Add Configuration Test | .5 | .5 | Larkins | Complete |
 | Remove Configuration Test | .5 | .5 | Larkins | Complete |
-| Edit Configuration Test | .5 | | | |
+| Edit Configuration Test | .5 | .5 | Larkins | Complete |
 | Display Configuration Test | .5 | 1 | Larkins | Complete |
-| Exit Test | .5 | | | |
-| Run Program Then Exit Test | .5 | | | |
+| Run Program Then Exit Test | .5 | 1.5 | Larkins | Complete |
+| Test File Documentation | .25 | .25 | Larkins | Complete |
 
 ### Sprint backlog for general teamwork tasks
 
@@ -52,3 +52,4 @@
 | IC480 Slideshow | 1 | 1 | Larkins | Complete |
 | Burndown Template | 1 | 1 | Larkins | Complete |
 | SME Meeting w/ Capt Burn | 1 | 1 | Larkins, Kreidler | Complete |
+| Research on Metasploit Configuration Function | 2 | 2 | Larkins | Complete |
