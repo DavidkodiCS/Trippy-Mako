@@ -1,6 +1,6 @@
 ## Sprint Retrospective
 
-### Date: [Insert Date Here]
+### Date: 20 JAN 2025
 
 ### Team Members:
 - David Kreidler
@@ -10,9 +10,9 @@
 ---
 
 ### Completed Tasks
-- **Task 1:** Completed by [Team Member]
-- **Task 2:** Completed by [Team Member]
-- **Task 3:** Completed by [Team Member]
+- **Task 1:** Completed by David Kreidler
+- **Task 2:** Completed by Meris Larkins
+- **Task 3:** Completed by Charlie Francesconi
 
 ---
 
