@@ -38,7 +38,7 @@ All feautures for this sprint have been accepted after demo. There are a couple 
 
 | Member Name   | Predicted Velocity | Updated Velocity |
 |---------------|--------------------|------------------|
-| Francesconi   | 2                  | 0                |
+| Francesconi   | 2                  | 2                |
 | Kreidler      | 4                  | 4                |
 | Larkins       | 2                  | 2                |
 
