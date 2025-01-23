@@ -21,6 +21,7 @@
 |   Remove Configuration   |     0.5      |       0.5       |     Kreidler     |    Complete    |
 |   List Configurations   |     0.25      |       0.25       |     Kreidler     |    Complete    |
 |   Display Configuration Information   |     0.5      |       0.75       |     Kreidler     |    Complete    |
+|   Make project portable   |     2      |       1       |     Francesconi     |    Complete    |
 
 ### Sprint backlog for Commands for triggering main features (TURN, Auth)
 
@@ -42,13 +43,14 @@
 | Display Configuration Test | .5 | 1 | Larkins | Complete |
 | Run Program Then Exit Test | .5 | 1.5 | Larkins | Complete |
 | Test File Documentation | .25 | .25 | Larkins | Complete |
+| Make portability documentation   |     0.25      |       0.25       |     Francesconi     |    Complete    |
 
 ### Sprint backlog for general teamwork tasks
 
 | Task | Est Hours | Actual Hours | Assigned | Status |
 |------|-----------|--------------|----------|--------|
 | Sprint Review | 1 | 1 | Larkins, Kreidler, Francesconi | Complete |
-| Scrum Documentation |  |  | Francesconi | Complete |
+| Scrum Documentation | 2 | 2 | Francesconi | Complete |
 | IC480 Slideshow | 1 | 1 | Larkins | Complete |
 | Burndown Template | 1 | 1 | Larkins | Complete |
 | SME Meeting w/ Capt Burn | 1 | 1 | Larkins, Kreidler | Complete |
