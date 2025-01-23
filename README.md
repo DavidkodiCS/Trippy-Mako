@@ -10,7 +10,7 @@ David Kreidler, Meris Larkins, Charlie Francesconi
 
 TURN Protocol CLI Tool
 
-## To install/Run
+## To Install/Run
 
 ### Installation:
 
