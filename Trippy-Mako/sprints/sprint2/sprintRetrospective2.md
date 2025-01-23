@@ -10,7 +10,12 @@
 ---
 
 ### Completed Tasks
+
 - [Sprint Backlog](sprints/sprint2/Sprint-Planning.md)
+- **Task 1:** Completed by David Kreidler
+- **Task 2:** Completed by Meris Larkins
+- **Task 3:** Completed by Charlie Francesconi
+
 
 ---
 
