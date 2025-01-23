@@ -8,24 +8,8 @@
 
 3. Error handling, user feedback, help command
 
-## Sprint Backlogs (Feature to Task Breakdown)
+## Sprint Backlog
 
-### Sprint backlog for TURN Features
+[Linked Here](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?usp=sharing)
 
-| Task | Est Hours | Actual Hours | Assigned | Status |
-|------|-----------|--------------|----------|--------|
-|   Structure of STUN Packets   |     2      |              |          |        | 
-|   Sending an Allocate Request   |      1.5     |              |          |        |
-|   Receiving an Allocate Success Response   |     2      |              |          |        |
-|   Receiving Error Responses   |      2     |              |          |        |
-|   Sending a Refresh Request   |     1.5      |              |          |        |
-|   Receiving a Refresh Response   |     1      |              |          |        |
-| Receiving other Error messages |  1 |     |     |
 
-### Sprint backlog for Error handling, user feedback, help command
-
-| Task | Est Hours | Actual Hours | Assigned | Status |
-|------|-----------|--------------|----------|--------|
-|   Documentation of TURN Features (Create Allocation / Send Refresh)   |           |              |          |        |
-|   PyTest for all build methods   |     1.5      |              |          |        |
-|      |           |              |          |        |
