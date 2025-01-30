@@ -89,6 +89,20 @@ The aioRTC library on github is a WebRTC implementation and Object RTC API, whic
 - [aioRTC](https://github.com/aiortc/aiortc)
 - [ORTC](https://ortc.org/)
 
+**WebRTC**
+WebRTC (Real-Time Communication) is an open source project that implements various protocols to include TURN in order to achieve real-time audio and/or video communication from one peer to another. Other uses of WebRTC include streaming video and audio as well as file sharing. WebRTC provides the tools for developers to establish the connection between peers. In other words, the developer still needs to figure out how to implement the library. After the implementation of WebRTC's suite of protocols and API (for javascript) is complete the Real-Time Transport Protocol is used to transmit audio and/or data. 
+
+A WebRTC agent is comprised of many protocols to include ICE, STUN, and TURN. It is an all-encompassing product with the primary purposes of establishing audio and video streams. An implementation of WebRTC is beyond the scope of what our customer is asking for and would not solve the ask of a standalone binary with the flexibility to meet the very specific requirements of the project, which is secure file transfer and a secure TCP connection from client to peer through a TURN server. The difference between our product and WebRTC is that our customer will not need to do any implementation on launch and it is specifically tailored to the needs mentioned above.
+
+- [WebRTC - 1](https://restream.io/learn/what-is/webrtc/)
+- [WebRTC - 2](https://webrtcforthecurious.com/docs/01-what-why-and-how/)
+
+**aioRTC**
+The aioRTC library on github is a WebRTC implementation and Object RTC API, which is used with WebRTC to make RTC applications for the web. AioRTC essentially WebRTC for the beginner. It simplifies the process of achieving the exchange of audio, video, and data channels. Some features include DTLS key and certificate generation, SCTP implementation sending and receiving of audio and video, data channels, etc. AioRTC functions similarly to the WebRTC API and provides a developer with a suite of Python classes and functions that make it easier for a developer to achieve RTC. We will not use this library to complete our project because it is once again out of the scope of what the customer needs. The goal of this project is not to create a TURN protocol suite but rather tool that allows a user to achieve a secure connection to a peer through a TURN server with the simple configuration of several settings through our CLI.
+
+- [aioRTC](https://github.com/aiortc/aiortc)
+- [ORTC](https://ortc.org/)
+
 **Wireguard**  
 
 Tailscale utilizes the Wireguard protocol, known for being lightweight, secure, and cross-platform. Wireguard's concise implementation (under 4,000 lines of code) ensures efficiency and speed compared to alternatives like OpenVPN. It encapsulates IP packets over UDP and uses advanced cryptography like Curve25519 and ChaCha20, offering simplicity comparable to SSH.
@@ -100,6 +114,13 @@ Tailscale, a VPN service, securely connects devices globally by acting as an int
 **Wireguard and Tailscale**
 
 The main difference between our product and the combination of Tailscale and Wireguard is that we are very explicitly not using VPNs. The need from our customer is to create the desired features of our tool using a TURN server as an intermediary between the client and peer. We did get some inspiration from Tailscale since it provides the user with an interactive shell to the various peers that are associated with the client. We plan on accomplishing this same task through a TURN server, which is not a conventional use of TURN but one that is possible. 
+
+**Discovery Insights**  
+Our research highlights two primary objectives: implementing the TURN/STUN protocols per RFCs using Python networking libraries such as `dpkt` and `scapy`, and integrating secure authentication. We will explore TLS and certification processes, ensuring our solution is as seamless as tools like Metasploit.
+
+
+The main difference between our product and the combination of Tailscale and Wireguard is that we are very explicitly not using VPNs. The need from our customer is to create the desired features of our tool using a TURN server as an intermediary between the client and peer. We did get some inspiration from Tailscale since it provides the user with an interactive shell to the various peers that are associated with the client. We plan on accomplishing this same task through a TURN server, which is not a conventional use of TURN but one that is possible. 
+
 
 ### Similar Libraries
 

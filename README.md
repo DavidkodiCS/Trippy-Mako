@@ -10,6 +10,18 @@ David Kreidler, Meris Larkins, Charlie Francesconi
 
 TURN Protocol CLI Tool
 
+## To Install/Run
+
+### Installation:
+
+1. Clone the repository
+2. Within the repository use command `docker build -t trippy-mako .`
+
+### To run:
+
+1. Start Docker Desktop
+1. In a terminal run `docker run -it -v "$(pwd)/Trippy-Mako/trippy-mako/core:/work" trippy-mako bash`
+
 ## Contents
 
 1. [Team Charter](https://github.com/DavidkodiCS/Trippy-Mako/blob/main/Charter.md)

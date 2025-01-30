@@ -160,3 +160,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+#ignore config changes
+configs.ini

@@ -38,7 +38,7 @@ All feautures for this sprint have been accepted after demo. There are a couple 
 
 | Member Name   | Predicted Velocity | Updated Velocity |
 |---------------|--------------------|------------------|
-| Francesconi   | 2                  | 0                |
+| Francesconi   | 2                  | 2                |
 | Kreidler      | 4                  | 4                |
 | Larkins       | 2                  | 2                |
 
@@ -56,6 +56,6 @@ Started skeleton code and created features for updating and saving configuration
 Larkins:
 Created tests for features designed this sprint. Velocity achieved!
 
-## Next sprint plan
+## [Next sprint plan](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?usp=sharing)
 
 Next sprint we plan to have an official Sprint Planning meeting to break down the goals "Virtual Box Testing Environment Setup" and creation of the testing VMs for our simulated network architecture. From there we will take our assigned features and build them to be deliverable to the customer for the next Sprint Retrospective.
