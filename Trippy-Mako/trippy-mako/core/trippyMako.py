@@ -83,6 +83,9 @@ def addConfig():
         configuration.write(configfile)
     
     print("Configuration successfully added!")
+    
+    #For when adding and immediately using
+    return name
         
 
 ## Remove Configuration From File ##
@@ -133,7 +136,9 @@ def displayConfig():
     print("TURN IP: " + configuration[display]['turnIP'])
     print("TURN Port: " + configuration[display]['turnPort'])
     print("Protocol: " + configuration[display]['protocol'])
-
+    
+def getConfig(config):
+    return [configuration[config]['turnIP'], configuration[config]['turnPort'], configuration[config]['protocol']]    
 
 def listConfig():
     print(configuration.sections())
@@ -141,6 +146,33 @@ def listConfig():
 
 def configOptions():
     print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
+    
+    
+## DEMO OPTION ##
+def demo():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        info = getConfig(config)
+        
+    elif(choose == "new"):
+        ##For current demo
+        ##IP = 127.0.0.1
+        ##PORT = 5349
+        config = addConfig()
+        info = getConfig(config)     
+    else:
+        print("Invalid command...")
+        demo()
+    
+    turnTM.sendAllocation(info[0], info[1])
+    
 
 
 ## Main Functions ##
@@ -169,6 +201,8 @@ def trippyMako():
                 sendPayload()
             case "proxy":
                 proxy()
+            case "demo":
+                demo()
             case _:
                 print("Unrecognized Command...")
 
