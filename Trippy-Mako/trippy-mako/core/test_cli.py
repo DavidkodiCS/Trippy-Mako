@@ -1,3 +1,5 @@
+import socket
+import pytest
 import trippyMako
 import builtins
 import os 
@@ -91,3 +93,16 @@ def test_exitAfter():
     output = get_display_output()
 
     assert output == ['\n> ', 'Exiting...']
+
+
+@pytest.mark.parametrize("host, port", [("localhost", 5349)])
+def test_coturn_running(host, port):
+    """Verify that Coturn server is running and listening on port 5349"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(5)  # Set timeout for connection attempt
+    try:
+        sock.connect((host, port))
+        sock.close()
+        assert True  # If connection succeeds, the test passes
+    except (socket.error, socket.timeout):
+        pytest.fail(f"Could not connect to Coturn server at {host}:{port}")
