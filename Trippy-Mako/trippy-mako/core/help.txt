@@ -9,6 +9,7 @@ Command List:
 > connect
 > send
 > proxy
+> demo
 
 configure: Allows the user to enter in the TURN Server's public facing IP address, 
 associated port number, as well as the user's desired protocol to use, and 
@@ -29,3 +30,7 @@ proxy: Using this command will allow the user to create what is essentially an
 open tunnel to the peer through the TURN server to send data through that the peer 
 will then send to other devices in the network. The tool will listen on a port and 
 provide an interface for the user to send the payload through the tunnel.
+
+demo: This feature allows the user to input a new or existing configuration
+and make an allocation to a CoTurn TURN server. The user will be able to see the
+allocation success response from the server and the entire hex message from the server.
