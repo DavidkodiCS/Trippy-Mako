@@ -20,7 +20,7 @@ TURN Protocol CLI Tool
 ### To run:
 
 1. Start Docker Desktop
-1. In a terminal run `docker run -it trippy-mako python3 trippyMako.py`
+1. In a terminal run `docker run -it -v "$(pwd)/Trippy-Mako/trippy-mako/core:/work" trippy-mako bash`
 
 ## Contents
 
