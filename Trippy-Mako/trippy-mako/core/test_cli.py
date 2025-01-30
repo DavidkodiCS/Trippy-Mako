@@ -1,9 +1,6 @@
-import sys 
-sys.path.insert(1, '../trippy-mako/core')
 import trippyMako
 import builtins
 import os 
-import pytest
 
 # source for first four functions: https://www.youtube.com/watch?v=tBAj2FqgIwg
 # these functions simulate input and output
