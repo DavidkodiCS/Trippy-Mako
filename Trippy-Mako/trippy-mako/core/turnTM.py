@@ -1,6 +1,30 @@
-import struct
 import os
+import asyncio
 import socket
+import struct
+import time
+
+## MESSAGE TYPES
+STUN_MESSAGE_TYPES = {
+    0x001: "Binding Request",
+    0x101: "Binding Response",
+    0x111: "Binding Error Response",
+    0x003: "Allocate Request",
+    0x103: "Allocate Response",
+    0x113: "Allocate Error Response",
+    0x004: "Refresh Request",
+    0x104: "Refresh Response",
+    0x114: "Refresh Error Response",
+    0x016: "Send Indication",
+    0x116: "Data Indication",
+    0x008: "CreatePermission Request",
+    0x108: "CreatePermission Response",
+    0x118: "CreatePermission Error Response",
+    0x009: "ChannelBind Request",
+    0x109: "ChannelBind Response",
+    0x119: "ChannelBind Error Response",
+}
+
 
 ## Message Builders
 def build_alloc():
@@ -90,10 +114,67 @@ def build_channelBind():
     MESSAGE_TYPE = 0x009
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
+    
+## Human Readable Server Responses ##
+def readServerResponse(response):    
+    msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
+    print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
+    print(f"MSG_LENGTH: {msg_length}")
+    print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
+    print(f"TRANSACTION_ID: {transaction_id.hex()}")
+    
+    offset = 20  # Start of attributes
 
-#Send Create Allocate
-def sendAllocation(ip, port):
-    turn_server = ip                          # TURN server's IP
+    # Parse Attributes
+    while offset < len(response):
+        attr_type, attr_length = struct.unpack_from("!HH", response, offset)
+        offset += 4  # Move past type and length
+
+        attr_value = response[offset : offset + attr_length]
+        offset += attr_length  # Move past value
+
+        if attr_type == 0x000D:  # LIFETIME
+            lifetime = struct.unpack("!I", attr_value)[0]
+            print(f"Lifetime\n\tValue: {lifetime} seconds")
+
+        elif attr_type == 0x0020:  # XOR-MAPPED-ADDRESS
+            family, xor_port = struct.unpack("!HH", attr_value[:4])
+            #MAGIC COOKIE
+            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+            ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+            port = xor_port ^ 0x2112
+            print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+
+        elif attr_type == 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
+            family, xor_port = struct.unpack("!HH", attr_value[:4])
+            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+            ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+            port = xor_port ^ 0x2112
+            print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+
+        elif attr_type == 0x8022:  # SOFTWARE
+            software_version = attr_value.decode(errors="ignore")
+            print(f"Software\n\tValue: {software_version}")
+
+        elif attr_type == 0x8028:  # FINGERPRINT
+            fingerprint = struct.unpack("!I", attr_value)[0]
+            print(f"Fingerprint\n\tValue: {fingerprint}")
+        
+# Helper function to XOR decode addresses
+def xor_decode(value, key):
+    return bytes(b1 ^ b2 for b1, b2 in zip(value, key))
+
+##Send refresh async
+async def send_refresh(sock, refresh):
+    while True:
+        sock.sendto(refresh, TURN_SERVER)
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+        await asyncio.sleep(300)  # Wait 300 seconds before sending again
+    
+
+#Start client
+def start_client(ip, port):
+    turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
     alloc_packet = build_alloc()
 
@@ -119,31 +200,13 @@ def sendAllocation(ip, port):
         print(f"Error: {e}")
 
     finally:
-            sock.close()
-
-##Refresh
-def sendRefresh(self):
+            sock.close()    
+            
+            
+    ## Maintain connection with refresh packets
     refresh = build_refresh()
     
-## Human Readable Server Responses ##
-def readServerResponse(response):
-    print(len(response))
-    
-    msg_type, msg_length, magic_cookie, transaction_id = struct.unpack("!HHI12s", response[:20])
-    print(f"MSG_TYPE: {msg_type}")
-    print(f"MSG_LENGTH: {msg_length}")
-    print(f"MAGIC_COOKIE: {magic_cookie}")
-    print(f"TRANSACTION_ID: {transaction_id}")
-    
-    response = response[20:]
-    
-    attr_type, attr_length, family, xor_port_ip = struct.unpack_from("!HHH4s", response[:8], 20)
-    print(f"MSG_TYPE: {msg_type}")
-    print(f"MSG_LENGTH: {msg_length}")
-    print(f"MAGIC_COOKIE: {magic_cookie}")
-    print(f"TRANSACTION_ID: {transaction_id}")
-    
-    
+        
 ##MAIN DEBUGGING
 if __name__ == "__main__":
     import turnTM

@@ -171,7 +171,7 @@ def demo():
         print("Invalid command...")
         demo()
     
-    turnTM.sendAllocation(info[0], info[1])
+    turnTM.start_client(info[0], info[1])
     
 
 
