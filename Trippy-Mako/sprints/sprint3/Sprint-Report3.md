@@ -20,22 +20,16 @@ All feautures for this sprint have been accepted after demo. Our customer was ab
 
 ## Updates to the Release Plan
 
- ### Sprint 4, 5, 6 features 
+ Sprint 4, 5, 6 features have been planned, but we will still hold sprint planning meetings to break out individual tasks.
 
-### Updated Member Velocities:
+## Updated Member Velocities:
 
-## TODO
-
-| Member Name   | Predicted Velocity | Updated Velocity |
-|---------------|--------------------|------------------|
-| Francesconi   | 2                  | 2                |
-| Kreidler      | 4                  | 4                |
-| Larkins       | 2                  | 2                |
+All members have been able to keep up with sprint demands for the last two sprints. In this last sprint David was not able to fully flesh out reading server response but more time can be allocated towards that task if needed and applicable to future features. As a team we need to work a little faster so for the next sprint we are looking to complete most tasks and the next sprint planning meeting by Sunday, FEB 9.
 
 
 ## Velocity Math and how that factors into updated release plan.
 
-## TODO
+Based on our current team velocity we are on track to finish the features that we planed out in sprints 5 and 6.
 
 ## [Next sprint plan](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?gid=972462669#gid=972462669)
 
