@@ -165,7 +165,7 @@ def xor_decode(value, key):
     return bytes(b1 ^ b2 for b1, b2 in zip(value, key))
 
 ##Send refresh async
-async def send_refresh(sock, refresh):
+async def send_refresh(sock, refresh, TURN_SERVER):
     while True:
         sock.sendto(refresh, TURN_SERVER)
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
@@ -176,6 +176,7 @@ async def send_refresh(sock, refresh):
 def start_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = {turn_server, int(turn_port)}
     alloc_packet = build_alloc()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -184,7 +185,7 @@ def start_client(ip, port):
     try:
         # Send the Allocate packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, (turn_server, turn_port))
+        sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
@@ -205,34 +206,39 @@ def start_client(ip, port):
             
     ## Maintain connection with refresh packets
     refresh = build_refresh()
+    send_refresh(sock, refresh, TURN_SERVER)
+
+    while True:
+        print("Waiting...")
+        time.sleep(1)
     
         
 ##MAIN DEBUGGING
-if __name__ == "__main__":
-    import turnTM
-    turn_server = "127.0.0.1"  # Replace with your TURN server's IP or domain
-    turn_port = 5349           # Default TURN port
-    alloc_packet = build_alloc()
+# if __name__ == "__main__":
+#     import turnTM
+#     turn_server = "127.0.0.1"  # Replace with your TURN server's IP or domain
+#     turn_port = 5349           # Default TURN port
+#     alloc_packet = build_alloc()
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(5)  # Set a timeout for the response (5 seconds)
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     sock.settimeout(5)  # Set a timeout for the response (5 seconds)
     
-    try:
-        # Send the Allocate packet to the TURN server
-        print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, (turn_server, turn_port))
+#     try:
+#         # Send the Allocate packet to the TURN server
+#         print(f"Sending packet to {turn_server}:{turn_port}")
+#         sock.sendto(alloc_packet, (turn_server, turn_port))
         
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
+#         # Receive the response from the TURN server
+#         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+#         print(f"Received response from {addr}")
 
-        if response:
-            print("Response (hex):", response.hex())
+#         if response:
+#             print("Response (hex):", response.hex())
 
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-        print(f"Error: {e}")
+#     except socket.timeout:
+#         print("No response received (timeout).")
+#     except Exception as e:
+#         print(f"Error: {e}")
 
-    finally:
-            sock.close()
+#     finally:
+#             sock.close()
