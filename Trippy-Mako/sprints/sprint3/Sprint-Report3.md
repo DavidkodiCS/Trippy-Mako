@@ -16,11 +16,11 @@ All feautures for this sprint have been accepted after demo. Our customer was ab
 
 ## Stories/features added to the backlog since the last Sprint Review Email
 
-## TODO
+### See next Sprint Plan
 
 ## Updates to the Release Plan
 
- ## TODO
+ ### Sprint 4, 5, 6 features 
 
 ### Updated Member Velocities:
 
