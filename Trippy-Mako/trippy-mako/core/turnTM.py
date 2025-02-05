@@ -49,18 +49,6 @@ def build_alloc():
 
     mLen = len(requested_transport)
 
-    # LIFETIME_ATTR_TYPE = 0x000D
-    # lifetime_value = 3600  # Lifetime in seconds
-
-    # lifetime_attr = struct.pack(
-    #     "!HHI",
-    #     LIFETIME_ATTR_TYPE,
-    #     4,
-    #     lifetime_value
-    # )
-
-    # mLen += len(lifetime_attr)
-
     # Pack the header (Type, Length, Magic Cookie, Transaction ID)
     header = struct.pack(
         STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
@@ -118,24 +106,68 @@ def build_send():
     MESSAGE_TYPE = 0x006
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
+    
+    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        0,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+    
+    return header
 
 def build_data():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x007
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
+    
+    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        0,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+    
+    return header
 
 def build_createPerm():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x008
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
+    
+    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        0,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+    
+    return header
 
 def build_channelBind():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x009
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
+    
+    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        0,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+    
+    return header
     
 ## Human Readable Server Responses ##
 def readServerResponse(response):    
@@ -232,8 +264,6 @@ async def start_client(ip, port):
     await asyncio.sleep(10)
     kill = build_kill_refresh()
     sock.sendto(kill, TURN_SERVER)
-        
-    
         
 ##MAIN DEBUGGING
 # if __name__ == "__main__":
