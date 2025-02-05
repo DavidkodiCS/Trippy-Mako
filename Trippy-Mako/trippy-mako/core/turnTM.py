@@ -91,6 +91,28 @@ def build_refresh():
     alloc_packet = header
     return alloc_packet
 
+def build_kill_refresh():
+        ##Lifetime of 0 to deallocate
+        lifetime_attr = struct.pack("!HHI", 0x000D, 4, 0)  
+        attr_len = len(lifetime_attr)
+    
+        STUN_HEADER_FORMAT = "!HHI12s"
+        MESSAGE_TYPE = 0x004
+        MAGIC_COOKIE = 0x2112A442
+        TRANSACTION_ID = os.urandom(12)
+
+        # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+        header = struct.pack(
+            STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+            MESSAGE_TYPE,  # Message type
+            attr_len,         # Message length
+            MAGIC_COOKIE,      # Magic cookie
+            TRANSACTION_ID          # Transaction ID
+        )
+
+        dealloc_packet = header + lifetime_attr
+        return dealloc_packet
+
 def build_send():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x006
@@ -165,18 +187,21 @@ def xor_decode(value, key):
     return bytes(b1 ^ b2 for b1, b2 in zip(value, key))
 
 ##Send refresh async
-async def send_refresh(sock, refresh, TURN_SERVER):
-    while True:
+async def send_refresh(sock, TURN_SERVER):
+   while True:
+        refresh = build_refresh()
         sock.sendto(refresh, TURN_SERVER)
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+        
         await asyncio.sleep(300)  # Wait 300 seconds before sending again
+        
     
 
-#Start client
-def start_client(ip, port):
+## Start client ##
+async def start_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
-    TURN_SERVER = {turn_server, int(turn_port)}
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
     alloc_packet = build_alloc()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -198,19 +223,16 @@ def start_client(ip, port):
     except socket.timeout:
         print("No response received (timeout).")
     except Exception as e:
-        print(f"Error: {e}")
-
-    finally:
-            sock.close()    
-            
+       print(f"Error: {e}")    
             
     ## Maintain connection with refresh packets
-    refresh = build_refresh()
-    send_refresh(sock, refresh, TURN_SERVER)
-
-    while True:
-        print("Waiting...")
-        time.sleep(1)
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    
+    print("Waiting...")
+    await asyncio.sleep(10)
+    kill = build_kill_refresh()
+    sock.sendto(kill, TURN_SERVER)
+        
     
         
 ##MAIN DEBUGGING

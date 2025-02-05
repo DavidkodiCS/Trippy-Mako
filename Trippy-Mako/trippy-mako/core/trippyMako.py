@@ -3,6 +3,7 @@
 ## Imports ##
 import configparser
 import turnTM
+import asyncio
 
 ## Command Functions ##
 def help():
@@ -171,7 +172,7 @@ def demo():
         print("Invalid command...")
         demo()
     
-    turnTM.start_client(info[0], info[1])
+    asyncio.run(turnTM.start_client(info[0], info[1]))
     
 
 
