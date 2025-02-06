@@ -250,7 +250,7 @@ async def send_refresh(sock, TURN_SERVER):
         sock.sendto(refresh, TURN_SERVER)
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
-        await asyncio.sleep(300)  # Wait 300 seconds before sending again
+        await asyncio.sleep(15) ##15 for demo purposes  # Wait 300 seconds before sending again
         
     
 
@@ -285,10 +285,11 @@ async def start_client(ip, port):
     ## Maintain connection with refresh packets
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
     
-    print("Waiting...")
-    await asyncio.sleep(10)
-    kill = build_kill_refresh()
-    sock.sendto(kill, TURN_SERVER)
+    while True:
+        print("Waiting...")
+        await asyncio.sleep(10)
+        # kill = build_kill_refresh()
+        # sock.sendto(kill, TURN_SERVER)
         
 ##MAIN DEBUGGING
 # if __name__ == "__main__":

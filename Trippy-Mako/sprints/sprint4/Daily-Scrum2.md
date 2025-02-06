@@ -15,12 +15,19 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 
 1. What have you done since last meeting?
 
+I have sending refresh packets full working at this point.
+
 2. What will you accomplish today / until the next daily scrum?
 
+By the next daily scrum I will be able to send a basic "Hello, World" to a peer connected to the TURN server.
 
 3. What impediments or obstacles are in your way?
 
+I need to figure out how to test this feature.
+
 4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+
+8/10
 
 
 ## Meris
