@@ -135,22 +135,41 @@ def build_data():
     
     return header
 
-def build_createPerm():
+def build_createPerm(ip, port):
+    MAGIC_COOKIE = 0x2112A442
+    ## XOR PORT + MAGIC COOKIE
+    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    
+    ## IP address to Bytes
+    ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
+    
+    MESSAGE_TYPE = 0x0012
+    
+    xor_peer_address = struct.pack("!HHBBH4s", 
+        MESSAGE_TYPE,  # Attribute Type (XOR-PEER-ADDRESS)
+        8,       # Length
+        0,       # Reserved
+        0x01,    # Family (IPv4)
+        xor_port,  # XOR'ed Port
+        ip_bytes)  # XOR'ed IP Address
+    
+    xor_message_length = len(xor_peer_address)
+    
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x008
-    MAGIC_COOKIE = 0x2112A442
+    #MAGIC COOKIE
     TRANSACTION_ID = os.urandom(12)
     
     # Pack the header (Type, Length, Magic Cookie, Transaction ID)
     header = struct.pack(
         STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
         MESSAGE_TYPE,  # Message type
-        0,         # Message length
+        xor_message_length,         # Message length
         MAGIC_COOKIE,      # Magic cookie
         TRANSACTION_ID          # Transaction ID
     )
     
-    return header
+    return header + xor_peer_address
 
 def build_channelBind():
     STUN_HEADER_FORMAT = "!HHI12s"
