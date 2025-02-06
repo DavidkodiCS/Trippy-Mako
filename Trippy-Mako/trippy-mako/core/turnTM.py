@@ -101,7 +101,13 @@ def build_kill_refresh():
         dealloc_packet = header + lifetime_attr
         return dealloc_packet
 
-def build_send():
+def build_send_indication(xor_peer_address, payload):
+    ## XOR-Peer-Address Attribute
+    
+    
+    ## Data Attribute
+    
+    
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x006
     MAGIC_COOKIE = 0x2112A442
@@ -118,7 +124,7 @@ def build_send():
     
     return header
 
-def build_data():
+def build_data_indication():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x007
     MAGIC_COOKIE = 0x2112A442
