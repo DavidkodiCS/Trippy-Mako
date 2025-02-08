@@ -30,6 +30,37 @@ STUN_MESSAGE_TYPES = {
     0x0119: "ChannelBind Error Response",
 }
 
+## TEST CLIENT for demo
+## Start client ##
+async def start_client(ip, port):
+    turn_server = ip             # TURN server's IP
+    turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    alloc_packet = build_alloc()
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(5)  # Set a timeout for the response (5 seconds)
+
+    try:
+        # Send the Allocate packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
+
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            readServerResponse(response)
+
+    except socket.timeout:
+        print("No response received (timeout).")
+    except Exception as e:
+       print(f"Error: {e}")    
+
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
 
 ## Start client ##
 async def start_send_client(ip, port):
@@ -88,6 +119,11 @@ async def start_send_client(ip, port):
         payload = input("Send a message: ")
         send = build_send_indication(peer_ip, peer_port, payload)
         sock.sendto(send, TURN_SERVER) 
+
+
+        if response:
+            print("Response (hex):", response.hex())
+            readServerResponse(response)
         # kill = build_kill_refresh()
         # sock.sendto(kill, TURN_SERVER)
         
@@ -110,6 +146,10 @@ async def start_listener_client(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+       # Receive the response from the TURN server
         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
         print(f"Received response from {addr}")
 
@@ -216,6 +256,7 @@ def build_createPerm(ip, port):
     xor_port = port ^ (MAGIC_COOKIE >> 16)
     
     ## IP address to Bytes
+    ip = socket.inet_aton(ip)
     ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
     
     MESSAGE_TYPE = 0x0012
@@ -253,6 +294,7 @@ def build_send_indication(ip, port, payload):
     xor_port = port ^ (MAGIC_COOKIE >> 16)
     
     ## IP address to Bytes
+    ip = socket.inet_aton(ip)
     ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
     
     MESSAGE_TYPE = 0x0012
@@ -270,7 +312,7 @@ def build_send_indication(ip, port, payload):
     ## Data Attribute
     DATA_ATTRIBUTE_TYPE = 0x0013  # Attribute type for DATA
     data_length = len(payload)
-    data_attribute = struct.pack("!HH", DATA_ATTRIBUTE_TYPE, data_length) + payload
+    data_attribute = struct.pack("!HH", DATA_ATTRIBUTE_TYPE, data_length) + payload.encode('utf-8')
     
     
     STUN_HEADER_FORMAT = "!HHI12s"
@@ -282,47 +324,6 @@ def build_send_indication(ip, port, payload):
         STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
         MESSAGE_TYPE,  # Message type
         xor_message_length + data_length,         # Message length
-        MAGIC_COOKIE,      # Magic cookie
-        TRANSACTION_ID          # Transaction ID
-    )
-    
-    return header + xor_peer_address + data_attribute
-
-def parse_data_indication(ip, port):
-    ## XOR-Peer-Address Attribute
-    MAGIC_COOKIE = 0x2112A442
-    ## XOR PORT + MAGIC COOKIE
-    xor_port = port ^ (MAGIC_COOKIE >> 16)
-    
-    ## IP address to Bytes
-    ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
-    
-    MESSAGE_TYPE = 0x0012
-    
-    xor_peer_address = struct.pack("!HHBBH4s", 
-        MESSAGE_TYPE,  # Attribute Type (XOR-PEER-ADDRESS)
-        8,       # Length
-        0,       # Reserved
-        0x01,    # Family (IPv4)
-        xor_port,  # XOR'ed Port
-        ip_bytes)  # XOR'ed IP Address
-    
-    xor_message_length = len(xor_peer_address)
-    
-    ## Data Attribute
-    DATA_ATTRIBUTE_TYPE = 0x0013  # Attribute type for DATA
-    data_length = len(payload)
-    data_attribute = struct.pack("!HH", DATA_ATTRIBUTE_TYPE, data_length) + payload
-
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x007
-    TRANSACTION_ID = os.urandom(12)
-    
-    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-    header = struct.pack(
-        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-        MESSAGE_TYPE,  # Message type
-        0,         # Message length
         MAGIC_COOKIE,      # Magic cookie
         TRANSACTION_ID          # Transaction ID
     )

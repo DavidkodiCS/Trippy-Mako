@@ -10,6 +10,7 @@ Command List:
 > send
 > proxy
 > demo
+> listen
 
 configure: Allows the user to enter in the TURN Server's public facing IP address, 
 associated port number, as well as the user's desired protocol to use, and 
@@ -34,3 +35,5 @@ provide an interface for the user to send the payload through the tunnel.
 demo: This feature allows the user to input a new or existing configuration
 and make an allocation to a CoTurn TURN server. The user will be able to see the
 allocation success response from the server and the entire hex message from the server.
+
+listen: This feature allows the client to listen for a peer on the TURN server.
