@@ -6,31 +6,40 @@ import time
 
 ## MESSAGE TYPES
 STUN_MESSAGE_TYPES = {
-    0x001: "Binding Request",
-    0x101: "Binding Response",
-    0x111: "Binding Error Response",
-    0x003: "Allocate Request",
-    0x103: "Allocate Response",
-    0x113: "Allocate Error Response",
-    0x004: "Refresh Request",
-    0x104: "Refresh Response",
-    0x114: "Refresh Error Response",
-    0x016: "Send Indication",
-    0x116: "Data Indication",
-    0x008: "CreatePermission Request",
-    0x108: "CreatePermission Response",
-    0x118: "CreatePermission Error Response",
-    0x009: "ChannelBind Request",
-    0x109: "ChannelBind Response",
-    0x119: "ChannelBind Error Response",
+    0x0001: "Binding Request",
+    0x0101: "Binding Success Response",
+    0x0111: "Binding Error Response",
+    
+    0x0003: "Allocate Request",
+    0x0103: "Allocate Success Response",
+    0x0113: "Allocate Error Response",
+
+    0x0004: "Refresh Request",
+    0x0104: "Refresh Success Response",
+    0x0114: "Refresh Error Response",
+
+    0x0006: "Send Indication",  
+    0x0017: "Data Indication",
+
+    0x0008: "CreatePermission Request",
+    0x0108: "CreatePermission Success Response",
+    0x0118: "CreatePermission Error Response",
+
+    0x0009: "ChannelBind Request",
+    0x0109: "ChannelBind Success Response",
+    0x0119: "ChannelBind Error Response",
 }
 
+
 ## Start client ##
-async def start_client(ip, port):
+async def start_send_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
+    peer_ip = input("IP of Peer: ")
+    peer_port = int(input("Port of peer: "))
     TURN_SERVER = tuple([turn_server, int(turn_port)])
     alloc_packet = build_alloc()
+    create_perm_packet = build_createPerm(peer_ip, peer_port)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(5)  # Set a timeout for the response (5 seconds)
@@ -39,6 +48,18 @@ async def start_client(ip, port):
         # Send the Allocate packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
         sock.sendto(alloc_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            readServerResponse(response)
+            
+        # Send the Create Perm packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(create_perm_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
@@ -64,10 +85,53 @@ async def start_client(ip, port):
     
     
     while True:
-        print("Waiting...")
-        await asyncio.sleep(10)
+        payload = input("Send a message: ")
+        send = build_send_indication(peer_ip, peer_port, payload)
+        sock.sendto(send, TURN_SERVER) 
         # kill = build_kill_refresh()
         # sock.sendto(kill, TURN_SERVER)
+        
+## LISTENER CLIENT
+
+async def start_listener_client(ip, port):
+    turn_server = ip             # TURN server's IP
+    turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    loop = asyncio.get_event_loop()
+    
+    alloc_packet = build_alloc()
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(5)  # Set a timeout for the response (5 seconds)
+    
+    try:
+        # Send the Allocate packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            readServerResponse(response)
+
+    except socket.timeout:
+        print("No response received (timeout).")
+    except Exception as e:
+       print(f"Error: {e}")  
+       
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+
+    while True:
+        response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            readServerResponse(response)
 
 
 ## Message Builders
@@ -224,7 +288,7 @@ def build_send_indication(ip, port, payload):
     
     return header + xor_peer_address + data_attribute
 
-def build_data_indication(ip, port, payload):
+def parse_data_indication(ip, port):
     ## XOR-Peer-Address Attribute
     MAGIC_COOKIE = 0x2112A442
     ## XOR PORT + MAGIC COOKIE
@@ -295,6 +359,7 @@ def readServerResponse(response):
 
     # Parse Attributes
     while offset < len(response):
+        MAGIC_COOKIE = 0x2112A442
         attr_type, attr_length = struct.unpack_from("!HH", response, offset)
         offset += 4  # Move past type and length
 
@@ -308,14 +373,14 @@ def readServerResponse(response):
         elif attr_type == 0x0020:  # XOR-MAPPED-ADDRESS
             family, xor_port = struct.unpack("!HH", attr_value[:4])
             #MAGIC COOKIE
-            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
             ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
             port = xor_port ^ 0x2112
             print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
 
         elif attr_type == 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
             family, xor_port = struct.unpack("!HH", attr_value[:4])
-            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
             ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
             port = xor_port ^ 0x2112
             print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
@@ -327,6 +392,16 @@ def readServerResponse(response):
         elif attr_type == 0x8028:  # FINGERPRINT
             fingerprint = struct.unpack("!I", attr_value)[0]
             print(f"Fingerprint\n\tValue: {fingerprint}")
+        elif attr_type == 0x0013:   # DATA
+            data = attr_value
+            print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
+            print(f"\tDecoded: {data.decode()}")
+        elif attr_type == 0x0012:   # XOR-PEER-ADDRESS (for Data)
+            family, xor_port = struct.unpack("!HH", attr_value[:4])
+            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+            peer_ip = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+            peer_port = xor_port ^ 0x2112
+            print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
         
 # Helper function to XOR decode addresses
 def xor_decode(value, key):
@@ -346,34 +421,4 @@ async def send_refresh(sock, TURN_SERVER):
             readServerResponse(response)
         
         
-        await asyncio.sleep(15) ##15 for demo purposes  # Wait 300 seconds before sending again
-        
-##MAIN DEBUGGING
-# if __name__ == "__main__":
-#     import turnTM
-#     turn_server = "127.0.0.1"  # Replace with your TURN server's IP or domain
-#     turn_port = 5349           # Default TURN port
-#     alloc_packet = build_alloc()
-
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     sock.settimeout(5)  # Set a timeout for the response (5 seconds)
-    
-#     try:
-#         # Send the Allocate packet to the TURN server
-#         print(f"Sending packet to {turn_server}:{turn_port}")
-#         sock.sendto(alloc_packet, (turn_server, turn_port))
-        
-#         # Receive the response from the TURN server
-#         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-#         print(f"Received response from {addr}")
-
-#         if response:
-#             print("Response (hex):", response.hex())
-
-#     except socket.timeout:
-#         print("No response received (timeout).")
-#     except Exception as e:
-#         print(f"Error: {e}")
-
-#     finally:
-#             sock.close()
+        await asyncio.sleep(300) # Wait 300 seconds before sending again
