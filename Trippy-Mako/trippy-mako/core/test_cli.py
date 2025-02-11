@@ -2,7 +2,8 @@ import socket
 import pytest
 import trippyMako
 import builtins
-import os 
+import os
+from unittest.mock import patch
 
 # source for first four functions: https://www.youtube.com/watch?v=tBAj2FqgIwg
 # these functions simulate input and output
@@ -107,14 +108,11 @@ def test_coturn_running(host, port):
     except (socket.error, socket.timeout):
         pytest.fail(f"Could not connect to Coturn server at {host}:{port}")
 
-
-@pytest.mark.parametrize("option", [("demo")])
-def menu_options(option):
-    set_keyboard_input(['demo'])
-    trippyMako.addConfig()
-    output = get_display_output()
-    assert output == ['Enter configuration name: ', 
-    'Enter TURN server IP address: ', 
-    'Enter TURN server port number: ', 
-    'Enter desired protocol: ', 
-    'Configuration successfully added!']
+def test_demo_option():
+    """See if demo option can be opened"""
+    with patch("builtins.input", side_effect=["demo","new", "test", "127.0.0.1", "5349", "TCP", "exit"]):
+        try:
+            trippyMako.main()
+            assert True
+        except Exception as e:
+            pytest.fail(f"Demo did not run: {e}")
