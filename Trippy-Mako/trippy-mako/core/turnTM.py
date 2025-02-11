@@ -32,35 +32,35 @@ STUN_MESSAGE_TYPES = {
 
 ## TEST CLIENT for demo
 ## Start client ##
-async def start_client(ip, port):
-    turn_server = ip             # TURN server's IP
-    turn_port = int(port)        # Default TURN port most likely
-    TURN_SERVER = tuple([turn_server, int(turn_port)])
-    alloc_packet = packetBuilder.build_alloc()
+# async def start_client(ip, port):
+#     turn_server = ip             # TURN server's IP
+#     turn_port = int(port)        # Default TURN port most likely
+#     TURN_SERVER = tuple([turn_server, int(turn_port)])
+#     alloc_packet = packetBuilder.build_alloc()
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
 
-    try:
-        # Send the Allocate packet to the TURN server
-        print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
+#     try:
+#         # Send the Allocate packet to the TURN server
+#         print(f"Sending packet to {turn_server}:{turn_port}")
+#         sock.sendto(alloc_packet, TURN_SERVER)
 
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
+#         # Receive the response from the TURN server
+#         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+#         print(f"Received response from {addr}")
 
-        if response:
-            print("Response (hex):", response.hex())
-            readServerResponse(response)
+#         if response:
+#             print("Response (hex):", response.hex())
+#             read_server_response(response)
 
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-       print(f"Error: {e}")    
+#     except socket.timeout:
+#         print("No response received (timeout).")
+#     except Exception as e:
+#        print(f"Error: {e}")    
 
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+#     ## Maintain connection with refresh packets
+#     asyncio.create_task(send_refresh(sock, TURN_SERVER))
 
 ## Start client ##
 async def start_send_client(ip, port):
@@ -86,7 +86,7 @@ async def start_send_client(ip, port):
 
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
             
         # Send the Create Perm packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
@@ -98,7 +98,7 @@ async def start_send_client(ip, port):
 
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
 
     except socket.timeout:
         print("No response received (timeout).")
@@ -123,7 +123,7 @@ async def start_send_client(ip, port):
 
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
         # kill = build_kill_refresh()
         # sock.sendto(kill, TURN_SERVER)
         
@@ -149,13 +149,9 @@ async def start_listener_client(ip, port):
         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
         print(f"Received response from {addr}")
 
-       # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
-
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
 
     except socket.timeout:
         print("No response received (timeout).")
@@ -171,10 +167,10 @@ async def start_listener_client(ip, port):
 
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
     
 ## Human Readable Server Responses ##
-def readServerResponse(response):    
+def read_server_response(response):    
     msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
     print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
     print(f"MSG_LENGTH: {msg_length}")
@@ -192,46 +188,39 @@ def readServerResponse(response):
         attr_value = response[offset : offset + attr_length]
         offset += attr_length  # Move past value
 
-        if attr_type == 0x000D:  # LIFETIME
-            lifetime = struct.unpack("!I", attr_value)[0]
-            print(f"Lifetime\n\tValue: {lifetime} seconds")
-
-        elif attr_type == 0x0020:  # XOR-MAPPED-ADDRESS
-            family, xor_port = struct.unpack("!HH", attr_value[:4])
-            #MAGIC COOKIE
-            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
-            ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-            port = xor_port ^ 0x2112
-            print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
-
-        elif attr_type == 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
-            family, xor_port = struct.unpack("!HH", attr_value[:4])
-            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
-            ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-            port = xor_port ^ 0x2112
-            print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
-
-        elif attr_type == 0x8022:  # SOFTWARE
-            software_version = attr_value.decode(errors="ignore")
-            print(f"Software\n\tValue: {software_version}")
-
-        elif attr_type == 0x8028:  # FINGERPRINT
-            fingerprint = struct.unpack("!I", attr_value)[0]
-            print(f"Fingerprint\n\tValue: {fingerprint}")
-        elif attr_type == 0x0013:   # DATA
-            data = attr_value
-            print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
-            print(f"\tDecoded: {data.decode()}")
-        elif attr_type == 0x0012:   # XOR-PEER-ADDRESS (for Data)
-            family, xor_port = struct.unpack("!HH", attr_value[:4])
-            xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
-            peer_ip = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-            peer_port = xor_port ^ 0x2112
-            print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
-        
-# Helper function to XOR decode addresses
-def xor_decode(value, key):
-    return bytes(b1 ^ b2 for b1, b2 in zip(value, key))
+        match attr_type:
+            case 0x000D: # LIFETIME
+                lifetime = struct.unpack("!I", attr_value)[0]
+                print(f"Lifetime\n\tValue: {lifetime} seconds")
+            case 0x0020: # XOR-MAPPED-ADDRESS
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                #MAGIC COOKIE
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x0008: # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x8022: # SOFTWARE
+                software_version = attr_value.decode(errors="ignore")
+                print(f"Software\n\tValue: {software_version}")
+            case 0x8028: # FINGERPRINT
+                fingerprint = struct.unpack("!I", attr_value)[0]
+                print(f"Fingerprint\n\tValue: {fingerprint}")
+            case 0x0013: # DATA
+                data = attr_value
+                print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
+                print(f"\tDecoded: {data.decode()}")
+            case 0x0012: # XOR-PEER-ADDRESS (PEER)
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+                peer_ip = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                peer_port = xor_port ^ 0x2112
+                print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
 
 ##Send refresh async
 async def send_refresh(sock, TURN_SERVER):
@@ -244,7 +233,7 @@ async def send_refresh(sock, TURN_SERVER):
         print(f"Received response from {addr}")
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
         
         
         await asyncio.sleep(300) # Wait 300 seconds before sending again
