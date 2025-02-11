@@ -1,8 +1,8 @@
 # Packet Builder Documentation
 
 ## Imports
-1. **os** -> Used to create the transaction id, which is apart of every STUN message
-2. **struct** -> Used to easily build packets (STUN Headers, TURN Messages, Attributes)
+1. **os:** Used to create the transaction id, which is apart of every STUN message
+2. **struct:** -> Used to easily build packets (STUN Headers, TURN Messages, Attributes)
 
 ## Messages vs. Attributes
 - **Messages:** Types of packets that are being sent to the TURN server
