@@ -133,12 +133,13 @@ async def start_listener_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
     TURN_SERVER = tuple([turn_server, int(turn_port)])
-    loop = asyncio.get_event_loop()
     
     alloc_packet = packetBuilder.build_alloc()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setblocking(False)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    sock.bind(('0.0.0.0', int(port)))
     
     try:
         # Send the Allocate packet to the TURN server
@@ -146,7 +147,7 @@ async def start_listener_client(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
         print(f"Received response from {addr}")
 
         if response:
@@ -158,16 +159,22 @@ async def start_listener_client(ip, port):
     except Exception as e:
        print(f"Error: {e}")  
        
+    ## Wait for responses from the turn server
+    asyncio.create_task(receive_response(sock))
+    
     ## Maintain connection with refresh packets
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
-
+            
+async def receive_response(sock):
     while True:
-        response, addr = await loop.sock.recvfrom(sock, 4096)
-        print(f"Received response from {addr}")
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
         if response:
             print("Response (hex):", response.hex())
             read_server_response(response)
+        
+        await asyncio.sleep(0.1)
     
 ## Human Readable Server Responses ##
 def read_server_response(response):    
@@ -229,11 +236,10 @@ async def send_refresh(sock, TURN_SERVER):
         sock.sendto(refresh, TURN_SERVER)
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
         print(f"Received response from {addr}")
         if response:
             print("Response (hex):", response.hex())
             read_server_response(response)
         
-        
-        await asyncio.sleep(300) # Wait 300 seconds before sending again
+        await asyncio.sleep(10) # Wait 300 seconds before sending again
