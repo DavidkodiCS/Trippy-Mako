@@ -116,7 +116,9 @@ async def start_send_client(ip, port):
     
     
     while True:
-        payload = input("Send a message: ")
+        payload = input("Send a message(q to quit): ")
+        if(payload == "q"):
+            break
         send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
         sock.sendto(send, TURN_SERVER) 
 
