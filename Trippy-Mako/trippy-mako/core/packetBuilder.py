@@ -1,6 +1,7 @@
 ## Message Builders
 import os
 import struct
+import socket
 
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"

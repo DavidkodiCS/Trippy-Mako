@@ -17,6 +17,12 @@ Each configuration has a title to remind the user of the configuration and field
 ```
 [turn]
 turnip = 127.0.0.1
-turnport = 5349
+turnport = 5349     # Secure Port
+protocol = TCP
+```
+```
+[turn]
+turnip = 127.0.0.1
+turnport = 3478     # Standard Port
 protocol = TCP
 ```
