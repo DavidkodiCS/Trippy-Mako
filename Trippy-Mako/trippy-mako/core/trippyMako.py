@@ -3,6 +3,7 @@
 ## Imports ##
 import configparser
 import turnTM
+import asyncio
 
 ## Command Functions ##
 def help():
@@ -12,6 +13,86 @@ def help():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
 
+## Secure TCP Connection (Shell) ##
+def connect():
+    pass
+
+## Feature to send messages and larger payloads to a peer ##
+def sendPayload():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        info = getConfig(config)
+          
+    elif(choose == "new"):
+        config = addConfig()
+        info = getConfig(config)     
+
+    else:
+        print("Invalid command...")
+        sendPayload()
+    
+    asyncio.run(turnTM.start_send_client(info[0], info[1]))
+
+
+def proxy():
+    pass
+
+## LISTEN ##
+def listen():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        info = getConfig(config)
+        
+    elif(choose == "new"):
+        ##For current demo
+        ##IP = 127.0.0.1
+        ##PORT = 5349
+        config = addConfig()
+        info = getConfig(config)     
+    else:
+        print("Invalid command...")
+        listen()
+    
+    asyncio.run(turnTM.start_listener_client(info[0], info[1]))
+    
+## DEMO OPTION ##
+# def demo():
+#     print("> Choose an existing configuration or create a new one:")
+#     print("> existing\n> new")
+#     choose = input("Choose: ")
+#     info = []
+    
+#     if(choose == "existing"):
+#         print("Please choose a configuration from the list below: ")
+#         listConfig()
+#         config = input("Choose configuration: ")
+#         info = getConfig(config)
+        
+#     elif(choose == "new"):
+#         ##For current demo
+#         ##IP = 127.0.0.1
+#         ##PORT = 5349
+#         config = addConfig()
+#         info = getConfig(config)     
+#     else:
+#         print("Invalid command...")
+#         demo()
+    
+#     asyncio.run(turnTM.start_client(info[0], info[1]))
 
 ## Configuration Menu ##
 def config():
@@ -39,36 +120,28 @@ def config():
                 displayConfig()
             case _:
                 print("Unrecognized Command...")
-
-
-def connect():
-    pass
-
-
-def sendPayload():
-    pass
-
-
-def proxy():
-    pass
-
-
+                
 ## Configuration Commands ##
+
+## Add configuration to configs.ini ##
 def addConfig():
     name = input("Enter configuration name: ")
     
-    # search for the entered name and notify the 
-    # user if it already exists
+    ## search for the entered name and notify the user if it already exists ##
     while configuration.has_section(name):
         print("Configuration name already exists.\nWould you like to 'edit' the existing config or 'create' a new one?")
         command = input("config > ")
-        if(command == 'edit'):
-            editConfig()
-            return
-        elif command == 'create':
-            name = input("Enter configuration name: ")
+        match command:
+            case "edit":
+                editConfig()
+                return
+            case "create":
+                name = input("Enter configuration name: ")
+            case _:
+                print("Unrecognized command...")
+            
 
-    # enter other details about server configuration    
+    ## Enter in fields about server configuration ##
     turnIP = input("Enter TURN server IP address: ")
     turnPort = input("Enter TURN server port number: ")
     protocol = input("Enter desired protocol: ")
@@ -84,108 +157,99 @@ def addConfig():
     
     print("Configuration successfully added!")
     
-    #For when adding and immediately using
+    # For when adding and immediately using
     return name
         
 
-## Remove Configuration From File ##
+## Remove Configuration From configs.ini ##
 def removeConfig():
     listConfig()
-    remove = input("Choose section to remove: ")
-    configuration.remove_section(remove)
-
-    with open("configs.ini", 'w') as configfile:
-        configuration.write(configfile)
+    section = input("Choose section to remove: ")
     
-    print("Configuration successfully removed!")
-
-
-## Edit Configuration ##
-def editConfig():
-    while True:
-        listConfig()
-        edit = input("Choose configuration to edit: ")
-        print("Sections:\nturnIP\nturnPort\nprotocol")
-        section = input("Choose section to edit: ")
-
-        match section:
-            case "turnIP":
-                configuration[edit]['turnIP'] = input("New turnIp: ")
-            case "turnPort":
-                configuration[edit]['turnPort'] = input("New turnPort: ")
-            case "protocol":
-                configuration[edit]['protocol'] = input("New protocol: ")
-            case _:
-                print("Invalid Section...")
+    if configuration.has_section(section):
+        configuration.remove_section(section)
 
         with open("configs.ini", 'w') as configfile:
             configuration.write(configfile)
+        
+        print("Configuration successfully removed!")
+    else:
+        print("Section does not exist...")
 
-        cont = input("Would you like to continue editing? (y/n)")
-        if cont == "y":
-            continue
-        elif cont == "n":
-            break
+## Edit Configuration ##
+def editConfig():
+    listConfig()
+    section = input("Choose configuration to edit: ")
     
-    print("Configuration successfully edited!")
+    if configuration.has_section(section):
+        print("Sections:\n\tturnIP\n\tturnPort\n\tprotocol")
+        
+        while True:
+            field = input("Choose field to edit: ")
 
-## Display A Configuration ##  
+            match field:
+                case "turnIP":
+                    configuration[section]['turnIP'] = input("New turnIp: ")
+                case "turnPort":
+                    configuration[section]['turnPort'] = input("New turnPort: ")
+                case "protocol":
+                    configuration[section]['protocol'] = input("New protocol: ")
+                case _:
+                    print("Invalid Field...")
+
+            ## Write to configs.ini
+            with open("configs.ini", 'w') as configfile:
+                configuration.write(configfile)
+
+            cont = input("Would you like to continue editing? (y/n)")
+            if cont == "y":
+                continue
+            elif cont == "n":
+                break
+    
+        print("Configuration successfully edited!")
+    else:
+        print("Section does not exist...")
+
+## Display Configuration Fields ##  
 def displayConfig():
     listConfig()
     display = input("Choose configuration to display: ")
-    print("TURN IP: " + configuration[display]['turnIP'])
-    print("TURN Port: " + configuration[display]['turnPort'])
-    print("Protocol: " + configuration[display]['protocol'])
+    if configuration.has_section(display):
+        print("TURN IP: " + configuration[display]['turnIP'])
+        print("TURN Port: " + configuration[display]['turnPort'])
+        print("Protocol: " + configuration[display]['protocol'])
+    else:
+        print("Section does not exist...")
     
+## Returns array containing all of the chosen configurations fields ##
 def getConfig(config):
     return [configuration[config]['turnIP'], configuration[config]['turnPort'], configuration[config]['protocol']]    
 
+## Lists the configuration names currently in config.ini ##
 def listConfig():
     print(configuration.sections())
 
-
+## Options ##
 def configOptions():
     print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
-    
-    
-## DEMO OPTION ##
-def demo():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ##For current demo
-        ##IP = 127.0.0.1
-        ##PORT = 5349
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        demo()
-    
-    turnTM.sendAllocation(info[0], info[1])
-    
 
-
-## Main Functions ##
-def welcome():
+### Trippy-Mako Main Menu###
+def main():
+    ## Load Configuration File ##
+    global configuration
+    configuration = configparser.ConfigParser()
+    configuration.read("configs.ini")
+    
+    ## Welcome Message ##
     try:
         with open("w1.txt", "r") as f:
             print(f.read())
     except FileNotFoundError:
         print("Error: Welcome file not found...")
+        
     print("Type help to see the available commands or exit to quit...\n\n")
-
-## Main Menu ##
-def trippyMako():
+    
     while True:
         command = input("\n> ").strip()
 
@@ -201,24 +265,14 @@ def trippyMako():
                 sendPayload()
             case "proxy":
                 proxy()
-            case "demo":
-                demo()
+            case "listen":
+                listen()
             case _:
                 print("Unrecognized Command...")
 
-## Load Configuration File ##
-def configSetup():
-    # User Configurations
-    global configuration
-    configuration = configparser.ConfigParser()
-    configuration.read("configs.ini")
+################################################################################
+################################################################################
 
-## MAIN ##
-def main():
-    configSetup()
-    welcome()
-    trippyMako()
-
-## Run Main Function ##
+## Run Trippy-Mako ##
 if __name__ == "__main__":
     main()
