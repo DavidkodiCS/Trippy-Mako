@@ -23,13 +23,6 @@
 
 ---
 
-### Individual Sprint Velocity
-- **[David Kreidler]:** Meeting goals and completing features
-- **[Charlie Francesconi]:** Meeting goals and completing features
-- **[Meris Larkins]:** Meeting goals and completing features
-
----
-
 ### Additional Notes
 - Bug fixes needed for feature 1
 
