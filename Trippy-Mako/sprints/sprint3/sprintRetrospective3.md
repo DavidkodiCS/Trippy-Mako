@@ -18,8 +18,8 @@
 ---
 
 ### Team Sprint Velocity
-- **Previous Sprint Velocity:** [See Sprint Review](Trippy-Mako\sprints\sprint3\Sprint-Review.md)
-- **Current Sprint Velocity:** [See Sprint Review](Trippy-Mako\sprints\sprint3\Sprint-Review.md)
+- **Previous Sprint Velocity:** [See Sprint Review](Trippy-Mako\Trippy-Mako\sprints\sprint3\Sprint-Review.md)
+- **Current Sprint Velocity:** [See Sprint Review](Trippy-Mako\Trippy-Mako\sprints\sprint3\Sprint-Review.md)
 
 ---
 
