@@ -38,7 +38,12 @@ listen: This feature allows the client to listen for a peer on the TURN server.
 
 ## To Install/Run
 
-### Installation:
+### User Run:
+
+1. Navigate to a file where you would like to store configurations
+2. run command `docker run -it -v "$(pwd):/config" chazzconi/trippy-mako bash`
+
+### Dev Installation:
 
 1. Clone the repository
 2. Within the repository use command `docker build -t trippy-mako .`
@@ -46,7 +51,8 @@ listen: This feature allows the client to listen for a peer on the TURN server.
 ### To run:
 
 1. Start Docker Desktop
-1. In a terminal run `docker run -it -v "$(pwd)/Trippy-Mako/trippy-mako/core:/work" trippy-mako bash`
+2. Navigate to a file to save configurations
+3. In a terminal run `docker run -it -v "$(pwd):/config" trippy-mako bash`
 
 ## Contents
 
