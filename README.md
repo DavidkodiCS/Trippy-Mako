@@ -8,7 +8,7 @@ David Kreidler, Meris Larkins, Charlie Francesconi
 
 ## Topic
 
-TURN Protocol CLI Tool
+TURN Protocol Command Line Interface Tool
 
 ## What It Does
 
