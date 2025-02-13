@@ -33,6 +33,10 @@ I need to figure out how to test this feature.
 ## Meris
 
 1. What have you done since last meeting?
-2. What will you accomplish today / until the next daily scrum?
-3. What impediments or obstacles are in your way?
-4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+   - I have installed the PfSense software and am working on configuring the firewall.
+3. What will you accomplish today / until the next daily scrum?
+   - I will finish configuring the firewall and work on getting software onto the hosts.
+5. What impediments or obstacles are in your way?
+   - None
+7. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+   - 8
