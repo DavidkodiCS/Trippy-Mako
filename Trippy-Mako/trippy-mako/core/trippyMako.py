@@ -3,7 +3,9 @@
 ## Imports ##
 import configparser
 import turnTM
+import os
 import asyncio
+
 
 ## Command Functions ##
 def help():
@@ -126,6 +128,15 @@ def config():
 ## Add configuration to configs.ini ##
 def addConfig():
     name = input("Enter configuration name: ")
+
+    # Get config directory from environment variable
+    config_dir = os.getenv("CONFIG_DIR", "/config")
+    config_path = os.path.join(config_dir, "settings.ini")
+    os.makedirs(config_dir, exist_ok=True)
+
+    # Read existing configurations if the file exists
+    if os.path.exists(config_path):
+        configuration.read(config_path)
     
     ## search for the entered name and notify the user if it already exists ##
     while configuration.has_section(name):
@@ -151,8 +162,8 @@ def addConfig():
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
     configuration[name]['protocol'] = protocol
-    
-    with open("configs.ini", 'w') as configfile:
+
+    with open(config_path, 'w') as configfile:
         configuration.write(configfile)
     
     print("Configuration successfully added!")

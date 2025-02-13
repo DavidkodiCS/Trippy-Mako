@@ -2,7 +2,8 @@ import socket
 import pytest
 import trippyMako
 import builtins
-import os 
+import os
+from unittest.mock import patch
 
 # source for first four functions: https://www.youtube.com/watch?v=tBAj2FqgIwg
 # these functions simulate input and output
@@ -107,14 +108,39 @@ def test_coturn_running(host, port):
     except (socket.error, socket.timeout):
         pytest.fail(f"Could not connect to Coturn server at {host}:{port}")
 
+def test_demo_option():
+    """See if demo option can be opened"""
+    with patch("builtins.input", side_effect=["demo","new", "test", "127.0.0.1", "5349", "TCP", "exit","exit"]):
+        try:
+            trippyMako.main()
+            assert True
+        except Exception as e:
+            pytest.fail(f"Demo did not run: {e}")
 
-@pytest.mark.parametrize("option", [("demo")])
-def menu_options(option):
-    set_keyboard_input(['demo'])
-    trippyMako.addConfig()
-    output = get_display_output()
-    assert output == ['Enter configuration name: ', 
-    'Enter TURN server IP address: ', 
-    'Enter TURN server port number: ', 
-    'Enter desired protocol: ', 
-    'Configuration successfully added!']
+
+# Adding a new set of options as here allows you to run a set of trippymako user
+# inputs and see if it runs succesfully
+@pytest.mark.parametrize(
+    "options",
+    [
+        ("Create Config", ["config", "create", "test", "10.0.0.1", "5349", "TCP", "exit", "exit"]),
+        ("Edit Config", ["config", "edit", "protocol", "UDP", "n", "exit", "exit"]),
+        ("List Configs", ["config", "list", "exit", "exit"]),
+        ("Display Config", ["config", "display", "test", "exit", "exit"]),
+        ("Help Config", ["config", "help", "exit", "exit"]),
+        ("Exit Config Menu", ["config", "exit", "exit"]),
+        ("Remove Config", ["config", "remove", "test", "exit", "exit"]),
+    ],
+    ids=lambda opt: opt[0]  # Use the first tuple item (name) as the test identifier
+)
+def test_config_options(options):
+    """See if config options run correctly"""
+    test_name, input_sequence  = options  # Unpack tuple
+
+    with patch("builtins.input", side_effect=input_sequence):
+        try:
+            trippyMako.main()
+            assert True
+        except Exception as e:
+            pytest.fail(f"Test '{test_name}' failed: {e}")
+
