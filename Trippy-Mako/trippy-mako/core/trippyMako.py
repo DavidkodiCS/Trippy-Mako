@@ -240,6 +240,7 @@ def configOptions():
 def main():
     ## Load Configuration File ##
     global configuration
+    global config_path
     configuration = configparser.ConfigParser()
     configuration.read("configs.ini")
     
