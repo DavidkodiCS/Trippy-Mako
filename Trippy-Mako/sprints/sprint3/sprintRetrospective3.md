@@ -32,4 +32,6 @@
 
 ### Additional Notes
 - Bug fixes needed for feature 1
+- NEED more version control (keep features between tests so we can showcase at meetings)
+- Stick to sprint tasks or add new tasks that are thought of so we pass hours audits
 
