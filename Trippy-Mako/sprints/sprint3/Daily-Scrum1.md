@@ -7,10 +7,14 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 ## Charlie
 
 1. What have you done since last meeting?
-
+Working on tests for cli and a custom test that can be updated based on different commands input. Trying to get
+tests to be portable as well as making configs.ini persistent between images.
 2. What will you accomplish today / until the next daily scrum?
+I am going to try and not fail today. Docker is making me sad.
 3. What impediments or obstacles are in your way?
+I can't figure out why docker doesn't generate files in the correct places or removes directories entierly.
 4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+2
 
 ## David
 
