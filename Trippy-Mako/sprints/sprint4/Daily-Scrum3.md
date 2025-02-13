@@ -15,28 +15,28 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 
 1. What have you done since last meeting?
 
-I have sending refresh packets full working at this point.
+Since last meeting I put a lot of working into the send and listen features of trippy-mako.
 
 2. What will you accomplish today / until the next daily scrum?
 
-By the next daily scrum I will be able to send a basic "Hello, World" to a peer connected to the TURN server.
+Today I will finish writing the dev documentation for packetBuilder.py, turnTM.py, and trippyMako.py. I will also clean up some code.
 
 3. What impediments or obstacles are in your way?
 
-I need to figure out how to test this feature.
+None.
 
 4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
 
-8/10
+10/10
 
 
 ## Meris
 
 1. What have you done since last meeting?
-   - I have installed the PfSense software and am working on configuring the firewall.
+   - I have rebuilt my virtual network after it was wiped from my mission device.
 3. What will you accomplish today / until the next daily scrum?
-   - I will finish configuring the firewall and work on getting software onto the hosts.
+   - I will finally be able to download software onto the hosts.
 5. What impediments or obstacles are in your way?
-   - None
+   - After migrating my network to my personal laptop: None
 7. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
    - 8

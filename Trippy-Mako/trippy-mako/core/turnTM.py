@@ -1,109 +1,84 @@
-import struct
-import os
+import asyncio
 import socket
+import struct
+import time
+import packetBuilder
 
-## Message Builders
-def build_alloc():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x0003
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
+## MESSAGE TYPES
+STUN_MESSAGE_TYPES = {
+    0x0001: "Binding Request",
+    0x0101: "Binding Success Response",
+    0x0111: "Binding Error Response",
+    
+    0x0003: "Allocate Request",
+    0x0103: "Allocate Success Response",
+    0x0113: "Allocate Error Response",
 
-    #Allocate Requires REQUESTED-TRANSPORT
-    REQUESTED_TRANSPORT_TYPE = 0x0019
-    REQUESTED_TRANSPORT_LENGTH = 4
-    UDP_TRANSPORT = 0x11
-    RESERVED = 0x00
+    0x0004: "Refresh Request",
+    0x0104: "Refresh Success Response",
+    0x0114: "Refresh Error Response",
 
-    requested_transport = struct.pack(
-        "!HHBB2x",
-        REQUESTED_TRANSPORT_TYPE,
-        REQUESTED_TRANSPORT_LENGTH,
-        UDP_TRANSPORT,
-        RESERVED
-    )
+    0x0006: "Send Indication",  
+    0x0017: "Data Indication",
 
-    mLen = len(requested_transport)
+    0x0008: "CreatePermission Request",
+    0x0108: "CreatePermission Success Response",
+    0x0118: "CreatePermission Error Response",
 
-    # LIFETIME_ATTR_TYPE = 0x000D
-    # lifetime_value = 3600  # Lifetime in seconds
+    0x0009: "ChannelBind Request",
+    0x0109: "ChannelBind Success Response",
+    0x0119: "ChannelBind Error Response",
+}
 
-    # lifetime_attr = struct.pack(
-    #     "!HHI",
-    #     LIFETIME_ATTR_TYPE,
-    #     4,
-    #     lifetime_value
-    # )
+## TEST CLIENT for demo
+## Start client ##
+# async def start_client(ip, port):
+#     turn_server = ip             # TURN server's IP
+#     turn_port = int(port)        # Default TURN port most likely
+#     TURN_SERVER = tuple([turn_server, int(turn_port)])
+#     alloc_packet = packetBuilder.build_alloc()
 
-    # mLen += len(lifetime_attr)
+#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
 
-    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-    header = struct.pack(
-        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-        MESSAGE_TYPE,  # Message type
-        mLen,         # Message length
-        MAGIC_COOKIE,      # Magic cookie
-        TRANSACTION_ID          # Transaction ID
-    )
+#     try:
+#         # Send the Allocate packet to the TURN server
+#         print(f"Sending packet to {turn_server}:{turn_port}")
+#         sock.sendto(alloc_packet, TURN_SERVER)
 
-    alloc_packet = header + requested_transport
-    return alloc_packet
+#         # Receive the response from the TURN server
+#         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+#         print(f"Received response from {addr}")
 
-def build_refresh():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x004
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
+#         if response:
+#             print("Response (hex):", response.hex())
+#             read_server_response(response)
 
-    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-    header = struct.pack(
-        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-        MESSAGE_TYPE,  # Message type
-        0,         # Message length
-        MAGIC_COOKIE,      # Magic cookie
-        TRANSACTION_ID          # Transaction ID
-    )
+#     except socket.timeout:
+#         print("No response received (timeout).")
+#     except Exception as e:
+#        print(f"Error: {e}")    
 
-    alloc_packet = header
-    return alloc_packet
+#     ## Maintain connection with refresh packets
+#     asyncio.create_task(send_refresh(sock, TURN_SERVER))
 
-def build_send():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x006
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
-
-def build_data():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x007
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
-
-def build_createPerm():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x008
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
-
-def build_channelBind():
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x009
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
-
-#Send Create Allocate
-def sendAllocation(ip, port):
-    turn_server = ip                          # TURN server's IP
+## Start client ##
+async def start_send_client(ip, port):
+    turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
-    alloc_packet = build_alloc()
+    peer_ip = input("IP of Peer: ")
+    peer_port = int(input("Port of peer: "))
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    alloc_packet = packetBuilder.build_alloc()
+    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(5)  # Set a timeout for the response (5 seconds)
+    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
     
     try:
         # Send the Allocate packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, (turn_server, turn_port))
+        sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
         response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
@@ -111,65 +86,162 @@ def sendAllocation(ip, port):
 
         if response:
             print("Response (hex):", response.hex())
-            readServerResponse(response)
+            read_server_response(response)
+            
+        # Send the Create Perm packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(create_perm_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
 
     except socket.timeout:
         print("No response received (timeout).")
     except Exception as e:
-        print(f"Error: {e}")
+       print(f"Error: {e}")    
+            
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    
+    ## Add peer ip and port to configuration setup
+    ## Figure out how to test with another client on VM
+    ## Need to build data indication so that client can receive "Hello, World!"
+    # perm = build_createPerm("127.0.0.1", 1234)
+    # sock.sendto(perm, TURN_SERVER)
+    
+    
+    while True:
+        payload = input("Send a message(q to quit): ")
+        if(payload == "q"):
+            break
+        send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
+        sock.sendto(send, TURN_SERVER) 
 
-    finally:
-            sock.close()
 
-##Refresh
-def sendRefresh(self):
-    refresh = build_refresh()
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+        # kill = build_kill_refresh()
+        # sock.sendto(kill, TURN_SERVER)
+        
+## LISTENER CLIENT
+
+async def start_listener_client(ip, port):
+    turn_server = ip             # TURN server's IP
+    turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    
+    alloc_packet = packetBuilder.build_alloc()
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setblocking(False)
+    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    sock.bind(('0.0.0.0', int(port)))
+    
+    try:
+        # Send the Allocate packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+
+    except socket.timeout:
+        print("No response received (timeout).")
+    except Exception as e:
+       print(f"Error: {e}")  
+       
+    ## Wait for responses from the turn server
+    asyncio.create_task(receive_response(sock))
+    
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+            
+async def receive_response(sock):
+    while True:
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+        
+        await asyncio.sleep(0.1)
     
 ## Human Readable Server Responses ##
-def readServerResponse(response):
-    print(len(response))
-    
-    msg_type, msg_length, magic_cookie, transaction_id = struct.unpack("!HHI12s", response[:20])
-    print(f"MSG_TYPE: {msg_type}")
+def read_server_response(response):    
+    msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
+    print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
     print(f"MSG_LENGTH: {msg_length}")
-    print(f"MAGIC_COOKIE: {magic_cookie}")
-    print(f"TRANSACTION_ID: {transaction_id}")
+    print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
+    print(f"TRANSACTION_ID: {transaction_id.hex()}")
     
-    response = response[20:]
-    
-    attr_type, attr_length, family, xor_port_ip = struct.unpack_from("!HHH4s", response[:8], 20)
-    print(f"MSG_TYPE: {msg_type}")
-    print(f"MSG_LENGTH: {msg_length}")
-    print(f"MAGIC_COOKIE: {magic_cookie}")
-    print(f"TRANSACTION_ID: {transaction_id}")
-    
-    
-##MAIN DEBUGGING
-if __name__ == "__main__":
-    import turnTM
-    turn_server = "127.0.0.1"  # Replace with your TURN server's IP or domain
-    turn_port = 5349           # Default TURN port
-    alloc_packet = build_alloc()
+    offset = 20  # Start of attributes
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(5)  # Set a timeout for the response (5 seconds)
-    
-    try:
-        # Send the Allocate packet to the TURN server
-        print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, (turn_server, turn_port))
+    # Parse Attributes
+    while offset < len(response):
+        MAGIC_COOKIE = 0x2112A442
+        attr_type, attr_length = struct.unpack_from("!HH", response, offset)
+        offset += 4  # Move past type and length
+
+        attr_value = response[offset : offset + attr_length]
+        offset += attr_length  # Move past value
+
+        match attr_type:
+            case 0x000D: # LIFETIME
+                lifetime = struct.unpack("!I", attr_value)[0]
+                print(f"Lifetime\n\tValue: {lifetime} seconds")
+            case 0x0020: # XOR-MAPPED-ADDRESS
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                #MAGIC COOKIE
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x0008: # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x8022: # SOFTWARE
+                software_version = attr_value.decode(errors="ignore")
+                print(f"Software\n\tValue: {software_version}")
+            case 0x8028: # FINGERPRINT
+                fingerprint = struct.unpack("!I", attr_value)[0]
+                print(f"Fingerprint\n\tValue: {fingerprint}")
+            case 0x0013: # DATA
+                data = attr_value
+                print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
+                print(f"\tDecoded: {data.decode()}")
+            case 0x0012: # XOR-PEER-ADDRESS (PEER)
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
+                peer_ip = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                peer_port = xor_port ^ 0x2112
+                print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
+
+##Send refresh async
+async def send_refresh(sock, TURN_SERVER):
+   while True:
+        refresh = packetBuilder.build_refresh()
+        sock.sendto(refresh, TURN_SERVER)
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
         print(f"Received response from {addr}")
-
         if response:
             print("Response (hex):", response.hex())
-
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-        print(f"Error: {e}")
-
-    finally:
-            sock.close()
+            read_server_response(response)
+        
+        await asyncio.sleep(10) # Wait 300 seconds before sending again
