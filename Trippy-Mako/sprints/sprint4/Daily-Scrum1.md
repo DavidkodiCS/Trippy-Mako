@@ -31,6 +31,10 @@ None.
 ## Meris
 
 1. What have you done since last meeting?
+   - I figured out which router software to use and have done research on it.
 3. What will you accomplish today / until the next daily scrum?
+   - I will continue figuring out how to install the router software properly.
 5. What impediments or obstacles are in your way?
+   - None
 7. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+   - 8
