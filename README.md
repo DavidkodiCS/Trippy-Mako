@@ -10,6 +10,32 @@ David Kreidler, Meris Larkins, Charlie Francesconi
 
 TURN Protocol CLI Tool
 
+## What It Does
+
+Trippy-Mako is a command-line tool that allows a host to securely communicate with another host, both of which are behind NAT networks, without connecting to each other. It does this by interfacing with a TURN (Traversal Using Relays around NAT) Server, and there are multiple specific functions Trippy-Mako uses to do so:
+
+configure: Allows the user to enter in the TURN Server's public facing IP address, 
+associated port number, as well as the user's desired protocol to use, and 
+authentication measures. Different settings could affect the speed and size of 
+the packets being sent across the network, which may be important to the user.
+
+connect: Allows the user to initiate a TCP connection over through the TURN 
+server to establish a more permanent connection a peer, like a secure shell.
+
+send: Allows the user to send a payload using the specified protocol specified 
+in the configuration stage.
+
+The tool will check the specified configuration during an action and, if it is 
+incorrect, will highlight to the user what is incorrect and will prompt the user 
+to make the changes with suggestions.
+
+proxy: Using this command will allow the user to create what is essentially an 
+open tunnel to the peer through the TURN server to send data through that the peer 
+will then send to other devices in the network. The tool will listen on a port and 
+provide an interface for the user to send the payload through the tunnel.
+
+listen: This feature allows the client to listen for a peer on the TURN server.
+
 ## To Install/Run
 
 ### Installation:
