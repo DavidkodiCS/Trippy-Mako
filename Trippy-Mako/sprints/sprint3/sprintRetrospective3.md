@@ -18,15 +18,8 @@
 ---
 
 ### Team Sprint Velocity
-- **Previous Sprint Velocity:** [See Sprint Review](Trippy-Mako\sprints\sprint3\Sprint-Review.md)
-- **Current Sprint Velocity:** [See Sprint Review](Trippy-Mako\sprints\sprint3\Sprint-Review.md)
-
----
-
-### Individual Sprint Velocity
-- **[David Kreidler]:** Meeting goals and completing features
-- **[Charlie Francesconi]:** Meeting goals and completing features
-- **[Meris Larkins]:** Meeting goals and completing features
+- **Previous Sprint Velocity:** [See Sprint Review](Sprint-Review.md)
+- **Current Sprint Velocity:** [See Sprint Review](Sprint-Review.md)
 
 ---
 
