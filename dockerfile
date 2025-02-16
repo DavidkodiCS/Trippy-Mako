@@ -6,7 +6,7 @@ RUN echo "listening-port=5349\nfingerprint\nno-auth\nno-tls\nno-dtls\nno-tcp-rel
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
-COPY Trippy-Mako/trippy-mako/core /app
+COPY trippy-mako/core /app
 
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
