@@ -30,38 +30,6 @@ STUN_MESSAGE_TYPES = {
     0x0119: "ChannelBind Error Response",
 }
 
-# TEST CLIENT for demo
-# Start client ##
-async def start_client(ip, port):
-    turn_server = ip             # TURN server's IP
-    turn_port = int(port)        # Default TURN port most likely
-    TURN_SERVER = tuple([turn_server, int(turn_port)])
-    alloc_packet = packetBuilder.build_alloc()
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
-
-    try:
-        # Send the Allocate packet to the TURN server
-        print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
-
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-       print(f"Error: {e}")    
-
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
-
 ## Start client ##
 async def start_send_client(ip, port):
     turn_server = ip             # TURN server's IP
@@ -69,11 +37,16 @@ async def start_send_client(ip, port):
     peer_ip = input("IP of Peer: ")
     peer_port = int(input("Port of peer: "))
     TURN_SERVER = tuple([turn_server, int(turn_port)])
+
+    ## Build Allocation and CreatePermission ##
     alloc_packet = packetBuilder.build_alloc()
     create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
 
+    ## Create Socket ##
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    sock.setblocking(False)
+    sock.bind(('0.0.0.0', 12345))
     
     try:
         # Send the Allocate packet to the TURN server
@@ -81,7 +54,8 @@ async def start_send_client(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        loop = asyncio.get_running_loop()
+        response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)
         print(f"Received response from {addr}")
 
         if response:
@@ -93,44 +67,25 @@ async def start_send_client(ip, port):
         sock.sendto(create_perm_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)
         print(f"Received response from {addr}")
 
         if response:
             print("Response (hex):", response.hex())
             read_server_response(response)
-
-    except socket.timeout:
-        print("No response received (timeout).")
+    except BlockingIOError:
+        pass
     except Exception as e:
        print(f"Error: {e}")    
-            
-    ## Maintain connection with refresh packets
+
+    ## Start sending refreshing
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
     
-    ## Add peer ip and port to configuration setup
-    ## Figure out how to test with another client on VM
-    ## Need to build data indication so that client can receive "Hello, World!"
-    # perm = build_createPerm("127.0.0.1", 1234)
-    # sock.sendto(perm, TURN_SERVER)
-    
-    
-    while True:
-        payload = input("Send a message(q to quit): ")
-        if(payload == "q"):
-            break
-        send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
-        sock.sendto(send, TURN_SERVER) 
-
-
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-        # kill = build_kill_refresh()
-        # sock.sendto(kill, TURN_SERVER)
+    ## Send Messages
+    await send_messages(sock, peer_ip, peer_port, TURN_SERVER)
+  
         
 ## LISTENER CLIENT
-
 async def start_listener_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
@@ -141,7 +96,7 @@ async def start_listener_client(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
-    sock.bind(('0.0.0.0', int(port)))
+    sock.bind(('0.0.0.0', int(23456)))
     
     try:
         # Send the Allocate packet to the TURN server
@@ -149,34 +104,31 @@ async def start_listener_client(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        loop = asyncio.get_running_loop()
+        response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)
         print(f"Received response from {addr}")
 
         if response:
             print("Response (hex):", response.hex())
             read_server_response(response)
 
-    except socket.timeout:
-        print("No response received (timeout).")
+    except BlockingIOError:
+        pass
     except Exception as e:
        print(f"Error: {e}")  
-       
-    ## Wait for responses from the turn server
-    asyncio.create_task(receive_response(sock))
     
     ## Maintain connection with refresh packets
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
-            
-async def receive_response(sock):
-    while True:
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
-        print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-        
-        await asyncio.sleep(0.1)
+    ## Wait for responses from the turn server
+    asyncio.create_task(receive_response(sock))
+
+    while True:
+        quit = await asyncio.to_thread(input, "(q to quit): ")
+        if quit == "q":
+            print("Exiting listener...")
+            break
+        await asyncio.sleep(1)
     
 ## Human Readable Server Responses ##
 def read_server_response(response):    
@@ -231,44 +183,49 @@ def read_server_response(response):
                 peer_port = xor_port ^ 0x2112
                 print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
 
+### ASYNC FUNCTIONS ###
 ##Send refresh async
 async def send_refresh(sock, TURN_SERVER):
    while True:
         refresh = packetBuilder.build_refresh()
         sock.sendto(refresh, TURN_SERVER)
-        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-        
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
+        #print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
         await asyncio.sleep(10) # Wait 300 seconds before sending again
-        
-if __name__ == "__main__":
-    turn_server = "54.234.196.215"             # TURN server's IP
-    turn_port = int(3478)        # Default TURN port most likely
-    TURN_SERVER = tuple([turn_server, int(turn_port)])
-    alloc_packet = packetBuilder.build_alloc()
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+## Receive response
+async def receive_response(sock):
+    loop = asyncio.get_running_loop()
+    while True:
+        try:
+            response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)  # Async recv 
+            print(f"Received response from {addr}: {response.hex()}")
+            read_server_response(response)
+        except BlockingIOError:  # Handles [Errno 11] Resource temporarily unavailable
+            await asyncio.sleep(0.1) 
+        except Exception as e:
+            print(f"Error receiving data: {e}")
 
-    try:
-        # Send the Allocate packet to the TURN server
-        print(f"Sending packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
+        await asyncio.sleep(0.1) 
 
-        # Receive the response from the TURN server
-        # response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        # print(f"Received response from {addr}")
+## Send messages to peer
+async def send_messages(sock, peer_ip, peer_port, TURN_SERVER): 
+    loop = asyncio.get_running_loop()
+    while True:
+        payload = await asyncio.to_thread(input, "Send a message (q to quit): ")
+        if payload == "q":
+            print("Exiting message sender...")
+            break
 
-        # if response:
-        #     print("Response (hex):", response.hex())
-        #     read_server_response(response)
+        send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
+        sock.sendto(send, TURN_SERVER)
+        print(f"Sent message to TURN server at {TURN_SERVER}")
 
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-       print(f"Error: {e}")  
+        try:
+            response, addr = await loop.run_in_executor(None, sock.recvfrom, 4096)  # Async recv 
+            print(f"Received response from {addr}: {response.hex()}")
+            read_server_response(response)
+        except BlockingIOError:  # Handles [Errno 11] Resource temporarily unavailable
+            await asyncio.sleep(0.1) 
+        except Exception as e:
+            print(f"Error receiving data: {e}")
