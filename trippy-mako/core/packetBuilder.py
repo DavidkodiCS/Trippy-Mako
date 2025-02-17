@@ -2,7 +2,6 @@
 import os
 import struct
 import socket
-import random
 
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"
