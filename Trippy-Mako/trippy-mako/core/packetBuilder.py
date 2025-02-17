@@ -1,7 +1,8 @@
 ## Message Builders
 import os
 import struct
-import socket
+
+MAGIC_COOKIE = 0x2112A442
 
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"
@@ -52,8 +53,8 @@ def build_refresh():
         TRANSACTION_ID          # Transaction ID
     )
 
-    refresh_packet = header
-    return refresh_packet
+    alloc_packet = header
+    return alloc_packet
 
 ## Sets the lifetime of the allocation to 0, killing the connection
 def build_kill_refresh():
