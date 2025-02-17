@@ -2,6 +2,7 @@
 import os
 import struct
 import socket
+import random
 
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"
@@ -158,20 +159,64 @@ def build_send_indication(ip, port, payload):
     
     return header + xor_peer_address + data_attribute
 
-# NOT NEEDED RIGHT NOW
-# def build_channelBind():
-#     STUN_HEADER_FORMAT = "!HHI12s"
-#     MESSAGE_TYPE = 0x009
-#     MAGIC_COOKIE = 0x2112A442
-#     TRANSACTION_ID = os.urandom(12)
+## Channel Bind ##
+def build_channelBind(ip, port, channel_number):
+    ## XOR-Peer-Address Attribute
+    MAGIC_COOKIE = 0x2112A442
+    ## XOR PORT + MAGIC COOKIE
+    xor_port = port ^ (MAGIC_COOKIE >> 16)
     
-#     # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-#     header = struct.pack(
-#         STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-#         MESSAGE_TYPE,  # Message type
-#         0,         # Message length
-#         MAGIC_COOKIE,      # Magic cookie
-#         TRANSACTION_ID          # Transaction ID
-#     )
+    ## IP address to Bytes
+    ip = socket.inet_aton(ip)
+    ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
     
-#     return header
+    MESSAGE_TYPE = 0x0012
+    
+    xor_peer_address = struct.pack("!HHBBH4s", 
+        MESSAGE_TYPE,  # Attribute Type (XOR-PEER-ADDRESS)
+        8,       # Length
+        0,       # Reserved
+        0x01,    # Family (IPv4)
+        xor_port,  # XOR'ed Port
+        ip_bytes)  # XOR'ed IP Address
+    
+    xor_message_length = len(xor_peer_address)
+    
+    ## Channel Attribute
+    CHANNEL_NUMBER_ATTR_TYPE = 0x000C
+    channel_attribute = struct.pack("!HHH2s",
+        CHANNEL_NUMBER_ATTR_TYPE,  # Attribute Type
+        4,  # Length (Always 4 bytes)
+        channel_number,  # Assigned Channel Number (0x4000 - 0x7FFF)
+        b'\x00\x00'  # Reserved (2 bytes)
+    )
+    
+    channel_attribute_length = len(channel_attribute)
+    
+    
+    STUN_HEADER_FORMAT = "!HHI12s"
+    MESSAGE_TYPE = 0x009
+    TRANSACTION_ID = os.urandom(12)
+    
+    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        xor_message_length + channel_attribute_length,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+    
+    return header + xor_peer_address + channel_attribute
+
+## Channel Data Message ##
+def build_channelData(data, CHANNEL_NUMBER):
+    CHANNEL_HEADER_FORMAT = "!HH"
+    
+    header = struct.pack(
+        CHANNEL_HEADER_FORMAT,
+        CHANNEL_NUMBER,
+        len(data)
+    )
+    
+    return header + data.encode('utf-8')
