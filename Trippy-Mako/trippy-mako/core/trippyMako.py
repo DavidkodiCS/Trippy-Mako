@@ -71,31 +71,6 @@ def listen():
     
     asyncio.run(turnTM.start_listener_client(info[0], info[1]))
     
-## DEMO OPTION ##
-def demo():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ##For current demo
-        ##IP = 127.0.0.1
-        ##PORT = 5349
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        demo()
-    
-    asyncio.run(turnTM.start_client(info[0], info[1]))
-
 ## Configuration Menu ##
 def config():
     print("Configuration Menu")
@@ -279,8 +254,6 @@ def main():
                 proxy()
             case "listen":
                 listen()
-            case "demo":
-                demo()
             case _:
                 print("Unrecognized Command...")
 
