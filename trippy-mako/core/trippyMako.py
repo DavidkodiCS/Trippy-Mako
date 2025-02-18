@@ -246,7 +246,7 @@ def main():
     
     # Get config directory from environment variable
     config_dir = os.getenv("CONFIG_DIR", "/config")
-    config_path = os.path.join(config_dir, "settings.ini")
+    config_path = os.path.join(config_dir, "config.ini")
     os.makedirs(config_dir, exist_ok=True)
 
     # Read existing configurations if the file exists
