@@ -4,11 +4,11 @@
 
 ### Features Developed and Demoed:
 
-- Feature 1: As a dev I can run a turn server to test sending packets & receiving server information
+1. As a user I can demo communicating back and forth between two hosts and TURN server on the same LAN.
 
-- Feature 2: As a user I can select a DEMO option & send an allocate packet to the TURN server and see a plaintext response from the server
+2. As a user I can send Allocation and Refresh packets to the TURN server from a private network (behind a NAT).
 
-- Feature 3: VM/Test Environment R&D + As a dev  I can spin up a VM test architecture with TURN server & 2 Clients
+3. R&D: Testing architecture Pt.2
 
 ## Accepted Features
 

@@ -8,7 +8,7 @@ After this third sprint we were able to once again complete each feature to abou
 
 ### Update the release plan
 
-[Release Plan](Trippy-Mako\sprints\updatedReleasePlan.md)
+[Release Plan](sprints\updatedReleasePlan.md)
 
 ### Presentation/Demo
 
