@@ -17,7 +17,26 @@ def help():
 
 ## Secure TCP Connection (Shell) ##
 def connect():
-    pass
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        info = getConfig(config)
+          
+    elif(choose == "new"):
+        config = addConfig()
+        info = getConfig(config)     
+
+    else:
+        print("Invalid command...")
+        sendPayload()
+    
+    asyncio.run(turnTM.get_shell(info[0], info[1]))
 
 ## Feature to send messages and larger payloads to a peer ##
 def sendPayload():
@@ -69,7 +88,8 @@ def listen():
         print("Invalid command...")
         listen()
     
-    asyncio.run(turnTM.start_listener_client(info[0], info[1]))
+    channel_number = input("Input channel number: ")
+    asyncio.run(turnTM.start_shell_listener(info[0], info[1]), channel_number)
     
 ## DEMO OPTION ##
 def demo():

