@@ -6,7 +6,7 @@ import time
 import packetBuilder
 import subprocess
 
-## MESSAGE TYPES
+## MESSAGE TYPES ##
 STUN_MESSAGE_TYPES = {
     0x0001: "Binding Request",
     0x0101: "Binding Success Response",
@@ -40,11 +40,14 @@ async def start_quick_message_client(ip, port):
     peer_ip = input("IP of Peer: ")
     peer_port = int(input("Port of peer: "))
     TURN_SERVER = tuple([turn_server, int(turn_port)])
-    alloc_packet = packetBuilder.build_alloc()
-    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
+    sock.setblocking(False) # We dont want socket to block other things
+    
+    ## Allocation
+    alloc_packet = packetBuilder.build_alloc()
+    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
     
     try:
         # Send the Allocate packet to the TURN server
@@ -71,25 +74,39 @@ async def start_quick_message_client(ip, port):
             print("Response (hex):", response.hex())
             read_server_response(response)
 
-    except socket.timeout:
-        print("No response received (timeout).")
+    except BlockingIOError:
+        # Ignore this error and continue listening
+        asyncio.sleep(0.1)
     except Exception as e:
        print(f"Error: {e}")    
             
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))    
-    
+    asyncio.create_task(send_refresh(sock, TURN_SERVER))   # Keep connection alive
+    await send_messages(sock, peer_ip, peer_port, TURN_SERVER)  # User sends messages
+
+## SEND MESSAGES ##
+async def send_messages(sock, peer_ip, peer_port, TURN_SERVER):
+    loop = asyncio.get_running_loop()
+
     while True:
-        payload = input("Send a message(q to quit): ")
-        if(payload == "q"):
-            break
-        send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
-        sock.sendto(send, TURN_SERVER) 
+        try:
+            payload = await loop.run_in_executor(None, input, "Send a command (q to quit): ")
+            if(payload == "q"):
+                break
 
+            send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
+            sock.sendto(send, TURN_SERVER)
 
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
+            response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+            print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+            if response:
+                print("Response (hex):", response.hex())
+                read_server_response(response)
+            
+            await asyncio.sleep(0.1)
+        except BlockingIOError:
+            # Ignore this error and continue listening
+            asyncio.sleep(0.1)
 
 ## Quick Message Listener ##
 async def start_message_listener(ip, port):
@@ -441,18 +458,17 @@ def read_server_response(response):
 ##Send refresh async
 async def send_refresh(sock, TURN_SERVER):
    while True:
-        refresh = packetBuilder.build_refresh()
-        sock.sendto(refresh, TURN_SERVER)
-        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-        
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-        
-        await asyncio.sleep(10) # Wait 300 seconds before sending again
-        
+        try:
+            refresh = packetBuilder.build_refresh()
+            sock.sendto(refresh, TURN_SERVER)
+            #print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            
+            await asyncio.sleep(10) # Wait 300 seconds before sending again
+        except BlockingIOError:
+            # Ignore this error and continue listening
+            asyncio.sleep(0.1)
+
+## MAIN - TESTING
 if __name__ == "__main__":
     turn_server = "54.234.196.215"             # TURN server's IP
     turn_port = int(3478)        # Default TURN port most likely
