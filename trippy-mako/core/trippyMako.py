@@ -4,7 +4,6 @@
 import configparser
 import turnTM
 import os
-import asyncio
 
 ## Command Functions ##
 def help():
@@ -35,7 +34,7 @@ def sendFile():
         print("Invalid command...")
         sendFile()
     
-    asyncio.run(turnTM.start_send_file_client(info[0], info[1]))
+    turnTM.start_send_file_client(info[0], info[1])
 
 ## FILE LISTEN ##
 def file_listen():
@@ -59,7 +58,7 @@ def file_listen():
         file_listen()
     
     channel_number = input("Input channel number: ")
-    asyncio.run(turnTM.start_file_listener(info[0], info[1]), channel_number)
+    turnTM.start_file_listener(info[0], info[1], channel_number)
 #######################
 
 ## GET REMOTE SHELL FEATURE ##
@@ -83,7 +82,7 @@ def connect():
         print("Invalid command...")
         connect()
     
-    asyncio.run(turnTM.get_shell_client(info[0], info[1]))
+    turnTM.get_shell_client(info[0], info[1])
 
 ## REMOTE SHELL LISTENER ##
 def shell_listen():
@@ -107,7 +106,7 @@ def shell_listen():
         shell_listen()
     
     channel_number = input("Input channel number: ")
-    asyncio.run(turnTM.start_shell_listener(info[0], info[1]), channel_number)
+    turnTM.start_shell_listener(info[0], info[1]), channel_number
 ###########################
 
 ## QUICK MESSAGE FEATURE ##
@@ -131,7 +130,7 @@ def message():
         print("Invalid command...")
         message()
     
-    asyncio.run(turnTM.start_quick_message_client(info[0], info[1]))
+    turnTM.start_quick_message_client(info[0], info[1])
 
 def message_listen():
     print("> Choose an existing configuration or create a new one:")
@@ -153,7 +152,7 @@ def message_listen():
         print("Invalid command...")
         message_listen()
     
-    asyncio.run(turnTM.start_message_listener(info[0], info[1]))
+    turnTM.start_message_listener(info[0], info[1])
 ###########################
 
 ## PROXY FEATURE ##
