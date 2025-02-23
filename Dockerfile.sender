@@ -1,0 +1,19 @@
+# Use Python base image
+FROM python:3.12
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy your program files into the container
+COPY trippy-mako/core /app
+
+# Install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
+# Set an environment variable for the TURN server IP or hostname
+ENV TURN_SERVER_IP=turn-server
+
+# Expose any ports if needed for communication with the TURN server
+# not 100% what this should be but I'm sure its nbd
+EXPOSE 8080 
