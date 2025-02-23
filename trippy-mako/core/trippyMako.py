@@ -353,9 +353,9 @@ def main():
                 shell_listen()
             case "message":
                 message()
-            case "demo -l":
+            case "message -l":
                 message_listen()
-            case "demo -listen":
+            case "message -listen":
                 message_listen()
             case _:
                 print("Unrecognized Command...")

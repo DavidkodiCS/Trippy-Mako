@@ -2,9 +2,11 @@ import asyncio
 import random
 import socket
 import struct
+import sys
 import time
 import packetBuilder
 import subprocess
+import select
 
 ## MESSAGE TYPES ##
 STUN_MESSAGE_TYPES = {
@@ -76,7 +78,7 @@ async def start_quick_message_client(ip, port):
 
     except BlockingIOError:
         # Ignore this error and continue listening
-        asyncio.sleep(0.1)
+        await asyncio.sleep(0.1)
     except Exception as e:
        print(f"Error: {e}")    
             
@@ -119,7 +121,6 @@ async def start_message_listener(ip, port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
-    sock.bind(('0.0.0.0', int(port)))
     
     try:
         # Send the Allocate packet to the TURN server
@@ -127,23 +128,20 @@ async def start_message_listener(ip, port):
         sock.sendto(alloc_packet, TURN_SERVER)
         
         # Receive the response from the TURN server
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
         print(f"Received response from {addr}")
 
         if response:
             print("Response (hex):", response.hex())
             read_server_response(response)
 
-    except socket.timeout:
-        print("No response received (timeout).")
+    except BlockingIOError:
+        # Ignore this error and continue listening
+        await asyncio.sleep(0.1)
     except Exception as e:
        print(f"Error: {e}")  
-       
-    ## Wait for responses from the turn server
-    asyncio.create_task(receive_response(sock))
     
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    listener_event_loop(sock, TURN_SERVER)
 
 ## SEND FILE FEATURE ##
 ## Start client ##
@@ -390,17 +388,6 @@ async def receive_execute_commands(sock, TURN_SERVER, channel_number):
         print(f"Sent command output back to client.")
         
         await asyncio.sleep(0.1)
-            
-async def receive_response(sock):
-    while True:
-        response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
-        print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
-
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-        
-        await asyncio.sleep(0.1)
     
 ## Human Readable Server Responses ##
 def read_server_response(response):    
@@ -455,6 +442,21 @@ def read_server_response(response):
                 peer_port = xor_port ^ 0x2112
                 print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
 
+async def receive_response(sock):
+    while True:
+        try:
+            response, addr = await asyncio.get_event_loop().sock_recvfrom(sock, 4096)
+            print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+            if response:
+                print("Response (hex):", response.hex())
+                read_server_response(response)
+        except BlockingIOError:
+            # Ignore this error and continue listening
+            await asyncio.sleep(0.1)
+
+        await asyncio.sleep(0.1)
+
 ##Send refresh async
 async def send_refresh(sock, TURN_SERVER):
    while True:
@@ -463,10 +465,47 @@ async def send_refresh(sock, TURN_SERVER):
             sock.sendto(refresh, TURN_SERVER)
             #print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             
-            await asyncio.sleep(10) # Wait 300 seconds before sending again
+            await asyncio.sleep(300) # Wait 300 seconds before sending again
         except BlockingIOError:
             # Ignore this error and continue listening
-            asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
+
+def listener_event_loop(sock, TURN_SERVER):
+    last_refresh_time = time.time()
+    refresh_interval = 300  # Send refresh every 5 minutes
+
+    print("Listening for messages. Press 'q' to quit.")
+
+    while True:
+        # Calculate remaining time before next refresh
+        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
+
+        # Check for readable sockets and user input
+        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
+
+        if sock in ready:
+            try:
+                response, addr = sock.recvfrom(4096)
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+                if response:
+                    print("Response (hex):", response.hex())
+                    read_server_response(response)
+            except Exception as e:
+                print(f"Socket error: {e}")
+
+        if sys.stdin in ready:
+            user_input = sys.stdin.readline().strip().lower()
+            if user_input == "q":
+                print("Exiting listener...")
+                break
+
+        # Send refresh packet if interval has passed
+        if time.time() - last_refresh_time >= refresh_interval:
+            refresh_packet = packetBuilder.build_refresh()
+            sock.sendto(refresh_packet, TURN_SERVER)
+            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            last_refresh_time = time.time()
 
 ## MAIN - TESTING
 if __name__ == "__main__":
