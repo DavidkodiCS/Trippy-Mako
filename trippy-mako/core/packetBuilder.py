@@ -113,9 +113,11 @@ def build_send_indication(ip, port, payload):
     MESSAGE_TYPE = 0x0011  # Send Indication
     
     ## XOR-Peer-Address Attribute
-    xor_port = port ^ (MAGIC_COOKIE & 0xFFFF)  # Correct XOR operation
-    ip_bytes = socket.inet_aton(ip)
-    xor_ip_bytes = bytes([b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i, b in enumerate(ip_bytes)])
+    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    xor_ip_bytes = bytearray(socket.inet_aton(ip))
+    for i in range(4):
+        xor_ip_bytes[i] ^= (MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF
+
 
     xor_peer_address = struct.pack("!HHBBH4s", 
         0x0012,  # Attribute Type (XOR-PEER-ADDRESS)

@@ -38,9 +38,10 @@ STUN_MESSAGE_TYPES = {
 def start_quick_message_client(ip, port):
     turn_server = ip             # TURN server's IP
     turn_port = int(port)        # Default TURN port most likely
+    TURN_SERVER = tuple([turn_server, int(turn_port)])
+
     peer_ip = input("IP of Peer: ")
     peer_port = int(input("Port of peer: "))
-    TURN_SERVER = tuple([turn_server, int(turn_port)])
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
@@ -55,32 +56,33 @@ def start_quick_message_client(ip, port):
         print(f"Sending packet to {turn_server}:{turn_port}")
         sock.sendto(alloc_packet, TURN_SERVER)
         
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
-
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
+        ready, _, _ = select.select([sock], [], [], 5)  # Wait for up to 5 seconds
+        if sock in ready:
+            response, addr = sock.recvfrom(4096)
+            print(f"Received response from {addr}")
+            if response:
+                print("Response (hex):", response.hex())
+                read_server_response(response)
+        else:
+            print("No response received from TURN server.")   
             
         # Send the Create Perm packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
         sock.sendto(create_perm_packet, TURN_SERVER)
         
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
-
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
+        ready, _, _ = select.select([sock], [], [], 5)  # Wait for up to 5 seconds
+        if sock in ready:
+            response, addr = sock.recvfrom(4096)
+            print(f"Received response from {addr}")
+            if response:
+                print("Response (hex):", response.hex())
+                read_server_response(response)
+        else:
+            print("No response received from TURN server.")
 
     except Exception as e:
        print(f"Error: {e}")    
 
-    qm_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port)
-
-def qm_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port):
     last_refresh_time = time.time()
     refresh_interval = 300  # Send refresh every 5 minutes
 
@@ -105,7 +107,6 @@ def qm_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port):
                 print(f"Socket error: {e}")
 
         if sys.stdin in ready:
-            print("> ", end="")
             user_input = sys.stdin.readline().strip()
             if user_input == "q":
                 print("Exiting client...")
@@ -120,6 +121,46 @@ def qm_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port):
             sock.sendto(refresh_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
+
+# def qm_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port):
+#     last_refresh_time = time.time()
+#     refresh_interval = 300  # Send refresh every 5 minutes
+
+#     print("Send quick messages. Enter 'q' to quit.")
+
+#     while True:
+#         # Calculate remaining time before next refresh
+#         time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
+
+#         # Check for readable sockets and user input
+#         ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
+
+#         if sock in ready:
+#             try:
+#                 response, addr = sock.recvfrom(4096)
+#                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+#                 if response:
+#                     print("Response (hex):", response.hex())
+#                     read_server_response(response)
+#             except Exception as e:
+#                 print(f"Socket error: {e}")
+
+#         if sys.stdin in ready:
+#             user_input = sys.stdin.readline().strip()
+#             if user_input == "q":
+#                 print("Exiting client...")
+#                 break
+#             else:
+#                 send = packetBuilder.build_send_indication(peer_ip, peer_port, user_input)
+#                 sock.sendto(send, TURN_SERVER)
+
+#         # Send refresh packet if interval has passed
+#         if time.time() - last_refresh_time >= refresh_interval:
+#             refresh_packet = packetBuilder.build_refresh()
+#             sock.sendto(refresh_packet, TURN_SERVER)
+#             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+#             last_refresh_time = time.time()
 
 ## Quick Message Listener ##
 def start_message_listener(ip, port):
@@ -138,13 +179,16 @@ def start_message_listener(ip, port):
         print(f"Sending packet to {turn_server}:{turn_port}")
         sock.sendto(alloc_packet, TURN_SERVER)
         
-        # Receive the response from the TURN server
-        response, addr = sock.recvfrom(4096)  # 4096 bytes buffer size
-        print(f"Received response from {addr}")
+        ready, _, _ = select.select([sock], [], [], 5)  # Wait for up to 5 seconds
+        if sock in ready:
+            response, addr = sock.recvfrom(4096)
+            print(f"Received response from {addr}")
+            if response:
+                print("Response (hex):", response.hex())
+                read_server_response(response)
+        else:
+            print("No response received from TURN server.")
 
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
     except Exception as e:
        print(f"Error: {e}")  
     
