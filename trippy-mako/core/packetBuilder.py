@@ -78,85 +78,67 @@ def build_kill_refresh():
         dealloc_packet = header + lifetime_attr
         return dealloc_packet
     
+import struct
+import os
+import socket
+
 def build_createPerm(ip, port):
     MAGIC_COOKIE = 0x2112A442
-    ## XOR PORT + MAGIC COOKIE
-    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    MESSAGE_TYPE = 0x0008  # CreatePermission Request
     
-    ## IP address to Bytes
-    ip = socket.inet_aton(ip)
-    ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
-    
-    MESSAGE_TYPE = 0x0012
-    
+    # XOR-Peer-Address Attribute
+    xor_port = port ^ (MAGIC_COOKIE & 0xFFFF)  # Corrected XOR operation
+    ip_bytes = socket.inet_aton(ip)
+    xor_ip_bytes = bytes([b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i, b in enumerate(ip_bytes)])
+
     xor_peer_address = struct.pack("!HHBBH4s", 
-        MESSAGE_TYPE,  # Attribute Type (XOR-PEER-ADDRESS)
+        0x0012,  # Attribute Type (XOR-PEER-ADDRESS)
         8,       # Length
         0,       # Reserved
         0x01,    # Family (IPv4)
         xor_port,  # XOR'ed Port
-        ip_bytes)  # XOR'ed IP Address
-    
-    xor_message_length = len(xor_peer_address)
-    
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x008
-    #MAGIC COOKIE
+        xor_ip_bytes)  # XOR'ed IP Address
+
+    # Corrected STUN header length calculation
     TRANSACTION_ID = os.urandom(12)
+    message_length = len(xor_peer_address)
     
-    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-    header = struct.pack(
-        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-        MESSAGE_TYPE,  # Message type
-        xor_message_length,         # Message length
-        MAGIC_COOKIE,      # Magic cookie
-        TRANSACTION_ID          # Transaction ID
-    )
-    
-    return header + xor_peer_address
+    stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
+
+    return stun_header + xor_peer_address
+
 
 def build_send_indication(ip, port, payload):
-    ## XOR-Peer-Address Attribute
     MAGIC_COOKIE = 0x2112A442
-    ## XOR PORT + MAGIC COOKIE
-    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    MESSAGE_TYPE = 0x0011  # Send Indication
     
-    ## IP address to Bytes
-    ip = socket.inet_aton(ip)
-    ip_bytes = bytes([ip[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i in range(4)])
-    
-    MESSAGE_TYPE = 0x0012
-    
+    ## XOR-Peer-Address Attribute
+    xor_port = port ^ (MAGIC_COOKIE & 0xFFFF)  # Correct XOR operation
+    ip_bytes = socket.inet_aton(ip)
+    xor_ip_bytes = bytes([b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i, b in enumerate(ip_bytes)])
+
     xor_peer_address = struct.pack("!HHBBH4s", 
-        MESSAGE_TYPE,  # Attribute Type (XOR-PEER-ADDRESS)
+        0x0012,  # Attribute Type (XOR-PEER-ADDRESS)
         8,       # Length
         0,       # Reserved
         0x01,    # Family (IPv4)
         xor_port,  # XOR'ed Port
-        ip_bytes)  # XOR'ed IP Address
-    
-    xor_message_length = len(xor_peer_address)
-    
-    ## Data Attribute
-    DATA_ATTRIBUTE_TYPE = 0x0013  # Attribute type for DATA
-    data_length = len(payload)
-    data_attribute = struct.pack("!HH", DATA_ATTRIBUTE_TYPE, data_length) + payload.encode('utf-8')
-    
-    
-    STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x0011
+        xor_ip_bytes)  # XOR'ed IP Address
+
+    ## Data Attribute (with padding)
+    DATA_ATTRIBUTE_TYPE = 0x0013
+    data = payload.encode('utf-8')
+    data_length = len(data)
+    data_length_padded = (data_length + 3) & ~3  # Ensure 4-byte alignment
+    padding = b"\x00" * (data_length_padded - data_length)
+    data_attribute = struct.pack("!HH", DATA_ATTRIBUTE_TYPE, data_length) + data + padding
+
+    ## STUN Header
     TRANSACTION_ID = os.urandom(12)
-    
-    # Pack the header (Type, Length, Magic Cookie, Transaction ID)
-    header = struct.pack(
-        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
-        MESSAGE_TYPE,  # Message type
-        xor_message_length + data_length,         # Message length
-        MAGIC_COOKIE,      # Magic cookie
-        TRANSACTION_ID          # Transaction ID
-    )
-    
-    return header + xor_peer_address + data_attribute
+    message_length = len(xor_peer_address) + len(data_attribute)  # Corrected length calculation
+    stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
+
+    return stun_header + xor_peer_address + data_attribute
 
 ## Channel Bind ##
 def build_channelBind(ip, port, channel_number):
