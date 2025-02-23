@@ -235,21 +235,49 @@ def start_send_file_client(ip, port):
     except Exception as e:
        print(f"Error: {e}")    
             
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
-    
-    ## file send send data in 4096 byte chunks
+    file_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port)
+
+def file_client_event_loop(sock, TURN_SERVER, peer_ip, peer_port):
+    last_refresh_time = time.time()
+    refresh_interval = 300  # Send refresh every 5 minutes
+
+    print("Send quick messages. Enter 'q' to quit.")
+
     while True:
-        payload = input("Send a message(q to quit): ")
-        if(payload == "q"):
-            break
-        send = packetBuilder.build_send_indication(peer_ip, peer_port, payload)
-        sock.sendto(send, TURN_SERVER) 
+        # Calculate remaining time before next refresh
+        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
 
+        # Check for readable sockets and user input
+        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
 
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
+        if sock in ready:
+            try:
+                response, addr = sock.recvfrom(4096)
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+                if response:
+                    print("Response (hex):", response.hex())
+                    read_server_response(response)
+            except Exception as e:
+                print(f"Socket error: {e}")
+
+        ## UPDATED TO HANDLE SENDING A FILE IN CHUNKS
+        # if sys.stdin in ready:
+        #     print("> ", end="")
+        #     user_input = sys.stdin.readline().strip()
+        #     if user_input == "q":
+        #         print("Exiting client...")
+        #         break
+        #     else:
+        #         send = packetBuilder.build_send_indication(peer_ip, peer_port, user_input)
+        #         sock.sendto(send, TURN_SERVER)
+
+        # Send refresh packet if interval has passed
+        if time.time() - last_refresh_time >= refresh_interval:
+            refresh_packet = packetBuilder.build_refresh()
+            sock.sendto(refresh_packet, TURN_SERVER)
+            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            last_refresh_time = time.time()
         
 ## FILE LISTENER ##
 def start_file_listener(ip, port):
@@ -282,11 +310,45 @@ def start_file_listener(ip, port):
     except Exception as e:
        print(f"Error: {e}")  
        
-    ## Wait for responses from the turn server
-    asyncio.create_task(receive_response(sock))
-    
-    ## Maintain connection with refresh packets
-    asyncio.create_task(send_refresh(sock, TURN_SERVER))
+    file_listener_event_loop(sock, TURN_SERVER)
+
+def file_listener_event_loop(sock, TURN_SERVER):
+    last_refresh_time = time.time()
+    refresh_interval = 300  # Send refresh every 5 minutes
+
+    print("Listening for messages. Press 'q' to quit.")
+
+    while True:
+        # Calculate remaining time before next refresh
+        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
+
+        # Check for readable sockets and user input
+        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
+
+        ## UPDATE SO THAT CHUNKS RECEIVED ARE WRITTEN TO FILE
+        # if sock in ready:
+        #     try:
+        #         response, addr = sock.recvfrom(4096)
+        #         print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+        #         if response:
+        #             print("Response (hex):", response.hex())
+        #             read_server_response(response)
+        #     except Exception as e:
+        #         print(f"Socket error: {e}")
+
+        if sys.stdin in ready:
+            user_input = sys.stdin.readline().strip().lower()
+            if user_input == "q":
+                print("Exiting listener...")
+                break
+
+        # Send refresh packet if interval has passed
+        if time.time() - last_refresh_time >= refresh_interval:
+            refresh_packet = packetBuilder.build_refresh()
+            sock.sendto(refresh_packet, TURN_SERVER)
+            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            last_refresh_time = time.time()    
 
 ## GET REMOTE SHELL FEATURE ##
 ## Start Remote Connection ##
