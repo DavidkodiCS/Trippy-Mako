@@ -40,16 +40,12 @@ def start_quick_message_client(ip, port):
     turn_port = int(port)        # Default TURN port most likely
     TURN_SERVER = tuple([turn_server, int(turn_port)])
 
-    peer_ip = input("IP of Peer: ")
-    peer_port = int(input("Port of peer: "))
-
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # Set a timeout for the response (5 seconds)
     sock.setblocking(False) # We dont want socket to block other things
     
     ## Allocation
     alloc_packet = packetBuilder.build_alloc()
-    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
     
     try:
         # Send the Allocate packet to the TURN server
@@ -66,6 +62,10 @@ def start_quick_message_client(ip, port):
         else:
             print("No response received from TURN server.")   
             
+
+        peer_ip = input("IP of Peer: ")
+        peer_port = int(input("Port of peer: "))
+        create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
         # Send the Create Perm packet to the TURN server
         print(f"Sending packet to {turn_server}:{turn_port}")
         sock.sendto(create_perm_packet, TURN_SERVER)
