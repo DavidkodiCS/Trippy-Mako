@@ -17,32 +17,7 @@ def help():
 
 ## Secure TCP Connection (Shell) ##
 def connect():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            sendPayload()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            sendPayload()
-        info = getConfig(config)
-          
-    elif(choose == "new"):
-        config = addConfig()
-        info = getConfig(config)     
-
-    else:
-        print("Invalid command...")
-        sendPayload()
-    
-    asyncio.run(turnTM.get_shell(info[0], info[1]))
+    pass
 
 ## Feature to send messages and larger payloads to a peer ##
 def sendPayload():
