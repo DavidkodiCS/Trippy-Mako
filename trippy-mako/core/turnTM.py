@@ -3,6 +3,9 @@ import socket
 import struct
 import time
 import packetBuilder
+import os
+
+CHUNK_SIZE = 4096
 
 ## MESSAGE TYPES
 STUN_MESSAGE_TYPES = {
@@ -61,6 +64,29 @@ async def start_client(ip, port):
 
     ## Maintain connection with refresh packets
     asyncio.create_task(send_refresh(sock, TURN_SERVER))
+
+async def send_file(sock, filename, turn_server, turn_port):
+    # Open the file to send
+    with open(filename, 'rb') as f:
+       
+        # Read and send file in chunks
+        while chunk := f.read(CHUNK_SIZE):
+            sock.send(chunk)
+            print(f'Sent chunk of size {len(chunk)} bytes')
+
+        print('File transfer complete.')
+
+async def receive_file(sock, output_filename, turn_server, turn_port):
+   
+    with open(output_filename, 'wb') as f:
+        while True:
+            chunk, _ = sock.recvfrom(CHUNK_SIZE)
+            if not chunk:
+                break  # EOF
+            f.write(chunk)
+            print(f'Received chunk of size {len(chunk)} bytes')
+
+    print('File reception complete.')
 
 ## Start client ##
 async def start_send_client(ip, port):
