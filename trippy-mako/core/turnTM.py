@@ -619,11 +619,18 @@ def read_server_response(response):
                 data = attr_value
                 print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
                 print(f"\tDecoded: {data.decode()}")
-            case 0x0012: # XOR-PEER-ADDRESS (PEER)
-                family, xor_port = struct.unpack("!HH", attr_value[:4])
-                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ 0x2112A442
-                peer_ip = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-                peer_port = xor_port ^ 0x2112
+            case 0x0012:  # XOR-PEER-ADDRESS (PEER)
+                reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Unpack properly
+                if family == 0x01:  # IPv4
+                    xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
+                    xor_ip = bytes([xor_ip_bytes[i] ^ (0x2112A442 >> (8 * (3 - i)) & 0xFF) for i in range(4)])  
+                    peer_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
+                else:
+                    print("🔹 XOR-PEER-ADDRESS is IPv6, handling not implemented.")
+                    break
+
+                peer_port = xor_port ^ 0x2112  # XOR the port with the top 16 bits of the magic cookie
+
                 print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
 
 ## MAIN - TESTING
