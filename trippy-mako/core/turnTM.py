@@ -158,10 +158,30 @@ def start_message_listener(ip, port):
     sock.setblocking(False)  # Non-blocking socket
     sock.settimeout(None)  # No timeout
 
+    # try:
+    #     # Send Allocate request to the TURN server
+    #     print(f"Sending Allocate packet to {turn_server}:{turn_port}")
+    #     sock.sendto(alloc_packet, TURN_SERVER)
+
+    #     # Wait for response
+    #     ready, _, _ = select.select([sock], [], [], 5)
+    #     if sock in ready:
+    #         response, addr = sock.recvfrom(4096)
+    #         print(f"Received response from {addr}")
+    #         if response:
+    #             print("Response (hex):", response.hex())
+    #             read_server_response(response)
+    #     else:
+    #         print("No response received from TURN server.")
+
+    # except Exception as e:
+    #     print(f"Error: {e}")
+
     try:
         # Send Allocate request to the TURN server
-        print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
+        stun_bind = packetBuilder.build_stun_bind()
+        print(f"Sending STUN Bind packet to {turn_server}:{turn_port}")
+        sock.sendto(stun_bind, TURN_SERVER)
 
         # Wait for response
         ready, _, _ = select.select([sock], [], [], 5)
@@ -177,42 +197,42 @@ def start_message_listener(ip, port):
     except Exception as e:
         print(f"Error: {e}")
 
-    # Start Listening Loop
-    last_refresh_time = time.time()
-    refresh_interval = 60  # Refresh every 1 minute
+    # # Start Listening Loop
+    # last_refresh_time = time.time()
+    # refresh_interval = 60  # Refresh every 1 minute
 
-    print("Listening for messages. Press 'q' to quit.")
+    # print("Listening for messages. Press 'q' to quit.")
 
-    while True:
-        # Calculate time until next refresh
-        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
+    # while True:
+    #     # Calculate time until next refresh
+    #     time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
 
-        # Wait for socket activity or user input
-        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
+    #     # Wait for socket activity or user input
+    #     ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
 
-        if sock in ready:
-            try:
-                response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+    #     if sock in ready:
+    #         try:
+    #             response, addr = sock.recvfrom(4096)
+    #             print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
-                if response:
-                    print("Response (hex):", response.hex())
-                    read_server_response(response)
-            except Exception as e:
-                print(f"Socket error: {e}")
+    #             if response:
+    #                 print("Response (hex):", response.hex())
+    #                 read_server_response(response)
+    #         except Exception as e:
+    #             print(f"Socket error: {e}")
 
-        if sys.stdin in ready:
-            user_input = sys.stdin.readline().strip().lower()
-            if user_input == "q":
-                print("Exiting listener...")
-                break
+    #     if sys.stdin in ready:
+    #         user_input = sys.stdin.readline().strip().lower()
+    #         if user_input == "q":
+    #             print("Exiting listener...")
+    #             break
 
-        # Send refresh packet if needed
-        if time.time() - last_refresh_time >= refresh_interval:
-            refresh_packet = packetBuilder.build_refresh()
-            sock.sendto(refresh_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-            last_refresh_time = time.time()
+    #     # Send refresh packet if needed
+    #     if time.time() - last_refresh_time >= refresh_interval:
+    #         refresh_packet = packetBuilder.build_refresh()
+    #         sock.sendto(refresh_packet, TURN_SERVER)
+    #         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+    #         last_refresh_time = time.time()
 
 ## SEND FILE FEATURE ##
 # Start the TURN client for sending a file
@@ -586,9 +606,16 @@ def read_server_response(response):
                         for i in range(4)
                     ])  
                     peer_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
-                else:
-                    print("🔹 XOR-PEER-ADDRESS is IPv6, handling not implemented.")
-                    break
 
                 peer_port = xor_port ^ 0x2112  # XOR the port with the top 16 bits of the magic cookie
                 print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
+            case 0x0001:  # Mapped Address Attribute
+                family, xor_port = struct.unpack_from("!BH", response, offset)
+                xor_port ^= (magic_cookie >> 16)  # Decode port
+                
+                if family == 0x01:  # IPv4
+                    xor_ip = struct.unpack_from("!I", response, offset)[0]
+                    xor_ip ^= magic_cookie  # Decode IPv4 address
+                    mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
+
+                print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
