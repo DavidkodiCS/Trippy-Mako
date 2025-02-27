@@ -6,6 +6,7 @@
 - [Testing Documentation](trippyTests.md)
 - [Coturn Documentation](coturn-testing.md)
 - [VNet Configuration](vnetConfig.md)
+- [EC2 Coturn Configuration](coturn-ec2Config.md)
 - [Style Guide Documentation](Trippy-Mako-StyleGuide.md)
 
 ## Dev Installation:
