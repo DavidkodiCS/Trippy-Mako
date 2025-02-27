@@ -5,6 +5,10 @@ import configparser
 import turnTM
 import os
 
+# ------------#
+# Trippy-Mako #
+# ------------#
+
 ## Command Functions ##
 def help():
     try:

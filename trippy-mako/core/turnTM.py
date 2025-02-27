@@ -7,6 +7,10 @@ import packetBuilder
 import subprocess
 import select
 
+# -------------------------------------------
+# Trippy-Mako TURN Client/Peer Implementation
+# -------------------------------------------
+
 ## MESSAGE TYPES ##
 STUN_MESSAGE_TYPES = {
     0x0001: "Binding Request",
@@ -33,8 +37,13 @@ STUN_MESSAGE_TYPES = {
     0x0119: "ChannelBind Error Response",
 }
 
-## QUICK MESSAGE FEATURE ##
-## Quick Message Client ##
+# ------------------------------------
+# Quick Message Feature
+# ------------------------------------
+
+# ------------------------------------
+# Quick Message Client
+# ------------------------------------
 def start_quick_message_client(ip, port):
     turn_server = ip  # TURN server's IP
     turn_port = int(port)  # Default TURN port most likely
@@ -144,7 +153,9 @@ def start_quick_message_client(ip, port):
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
-## Quick Message Listener ##
+# ----------------------
+# Quick Message Listener
+# ----------------------
 def start_message_listener(ip, port):
     turn_server = ip  # TURN server's IP
     turn_port = int(port)  # TURN server's port
@@ -158,30 +169,10 @@ def start_message_listener(ip, port):
     sock.setblocking(False)  # Non-blocking socket
     sock.settimeout(None)  # No timeout
 
-    # try:
-    #     # Send Allocate request to the TURN server
-    #     print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-    #     sock.sendto(alloc_packet, TURN_SERVER)
-
-    #     # Wait for response
-    #     ready, _, _ = select.select([sock], [], [], 5)
-    #     if sock in ready:
-    #         response, addr = sock.recvfrom(4096)
-    #         print(f"Received response from {addr}")
-    #         if response:
-    #             print("Response (hex):", response.hex())
-    #             read_server_response(response)
-    #     else:
-    #         print("No response received from TURN server.")
-
-    # except Exception as e:
-    #     print(f"Error: {e}")
-
     try:
         # Send Allocate request to the TURN server
-        stun_bind = packetBuilder.build_stun_bind()
-        print(f"Sending STUN Bind packet to {turn_server}:{turn_port}")
-        sock.sendto(stun_bind, TURN_SERVER)
+        print(f"Sending Allocate packet to {turn_server}:{turn_port}")
+        sock.sendto(alloc_packet, TURN_SERVER)
 
         # Wait for response
         ready, _, _ = select.select([sock], [], [], 5)
@@ -197,45 +188,50 @@ def start_message_listener(ip, port):
     except Exception as e:
         print(f"Error: {e}")
 
-    # # Start Listening Loop
-    # last_refresh_time = time.time()
-    # refresh_interval = 60  # Refresh every 1 minute
+    # Start Listening Loop
+    last_refresh_time = time.time()
+    refresh_interval = 60  # Refresh every 1 minute
 
-    # print("Listening for messages. Press 'q' to quit.")
+    print("Listening for messages. Press 'q' to quit.")
 
-    # while True:
-    #     # Calculate time until next refresh
-    #     time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
+    while True:
+        # Calculate time until next refresh
+        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
 
-    #     # Wait for socket activity or user input
-    #     ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
+        # Wait for socket activity or user input
+        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
 
-    #     if sock in ready:
-    #         try:
-    #             response, addr = sock.recvfrom(4096)
-    #             print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+        if sock in ready:
+            try:
+                response, addr = sock.recvfrom(4096)
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
-    #             if response:
-    #                 print("Response (hex):", response.hex())
-    #                 read_server_response(response)
-    #         except Exception as e:
-    #             print(f"Socket error: {e}")
+                if response:
+                    print("Response (hex):", response.hex())
+                    read_server_response(response)
+            except Exception as e:
+                print(f"Socket error: {e}")
 
-    #     if sys.stdin in ready:
-    #         user_input = sys.stdin.readline().strip().lower()
-    #         if user_input == "q":
-    #             print("Exiting listener...")
-    #             break
+        if sys.stdin in ready:
+            user_input = sys.stdin.readline().strip().lower()
+            if user_input == "q":
+                print("Exiting listener...")
+                break
 
-    #     # Send refresh packet if needed
-    #     if time.time() - last_refresh_time >= refresh_interval:
-    #         refresh_packet = packetBuilder.build_refresh()
-    #         sock.sendto(refresh_packet, TURN_SERVER)
-    #         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-    #         last_refresh_time = time.time()
+        # Send refresh packet if needed
+        if time.time() - last_refresh_time >= refresh_interval:
+            refresh_packet = packetBuilder.build_refresh()
+            sock.sendto(refresh_packet, TURN_SERVER)
+            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            last_refresh_time = time.time()
 
-## SEND FILE FEATURE ##
-# Start the TURN client for sending a file
+# -----------------
+# Send File Feature
+# -----------------
+
+# -------------------
+# Sending File Client
+# -------------------
 def start_send_file_client(ip, port):
     turn_server = ip  # TURN server's IP
     turn_port = int(port)  # Default TURN port
@@ -315,7 +311,9 @@ def start_send_file_client(ip, port):
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
-# Start a TURN-based listener for receiving a file
+# ------------------
+# Send File Listener
+# ------------------
 def start_file_listener(ip, port):
     turn_server = ip  # TURN server's IP
     turn_port = int(port)  # Default TURN port
@@ -373,8 +371,13 @@ def start_file_listener(ip, port):
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
   
+# --------------------
+# Remote Shell Feature
+# --------------------
 
-## GET REMOTE SHELL FEATURE ##
+# ------------------------------------
+# Remote Shell Client
+# ------------------------------------
 def get_shell_client(ip, port):
     turn_server = ip  
     turn_port = int(port)  
@@ -469,7 +472,9 @@ def get_shell_client(ip, port):
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
-## Remote Shell Listener ##
+# ------------------------------------
+# Remote Shell Listener
+# ------------------------------------
 def start_shell_listener(ip, port, channel_number):
     turn_server = ip  
     turn_port = int(port)  
@@ -543,8 +548,9 @@ def start_shell_listener(ip, port, channel_number):
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
-## HELPER FUNCTIONS ##    
-## Human Readable Server Responses ##
+# ------------------------------------
+# Helper Function: Parse Server Response
+# ------------------------------------
 def read_server_response(response):    
     # Unpack the STUN header
     msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)

@@ -7,7 +7,9 @@ import socket
 # Trippy-Mako Packet Builder
 # -----------------------------
 
+# -----------------------------
 # Build Allocate Request Packet
+# -----------------------------
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x0003
@@ -41,7 +43,9 @@ def build_alloc():
 
     return header + requested_transport
 
+# ----------------------------
 # Build Refresh Request Packet
+# ----------------------------
 def build_refresh():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x0004
@@ -59,7 +63,9 @@ def build_refresh():
 
     return header
 
+# ----------------------------------------------------
 # Build Refresh Request with Lifetime 0 (Deallocation)
+# ----------------------------------------------------
 def build_kill_refresh():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x0004
@@ -81,7 +87,9 @@ def build_kill_refresh():
 
     return header + lifetime_attr
 
+# -------------------------------
 # Build Create Permission Request
+# -------------------------------
 def build_createPerm(ip, port):
     MAGIC_COOKIE = 0x2112A442
     MESSAGE_TYPE = 0x0008  # CreatePermission Request
@@ -107,7 +115,9 @@ def build_createPerm(ip, port):
 
     return stun_header + xor_peer_address
 
+# ----------------------------
 # Build Send Indication Packet
+# ----------------------------
 def build_send_indication(ip, port, payload):
     MAGIC_COOKIE = 0x2112A442
     MESSAGE_TYPE = 0x0011  # Send Indication
@@ -139,7 +149,9 @@ def build_send_indication(ip, port, payload):
 
     return stun_header + xor_peer_address + data_attribute
 
+# --------------------------
 # Build Channel Bind Request
+# --------------------------
 def build_channelBind(ip, port, channel_number):
     MAGIC_COOKIE = 0x2112A442
     MESSAGE_TYPE = 0x0009  # Channel Bind Request
@@ -171,12 +183,16 @@ def build_channelBind(ip, port, channel_number):
 
     return stun_header + xor_peer_address + channel_attribute
 
+# --------------------------
 # Build Channel Data Message
+# --------------------------
 def build_channelData(data, channel_number):
     header = struct.pack("!HH", channel_number, len(data))
     return header + data.encode('utf-8')
 
+# -----------------------
 # Build STUN Bind Request
+# -----------------------
 def build_stun_bind():
     STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x0001  # STUN Bind Request
