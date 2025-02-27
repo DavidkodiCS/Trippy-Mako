@@ -1,56 +1,38 @@
-# Sprint 4/5 Report
+# Sprint 4/5 Report  
 
-## Features developed and demoed during the Sprint Review
+## Features Developed and Demoed During the Sprint Review  
 
-### Features Developed and Demoed:
+### Sprint 4  
 
-#### Sprint 4
-1. As a user I can demo communicating back and forth between two hosts and TURN server on the same LAN.
+1. As a user, I can demonstrate communication between two hosts and a TURN server on the same LAN.  
+2. As a user, I can send Allocation and Refresh packets to the TURN server from a private network (behind a NAT).  
+3. R&D: Testing Architecture Pt. 2.  
+4. As a user, I can listen for another peer to send me data.  
 
-2. As a user I can send Allocation and Refresh packets to the TURN server from a private network (behind a NAT). 
+### Sprint 5  
 
-3. R&D: Testing architecture Pt.2
+1. As a user, I can enter a peer's IP address and port into a configuration.  
+2. As a user, I can send messages and files to a peer via the TURN server.  
+3. As a user, I can initiate a TCP connection with a peer and gain remote access.  
+4. Complete issue backlog refinement and development/user documentation.  
+5. As a developer, I can spin up an EC2 instance with Coturn to test with VNets.  
 
-4. As a user I can listen for another peer to send me data."
+## Accepted Features  
 
-#### Sprint 5
-1. As a user I can enter in a peer's ip address and port into a configuration.
+All features for this sprint have been tentatively accepted after the demo, which encompasses Sprints 4 and 5. Once we successfully demonstrate peer-to-peer communication, all features will be considered 100% complete.  
 
-2.  As a user I can send messages and files to a peer on the TURN server. 
+## Stories/Features Added to the Backlog Since the Last Sprint Review  
 
-3.  As a user I can initiate a TCP connection with a peer and gain remote access.
+**Feature 1:** As a user, I can use all three main features of Trippy-Mako to communicate with a peer.  
 
-4. Complete Issue build up and dev/user documentation build up.
+We had to push all features related to client-peer communication to the next sprint due to significant blockers. These features have been consolidated into a single feature for the next sprint, as resolving this issue will ensure all core functionalities work as intended.  
 
-5. As a dev I can spin up an EC2 instance with coturn to test with VNets."
+## Updates to the Release Plan  
 
-## Accepted Features
+Authentication and encryption will be pushed back to Sprint 7 so we can focus on establishing client-peer communication, allowing us to complete all the main features of Trippy-Mako.  
 
-All feautures for this sprint have been accepted after demo. Our customer was able to demo our product on his workstation at home through a published docker image. Research and Development progress on feature three was discussed with our customer. This third feature will continue into the next sprint and be used for testing as we progress in the capstone.
+### [Updated Member Velocities](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?gid=1321373368#gid=1321373368)  
 
-## Stories/features added to the backlog since the last Sprint Review Email
+## [Next Sprint Plan](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?gid=601765542#gid=601765542)  
 
-## TODO
-
-## Updates to the Release Plan
-
- ## TODO
-
-### Updated Member Velocities:
-
-## TODO
-
-| Member Name   | Predicted Velocity | Updated Velocity |
-|---------------|--------------------|------------------|
-| Francesconi   | 2                  | 2                |
-| Kreidler      | 4                  | 4                |
-| Larkins       | 2                  | 2                |
-
-
-## Velocity Math and how that factors into updated release plan.
-
-## TODO
-
-## [Next sprint plan](https://docs.google.com/spreadsheets/d/1iDczfXFm2CANtSYXumhWK-F_ozv4bLBBos8dFoWCZYU/edit?gid=972462669#gid=972462669)
-
-Next sprint we plan on building on our progress of communicating between the client and adding the feature of being able to do this behind a private network. By the end of this sprint our testing architecture to create a more realistic scenario for our client should be nearly finished.
+In the next sprint, we need to overcome the major blocker from the past two sprints: ensuring proper communication between our client and peer using the TURN server hosted on an AWS EC2 instance.
