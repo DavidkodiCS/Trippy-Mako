@@ -163,3 +163,4 @@ cython_debug/
 
 #ignore config changes
 configs.ini
+config.ini

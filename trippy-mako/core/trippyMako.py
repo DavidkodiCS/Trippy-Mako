@@ -4,8 +4,10 @@
 import configparser
 import turnTM
 import os
-import asyncio
 
+# ------------#
+# Trippy-Mako #
+# ------------#
 
 ## Command Functions ##
 def help():
@@ -15,7 +17,67 @@ def help():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
 
-## Secure TCP Connection (Shell) ##
+## SEND FILE FEATURE ##
+def sendFile():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        if len(configuration.sections()) == 0:
+            print("You have no saved configurations.")
+            sendPayload()
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        if not(configuration.has_section(config)):
+            print("That configuration does not exist.")
+            sendPayload()
+        info = getConfig(config)
+          
+    elif(choose == "new"):
+        config = addConfig()
+        info = getConfig(config)     
+
+    else:
+        print("Invalid command...")
+        sendFile()
+    
+    turnTM.start_send_file_client(info[0], info[1])
+
+## FILE LISTEN ##
+def file_listen():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
+    
+    if(choose == "existing"):
+        if len(configuration.sections()) == 0:
+            print("You have no saved configurations.")
+            sendPayload()
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        if not(configuration.has_section(config)):
+            print("That configuration does not exist.")
+            sendPayload()
+        info = getConfig(config)
+        
+    elif(choose == "new"):
+        ##PORT = 5349 or 3478
+        config = addConfig()
+        info = getConfig(config)     
+    else:
+        print("Invalid command...")
+        file_listen()
+    
+    channel_number = input("Input channel number: ")
+    turnTM.start_file_listener(info[0], info[1], channel_number)
+#######################
+
+## GET REMOTE SHELL FEATURE ##
 def connect():
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
@@ -23,15 +85,9 @@ def connect():
     info = []
     
     if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            sendPayload()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            sendPayload()
         info = getConfig(config)
           
     elif(choose == "new"):
@@ -40,45 +96,12 @@ def connect():
 
     else:
         print("Invalid command...")
-        sendPayload()
+        connect()
     
-    asyncio.run(turnTM.get_shell(info[0], info[1]))
+    turnTM.get_shell_client(info[0], info[1])
 
-## Feature to send messages and larger payloads to a peer ##
-def sendPayload():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            sendPayload()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            sendPayload()
-        info = getConfig(config)
-          
-    elif(choose == "new"):
-        config = addConfig()
-        info = getConfig(config)     
-
-    else:
-        print("Invalid command...")
-        sendPayload()
-    
-    asyncio.run(turnTM.start_send_client(info[0], info[1]))
-
-
-def proxy():
-    pass
-
-## LISTEN ##
-def listen():
+## REMOTE SHELL LISTENER ##
+def shell_listen():
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
     choose = input("Choose: ")
@@ -97,20 +120,41 @@ def listen():
         info = getConfig(config)
         
     elif(choose == "new"):
-        ##For current demo
-        ##IP = 127.0.0.1
-        ##PORT = 5349
+        ## PORT = 5349 or 3478
         config = addConfig()
         info = getConfig(config)     
     else:
         print("Invalid command...")
-        listen()
+        shell_listen()
     
     channel_number = input("Input channel number: ")
-    asyncio.run(turnTM.start_shell_listener(info[0], info[1]), channel_number)
+    turnTM.start_shell_listener(info[0], info[1]), channel_number
+###########################
+
+## QUICK MESSAGE FEATURE ##
+def message():
+    print("> Choose an existing configuration or create a new one:")
+    print("> existing\n> new")
+    choose = input("Choose: ")
+    info = []
     
-## DEMO OPTION ##
-def demo():
+    if(choose == "existing"):
+        print("Please choose a configuration from the list below: ")
+        listConfig()
+        config = input("Choose configuration: ")
+        info = getConfig(config)
+        
+    elif(choose == "new"):
+        ## PORT = 5349 or 3478
+        config = addConfig()
+        info = getConfig(config)     
+    else:
+        print("Invalid command...")
+        message()
+    
+    turnTM.start_quick_message_client(info[0], info[1])
+
+def message_listen():
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
     choose = input("Choose: ")
@@ -129,16 +173,20 @@ def demo():
         info = getConfig(config)
         
     elif(choose == "new"):
-        ##For current demo
-        ##IP = 127.0.0.1
-        ##PORT = 5349
+        ## PORT = 5349 or 3478
         config = addConfig()
         info = getConfig(config)     
     else:
         print("Invalid command...")
-        demo()
+        message_listen()
     
-    asyncio.run(turnTM.start_client(info[0], info[1]))
+    turnTM.start_message_listener(info[0], info[1])
+###########################
+
+## PROXY FEATURE ##
+def proxy():
+    pass
+###################
 
 ## Configuration Menu ##
 def config():
@@ -168,7 +216,6 @@ def config():
                 print("Unrecognized Command...")
                 
 ## Configuration Commands ##
-
 ## Add configuration to configs.ini ##
 def addConfig():
     name = input("Enter configuration name: ")
@@ -317,14 +364,26 @@ def main():
                 help()
             case "config":
                 config()
-            case "send":
-                sendPayload()
             case "proxy":
                 proxy()
-            case "listen":
-                listen()
-            case "demo":
-                demo()
+            case "send":
+                sendFile()
+            case "listen -f":
+                file_listen()
+            case "listen -file":
+                file_listen()
+            case "connect": ## get a shell
+                connect()
+            case "listen -s":
+                shell_listen()
+            case "listen -shell":
+                shell_listen()
+            case "message":
+                message()
+            case "message -l":
+                message_listen()
+            case "message -listen":
+                message_listen()
             case _:
                 print("Unrecognized Command...")
 
