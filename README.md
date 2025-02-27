@@ -58,6 +58,6 @@ listen: This feature allows the client to listen for a peer on the TURN server.
 
 1. [Team Charter](Charter.md)
 2. [Capstone Proposal](proposal/proposal.md)
-3. [Developer Documentation](docs-dev/README)
+3. [Developer Documentation](docs-dev/README.md)
 4. [Poster](https://docs.google.com/presentation/d/1Ua0MMuqRZ-b5kbvC48WoUsahLcg4EEjAxT-er4XbvGA/edit?usp=sharing)
 5. [Capstone Presentation](https://docs.google.com/presentation/d/1EEil-rpdahq-6Y4z7Y-bLYhUQXilDrPkDXivoDhVkWI/edit?pli=1#slide=id.g32576c3bf74_0_346)
