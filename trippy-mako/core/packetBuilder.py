@@ -205,3 +205,22 @@ def build_channelData(data, CHANNEL_NUMBER):
     )
     
     return header + data.encode('utf-8')
+
+
+## PEER STUN Bind
+
+def build_stun_bind():
+    STUN_HEADER_FORMAT = "!HHI12s"
+    MESSAGE_TYPE = 0x0001
+    MAGIC_COOKIE = 0x2112A442
+    TRANSACTION_ID = os.urandom(12)
+
+    header = struct.pack(
+        STUN_HEADER_FORMAT,  # Network byte order: 2 bytes, 2 bytes, 4 bytes, 12 bytes
+        MESSAGE_TYPE,  # Message type
+        0,         # Message length
+        MAGIC_COOKIE,      # Magic cookie
+        TRANSACTION_ID          # Transaction ID
+    )
+
+    return header
