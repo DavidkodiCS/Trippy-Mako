@@ -1,28 +1,10 @@
-# Sprint 4/5 Report
+# Sprint 6 Report
 
 ## Features developed and demoed during the Sprint Review
 
 ### Features Developed and Demoed:
 
-#### Sprint 4
-1. As a user I can demo communicating back and forth between two hosts and TURN server on the same LAN.
-
-2. As a user I can send Allocation and Refresh packets to the TURN server from a private network (behind a NAT). 
-
-3. R&D: Testing architecture Pt.2
-
-4. As a user I can listen for another peer to send me data."
-
-#### Sprint 5
-1. As a user I can enter in a peer's ip address and port into a configuration.
-
-2.  As a user I can send messages and files to a peer on the TURN server. 
-
-3.  As a user I can initiate a TCP connection with a peer and gain remote access.
-
-4. Complete Issue build up and dev/user documentation build up.
-
-5. As a dev I can spin up an EC2 instance with coturn to test with VNets."
+## TODO
 
 ## Accepted Features
 
