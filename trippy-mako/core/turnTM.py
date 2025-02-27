@@ -4,6 +4,7 @@ import struct
 import sys
 import time
 import packetBuilder
+import os
 import subprocess
 import select
 
