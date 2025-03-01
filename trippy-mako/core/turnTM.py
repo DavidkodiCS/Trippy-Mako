@@ -626,3 +626,7 @@ def read_server_response(response):
                     mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
 
                 print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
+            case 0x0017:  # DATA INDICATION
+                print("Received Data Indication")
+            case _:
+                print(f"Unknown Type: {hex(attr_type)}")
