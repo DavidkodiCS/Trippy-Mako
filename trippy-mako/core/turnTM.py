@@ -54,6 +54,9 @@ def start_quick_message_client(ip, port):
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
 
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    channel_number = 0x4001
+
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
     print(f"Sending Allocate packet to {turn_server}:{turn_port}")
@@ -71,8 +74,8 @@ def start_quick_message_client(ip, port):
         print("No response received from TURN server.")
 
     # Get Peer Information
-    peer_ip = input("IP of Peer: ")
-    peer_port = int(input("Port of Peer: "))
+    peer_ip = input("XOR-MAP IP of Peer: ")
+    peer_port = 0
 
     # Create Permission Request
     create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
@@ -90,10 +93,24 @@ def start_quick_message_client(ip, port):
     else:
         print("No response received from TURN server.")
 
-    # Send Test Message
-    test_message = "Hello World!"
-    send_packet = packetBuilder.build_send_indication(peer_ip, peer_port, test_message)
-    sock.sendto(send_packet, TURN_SERVER)
+    peer_ip = input("RTA IP of Peer: ")
+    peer_port = int(input("RTA PORT of Peer: "))
+
+    # Send Channel Bind Request
+    channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
+    print(f"Sending Channel Bind Request (Channel {channel_number})...")
+    sock.sendto(channel_bind_packet, TURN_SERVER)
+
+    # Wait for a response
+    ready, _, _ = select.select([sock], [], [], 5)
+    if sock in ready:
+        response, addr = sock.recvfrom(4096)
+        print(f"Received response from {addr}")
+        if response:
+            print("Response (hex):", response.hex())
+            read_server_response(response)
+    else:
+        print("No response received from TURN server.")
 
     # Refresh Allocation
     try:
@@ -144,13 +161,18 @@ def start_quick_message_client(ip, port):
                 print("Exiting client...")
                 break
             else:
-                send_packet = packetBuilder.build_send_indication(peer_ip, peer_port, user_input)
-                sock.sendto(send_packet, TURN_SERVER)
+                # Send message via ChannelData instead of Send Indication
+                channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
+                sock.sendto(channel_data_packet, TURN_SERVER)
+                print(f"Sent message via Channel {channel_number}")
 
         # Send refresh packet if needed
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
+            channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
+            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            sock.sendto(channel_bind_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
@@ -626,7 +648,21 @@ def read_server_response(response):
                     mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
 
                 print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
-            case 0x0017:  # DATA INDICATION
+            case 0x007:  # DATA INDICATION
                 print("Received Data Indication")
+            case 0x0016:
+                print("Relayed Transport Address (RTA)")
+                reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])
+
+                if family == 0x01:  # IPv4
+                    xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
+                    xor_ip = bytes([
+                        xor_ip_bytes[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) 
+                        for i in range(4)
+                    ])  
+                    relayed_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
+
+                relayed_port = xor_port ^ 0x2112  # Decode port
+                print(f"🔹 XOR-RELAYED-ADDRESS (RTA)\n\tIP: {relayed_ip}\n\tPORT: {relayed_port}")
             case _:
                 print(f"Unknown Type: {hex(attr_type)}")

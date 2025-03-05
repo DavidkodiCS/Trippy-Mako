@@ -12,7 +12,7 @@ import socket
 # -----------------------------
 def build_alloc():
     STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x0003
+    MESSAGE_TYPE = 0x003
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
 
@@ -48,7 +48,7 @@ def build_alloc():
 # ----------------------------
 def build_refresh():
     STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x0004
+    MESSAGE_TYPE = 0x004
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
 
@@ -68,7 +68,7 @@ def build_refresh():
 # ----------------------------------------------------
 def build_kill_refresh():
     STUN_HEADER_FORMAT = "!HHI12s"
-    MESSAGE_TYPE = 0x0004
+    MESSAGE_TYPE = 0x004
     MAGIC_COOKIE = 0x2112A442
     TRANSACTION_ID = os.urandom(12)
 
@@ -92,14 +92,15 @@ def build_kill_refresh():
 # -------------------------------
 def build_createPerm(ip, port):
     MAGIC_COOKIE = 0x2112A442
-    MESSAGE_TYPE = 0x0008  # CreatePermission Request
+    MESSAGE_TYPE = 0x008  # CreatePermission Request
     TRANSACTION_ID = os.urandom(12)
 
     # XOR-Peer-Address Attribute
-    xor_port = port ^ (MAGIC_COOKIE & 0xFFFF)
-    xor_ip_bytes = bytearray(socket.inet_aton(ip))
-    for i in range(4):
-        xor_ip_bytes[i] ^= (MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF
+    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    xor_ip_bytes = bytes([
+        b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF)
+        for i, b in enumerate(socket.inet_aton(ip))
+    ])
 
     xor_peer_address = struct.pack("!HHBBH4s",
         0x0012,  # Attribute Type (XOR-PEER-ADDRESS)
@@ -120,17 +121,18 @@ def build_createPerm(ip, port):
 # ----------------------------
 def build_send_indication(ip, port, payload):
     MAGIC_COOKIE = 0x2112A442
-    MESSAGE_TYPE = 0x0011  # Send Indication
+    MESSAGE_TYPE = 0x0016  # Correct STUN Send Indication type
     TRANSACTION_ID = os.urandom(12)
 
     # XOR-Peer-Address Attribute
-    xor_port = port ^ (MAGIC_COOKIE & 0xFFFF)
-    xor_ip_bytes = bytearray(socket.inet_aton(ip))
-    for i in range(4):
-        xor_ip_bytes[i] ^= (MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF
+    xor_port = port ^ (MAGIC_COOKIE >> 16)
+    xor_ip_bytes = bytes([
+        b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF)
+        for i, b in enumerate(socket.inet_aton(ip))
+    ])
 
     xor_peer_address = struct.pack("!HHBBH4s",
-        0x0012,  # Attribute Type (XOR-PEER-ADDRESS)
+        0x0012,  # XOR-PEER-ADDRESS
         8,       # Length
         0,       # Reserved
         0x01,    # Family (IPv4)
@@ -140,26 +142,31 @@ def build_send_indication(ip, port, payload):
 
     # Data Attribute
     data = payload.encode('utf-8')
-    data_length_padded = (len(data) + 3) & ~3  # Ensure 4-byte alignment
+    data_length_padded = (len(data) + 3) & ~3
     padding = b"\x00" * (data_length_padded - len(data))
     data_attribute = struct.pack("!HH", 0x0013, len(data)) + data + padding
 
+    # STUN Header
     message_length = len(xor_peer_address) + len(data_attribute)
     stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
 
     return stun_header + xor_peer_address + data_attribute
+
 
 # --------------------------
 # Build Channel Bind Request
 # --------------------------
 def build_channelBind(ip, port, channel_number):
     MAGIC_COOKIE = 0x2112A442
-    MESSAGE_TYPE = 0x0009  # Channel Bind Request
+    MESSAGE_TYPE = 0x009  # Channel Bind Request
     TRANSACTION_ID = os.urandom(12)
 
     # XOR-Peer-Address Attribute
     xor_port = port ^ (MAGIC_COOKIE >> 16)
-    xor_ip_bytes = bytes([b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) for i, b in enumerate(socket.inet_aton(ip))])
+    xor_ip_bytes = bytes([
+        b ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF)
+        for i, b in enumerate(socket.inet_aton(ip))
+    ])
 
     xor_peer_address = struct.pack("!HHBBH4s",
         0x0012,  # Attribute Type (XOR-PEER-ADDRESS)
@@ -186,9 +193,14 @@ def build_channelBind(ip, port, channel_number):
 # --------------------------
 # Build Channel Data Message
 # --------------------------
-def build_channelData(data, channel_number):
-    header = struct.pack("!HH", channel_number, len(data))
-    return header + data.encode('utf-8')
+def build_channelData(channel_number, data):
+    data_bytes = data.encode('utf-8')
+    length = len(data_bytes)
+
+    # ChannelData Header: Channel Number (16-bit) + Length (16-bit)
+    header = struct.pack("!HH", channel_number, length)
+
+    return header + data_bytes
 
 # -----------------------
 # Build STUN Bind Request
