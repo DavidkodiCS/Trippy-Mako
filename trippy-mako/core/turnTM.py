@@ -45,21 +45,20 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 # Quick Message Client
 # ------------------------------------
-def start_quick_message_client(ip, port):
-    turn_server = ip  # TURN server's IP
-    turn_port = int(port)  # Default TURN port most likely
-    TURN_SERVER = (turn_server, turn_port)
+def start_quick_message_client(turn_server, turn_port):
+    TURN_SERVER = (turn_server, int(turn_port))
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
 
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
     channel_number = 0x4001
 
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
-    print(f"Sending Allocate packet to {turn_server}:{turn_port}")
+    print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
     sock.sendto(alloc_packet, TURN_SERVER)
 
     # Wait for a response
@@ -74,8 +73,9 @@ def start_quick_message_client(ip, port):
         print("No response received from TURN server.")
 
     # Get Peer Information
-    peer_ip = input("TURN IP of RTA: ")
-    peer_port = int(input("RTA PORT:"))
+    print("Please enter the following information before allocation timeout (1 minute)...")
+    peer_ip = input("TURN Server IP (RTA): ")
+    peer_port = int(input("TURN PORT (RTA):"))
 
     # Create Permission Request
     create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
@@ -247,6 +247,7 @@ def start_message_listener(ip, port):
             sock.sendto(refresh_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
+
 
 # -----------------
 # Send File Feature
@@ -575,15 +576,8 @@ def start_shell_listener(ip, port, channel_number):
 # Helper Function: Parse Server Response
 # ------------------------------------
 def read_server_response(response):    
-    
-
     # Unpack the STUN header
     try:
-        channel_number, length = struct.unpack_from("!HH", response, 0)
-        print(f"CHANNEL NUMBER: {channel_number}")
-        print(f"LENGTH: {length}")
-        message = response[4:4+length]  # Slice the message portion
-        print(f"MESSAGE: {message.decode(errors='ignore')}")  # Decode safely
         msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
         offset = 20  # Start of attributes
 
@@ -633,7 +627,7 @@ def read_server_response(response):
                 case 0x0013:  # DATA
                     data = attr_value
                     print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
-                    print(f"\tDecoded: {data.decode()}")
+                    print(f"\tDecoded: {data.decode(errors="ignore")}")
 
                 case 0x0012:  # XOR-PEER-ADDRESS (PEER)
                     reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Proper unpacking
@@ -676,10 +670,11 @@ def read_server_response(response):
                 case _:
                     print(f"Unknown Type: {hex(attr_type)}")
     except:
+        print("CHANNEL DATA MESSAGE\n")
         channel_number, length = struct.unpack_from("!HH", response, 0)
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
         message = response[4:4+length]  # Slice the message portion
-        print(f"MESSAGE: {message.decode(errors='ignore')}")  # Decode safely
+        print(f"MESSAGE: {message.decode(errors='ignore')}")
     
     
