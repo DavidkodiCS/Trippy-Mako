@@ -351,7 +351,7 @@ def main():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
         
-    print("Type help to see the available commands or exit to quit...\n\n")
+    print("Type 'help' to see the available commands or 'exit' to quit...\n\n")
     
     while True:
         command = input("\n> ").strip()
