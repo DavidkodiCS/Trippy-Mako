@@ -49,11 +49,6 @@ def generalSetup():
         generalSetup()
         
     return info
-
-## PROXY FEATURE ##
-def proxy():
-    pass
-###################
                 
 # -----------------------#
 # Configuration Commands #
@@ -236,7 +231,7 @@ def main():
             case "config":
                 config()
             case "proxy":
-                proxy()
+                print("Feature not implemented yet")
             case "sendFile":
                 turnInfo = generalSetup()
                 start_send_file_client(turnInfo[0], turnInfo[1])
