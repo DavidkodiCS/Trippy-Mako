@@ -27,13 +27,13 @@ def sendFile():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            sendPayload()
+            sendFile()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            sendPayload()
+            sendFile()
         info = getConfig(config)
           
     elif(choose == "new"):
@@ -56,13 +56,13 @@ def file_listen():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            sendPayload()
+            file_listen()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            sendPayload()
+            file_listen()
         info = getConfig(config)
         
     elif(choose == "new"):
@@ -110,13 +110,13 @@ def shell_listen():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            listen()
+            shell_listen()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            listen()
+            shell_listen()
         info = getConfig(config)
         
     elif(choose == "new"):
@@ -163,13 +163,13 @@ def message_listen():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            demo()
+            message_listen()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            demo()
+            message_listen()
         info = getConfig(config)
         
     elif(choose == "new"):
