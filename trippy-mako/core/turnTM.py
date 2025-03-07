@@ -54,7 +54,7 @@ def start_quick_message_client(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return
 
@@ -78,7 +78,7 @@ def start_quick_message_client(turn_server, turn_port):
 
                 if response:
                     print("Response (hex):", response.hex())
-                    read_server_response(response)
+                    _read_server_response(response)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -116,7 +116,7 @@ def start_message_listener(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return
 
@@ -140,7 +140,7 @@ def start_message_listener(turn_server, turn_port):
 
                 if response:
                     print("Response (hex):", response.hex())
-                    read_server_response(response)
+                    _read_server_response(response)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -179,7 +179,7 @@ def start_send_file_client(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return
     
@@ -246,7 +246,7 @@ def start_file_listener(turn_server, turn_port):
     filename = input("Please choose a filename or file to be written to: ")
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return    
 
@@ -304,7 +304,7 @@ def start_shell_client(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return
 
@@ -325,7 +325,7 @@ def start_shell_client(turn_server, turn_port):
 
                 if response:
                     print(f"Response (hex): {response.hex()}")
-                    read_server_response(response)
+                    _read_server_response(response)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -362,7 +362,7 @@ def start_shell_listener(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return   
 
@@ -412,7 +412,7 @@ def start_shell_listener(turn_server, turn_port):
 # ------------------------------------
 # Helper Function: Parse Server Response
 # ------------------------------------
-def read_server_response(response):    
+def _read_server_response(response):    
     # Unpack the STUN header
     try:
         msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
@@ -517,7 +517,7 @@ def read_server_response(response):
 # ------------------------------------
 # Helper Function: Establish Connection to Turn Server
 # ------------------------------------
-def create_turn_connection(sock, TURN_SERVER, channel_number):
+def _create_turn_connection(sock, TURN_SERVER, channel_number):
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
     print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
@@ -530,7 +530,7 @@ def create_turn_connection(sock, TURN_SERVER, channel_number):
         print(f"Received response from {addr}")
         if response:
             print("Response (hex):", response.hex())
-            read_server_response(response)
+            _read_server_response(response)
     else:
         print("No response received from TURN server.")
         return -1
@@ -552,7 +552,7 @@ def create_turn_connection(sock, TURN_SERVER, channel_number):
         print(f"Received response from {addr}")
         if response:
             print("Response (hex):", response.hex())
-            read_server_response(response)
+            _read_server_response(response)
     else:
         print("No response received from TURN server.")
         return -1
@@ -569,7 +569,7 @@ def create_turn_connection(sock, TURN_SERVER, channel_number):
         print(f"Received response from {addr}")
         if response:
             print("Response (hex):", response.hex())
-            read_server_response(response)
+            _read_server_response(response)
     else:
         print("No response received from TURN server.")
         return -1
@@ -587,7 +587,7 @@ def create_turn_connection(sock, TURN_SERVER, channel_number):
             print(f"Received response from {addr}")
             if response:
                 print("Response (hex):", response.hex())
-                read_server_response(response)
+                _read_server_response(response)
         else:
             print("No response received from TURN server.")
             return -1
@@ -595,3 +595,12 @@ def create_turn_connection(sock, TURN_SERVER, channel_number):
         print(f"Error: {e}")
 
     return (peer_ip, peer_port)
+
+## When imported using from turnTM import * only imports these functions:
+__all__ = ["start_send_file_client", 
+           "start_file_listener", 
+           "start_shell_client", 
+           "start_shell_listener", 
+           "start_quick_message_client",
+            "start_message_listener"
+        ]

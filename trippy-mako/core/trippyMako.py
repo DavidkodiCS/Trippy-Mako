@@ -2,7 +2,7 @@
 
 ## Imports ##
 import configparser
-import turnTM
+from turnTM import *
 import os
 
 # ------------#
@@ -230,22 +230,22 @@ def main():
                 proxy()
             case "sendFile":
                 turnInfo = generalSetup()
-                turnTM.start_send_file_client(turnInfo[0], turnInfo[1])
+                start_send_file_client(turnInfo[0], turnInfo[1])
             case "listen -f" | "listen -file":
                 turnInfo = generalSetup()
-                turnTM.start_file_listener(turnInfo[0], turnInfo[1])
+                start_file_listener(turnInfo[0], turnInfo[1])
             case "connect": ## get a shell
                 turnInfo = generalSetup()
-                turnTM.start_shell_client(turnInfo[0], turnInfo[1])
+                start_shell_client(turnInfo[0], turnInfo[1])
             case "listen -s" | "listen -shell":
                 turnInfo = generalSetup()
-                turnTM.start_shell_listener(turnInfo[0], turnInfo[1])
+                start_shell_listener(turnInfo[0], turnInfo[1])
             case "message":
                 turnInfo = generalSetup()
-                turnTM.start_quick_message_client(turnInfo[0], turnInfo[1])
+                start_quick_message_client(turnInfo[0], turnInfo[1])
             case "message -l" | "message -listen":
                 turnInfo = generalSetup()
-                turnTM.start_message_listener(turnInfo[0], turnInfo[1])
+                start_message_listener(turnInfo[0], turnInfo[1])
             case _:
                 print("Unrecognized Command...")
 
