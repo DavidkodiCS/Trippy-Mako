@@ -92,7 +92,7 @@ def build_createPerm(ip, port):
     return build_stun_header(MESSAGE_TYPE, message_length) + xor_peer_address
 
 # ----------------------------
-# Build Send Indication Packet
+# Build Send Indication Packet - NOT USED
 # ----------------------------
 def build_send_indication(ip, port, payload):
     MESSAGE_TYPE = 0x0016  #Send Indication Message
