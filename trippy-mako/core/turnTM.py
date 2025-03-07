@@ -201,13 +201,14 @@ def start_send_file_client(turn_server, turn_port):
         
         if sock in ready:
             try:
-                response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
-                if response:
-                    print("Response (hex):", response.hex())
-                    read_server_response(response)
+                while True:
+                    data = f.read(1024)
+                    if not data:
+                        break
+                    sock.sendall(data)
+                print("File successfully sent!")
             except Exception as e:
-                print(f"Socket error: {e}")
+                print(f"Error sending file: {e}")
         
         if sys.stdin in ready:
             user_input = sys.stdin.readline().strip()
@@ -240,6 +241,9 @@ def start_file_listener(turn_server, turn_port):
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
     channel_number = 0x4001
+    
+    ## Filename
+    filename = input("Please choose a filename or file to be written to: ")
 
     # Establish initial TURN connection
     RTA_TUP = create_turn_connection(sock, TURN_SERVER, channel_number)
@@ -255,14 +259,17 @@ def start_file_listener(turn_server, turn_port):
         time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
         ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
         
-        # TODO: Implement file receiving functionality here
-        # if sock in ready:
-        #     try:
-        #         response, addr = sock.recvfrom(4096)
-        #         print(f"Received data from {addr} at {time.strftime('%H:%M:%S')}")
-        #         # Process received file chunks
-        #     except Exception as e:
-        #         print(f"Socket error: {e}")
+        if sock in ready:
+            try:
+                with open(filename, 'wb') as f:
+                    while True:
+                        data = sock.recv(1024)
+                        if not data:
+                            break
+                        f.write(data)
+                print(f"Received and saved file as {filename}")
+            except Exception as e:
+                print(f"Socket error: {e}")
         
         if sys.stdin in ready:
             user_input = sys.stdin.readline().strip().lower()
