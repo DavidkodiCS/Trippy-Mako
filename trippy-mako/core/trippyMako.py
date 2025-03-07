@@ -18,7 +18,7 @@ def help():
         print("Error: Welcome file not found...")
 
 ## General Config Setup for Main Features ##
-def generalSetup(feature):
+def generalSetup():
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
     choose = input("Choose: ")
@@ -27,7 +27,7 @@ def generalSetup(feature):
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            generalSetup()
+            return
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
@@ -42,7 +42,7 @@ def generalSetup(feature):
 
     else:
         print("Invalid command...")
-        generalSetup(feature)
+        generalSetup()
         
     return info
 
@@ -228,24 +228,24 @@ def main():
                 config()
             case "proxy":
                 proxy()
-            case "send":
-                sendFile()
-            case "listen -f":
-                file_listen()
-            case "listen -file":
-                file_listen()
+            case "sendFile":
+                turnInfo = generalSetup()
+                turnTM.start_send_file_client(turnInfo[0], turnInfo[1])
+            case "listen -f" | "listen -file":
+                turnInfo = generalSetup()
+                turnTM.start_file_listener(turnInfo[0], turnInfo[1])
             case "connect": ## get a shell
-                connect()
-            case "listen -s":
-                shell_listen()
-            case "listen -shell":
-                shell_listen()
+                turnInfo = generalSetup()
+                turnTM.start_shell_client(turnInfo[0], turnInfo[1])
+            case "listen -s" | "listen -shell":
+                turnInfo = generalSetup()
+                turnTM.start_shell_listener(turnInfo[0], turnInfo[1])
             case "message":
-                message()
-            case "message -l":
-                message_listen()
-            case "message -listen":
-                message_listen()
+                turnInfo = generalSetup()
+                turnTM.start_quick_message_client(turnInfo[0], turnInfo[1])
+            case "message -l" | "message -listen":
+                turnInfo = generalSetup()
+                turnTM.start_message_listener(turnInfo[0], turnInfo[1])
             case _:
                 print("Unrecognized Command...")
 

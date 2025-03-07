@@ -294,7 +294,7 @@ def start_file_listener(turn_server, turn_port):
 # ------------------------------------
 # Remote Shell Client
 # ------------------------------------
-def get_shell_client(turn_server, turn_port):
+def start_shell_client(turn_server, turn_port):
     TURN_SERVER = (turn_server, int(turn_port))    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
