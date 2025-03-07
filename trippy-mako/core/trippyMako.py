@@ -9,7 +9,11 @@ import os
 # Trippy-Mako #
 # ------------#
 
-## Command Functions ##
+# -----------------------#
+# Main Command Functions #
+# -----------------------#
+
+## Display Help ##
 def help():
     try:
         with open("help.txt", "r") as f:
