@@ -47,7 +47,7 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 def start_quick_message_client(turn_server, turn_port):
     TURN_SERVER = (turn_server, int(turn_port))
-
+    # comment
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
