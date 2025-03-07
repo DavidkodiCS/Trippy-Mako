@@ -331,7 +331,6 @@ def main():
     global configuration
     global config_path
     configuration = configparser.ConfigParser()
-    configuration.read("configs.ini")
     
     # Get config directory from environment variable
     config_dir = os.getenv("CONFIG_DIR", "/config")
