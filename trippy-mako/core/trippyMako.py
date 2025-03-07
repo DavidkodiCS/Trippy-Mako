@@ -50,6 +50,10 @@ def generalSetup():
 def proxy():
     pass
 ###################
+                
+# -----------------------#
+# Configuration Commands #
+# -----------------------#
 
 ## Configuration Menu ##
 def config():
@@ -78,7 +82,6 @@ def config():
             case _:
                 print("Unrecognized Command...")
                 
-## Configuration Commands ##
 ## Add configuration to configs.ini ##
 def addConfig():
     name = input("Enter configuration name: ")
@@ -190,7 +193,9 @@ def listConfig():
 def configOptions():
     print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
 
-### Trippy-Mako Main Menu###
+# ----------------------#
+# Trippy-Mako Main Menu #
+# ----------------------#
 def main():
     ## Load Configuration File ##
     global configuration
