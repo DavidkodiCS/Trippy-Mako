@@ -73,8 +73,7 @@ def file_listen():
         print("Invalid command...")
         file_listen()
     
-    channel_number = input("Input channel number: ")
-    turnTM.start_file_listener(info[0], info[1], channel_number)
+    turnTM.start_file_listener(info[0], info[1])
 #######################
 
 ## GET REMOTE SHELL FEATURE ##
@@ -127,8 +126,7 @@ def shell_listen():
         print("Invalid command...")
         shell_listen()
     
-    channel_number = input("Input channel number: ")
-    turnTM.start_shell_listener(info[0], info[1]), channel_number
+    turnTM.start_shell_listener(info[0], info[1])
 ###########################
 
 ## QUICK MESSAGE FEATURE ##
