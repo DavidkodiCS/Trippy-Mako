@@ -17,8 +17,8 @@ def help():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
 
-## SEND FILE FEATURE ##
-def sendFile():
+## General Config Setup for Main Features ##
+def generalSetup(feature):
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
     choose = input("Choose: ")
@@ -27,13 +27,13 @@ def sendFile():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            sendFile()
+            generalSetup()
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            sendFile()
+            generalSetup()
         info = getConfig(config)
           
     elif(choose == "new"):
@@ -42,144 +42,9 @@ def sendFile():
 
     else:
         print("Invalid command...")
-        sendFile()
-    
-    turnTM.start_send_file_client(info[0], info[1])
-
-## FILE LISTEN ##
-def file_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            file_listen()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            file_listen()
-        info = getConfig(config)
+        generalSetup(feature)
         
-    elif(choose == "new"):
-        ##PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        file_listen()
-    
-    turnTM.start_file_listener(info[0], info[1])
-#######################
-
-## GET REMOTE SHELL FEATURE ##
-def connect():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-          
-    elif(choose == "new"):
-        config = addConfig()
-        info = getConfig(config)     
-
-    else:
-        print("Invalid command...")
-        connect()
-    
-    turnTM.get_shell_client(info[0], info[1])
-
-## REMOTE SHELL LISTENER ##
-def shell_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            shell_listen()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            shell_listen()
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        shell_listen()
-    
-    turnTM.start_shell_listener(info[0], info[1])
-###########################
-
-## QUICK MESSAGE FEATURE ##
-def message():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        message()
-    
-    turnTM.start_quick_message_client(info[0], info[1])
-
-def message_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            message_listen()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            message_listen()
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        message_listen()
-    
-    turnTM.start_message_listener(info[0], info[1])
-###########################
+    return info
 
 ## PROXY FEATURE ##
 def proxy():
