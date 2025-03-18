@@ -41,7 +41,8 @@ listen: This feature allows the client to listen for a peer on the TURN server.
 ### User Run:
 
 1. Navigate to a file where you would like to store configurations
-2. run command `docker run -it -v "$(pwd):/config" chazzconi/trippy-mako bash`
+2. run command `docker pull chazzconi/trippy-mako:v0.1.0-alpha`
+2. run command `docker run -it -v "$(pwd):/config" chazzconi/trippy-mako:v0.1.0-alpha bash`
 
 ### Dev Installation:
 
