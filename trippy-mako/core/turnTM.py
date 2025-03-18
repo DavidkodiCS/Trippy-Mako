@@ -193,7 +193,7 @@ def start_send_file_client(turn_server, turn_port):
             print("File read...")
         
             while True:        
-                data = f.read(1024).encode("utf-8")
+                data = f.read(1024)
                 if not data:
                     break
                 channel_data_packet = packetBuilder.build_channelData(channel_number, data)
