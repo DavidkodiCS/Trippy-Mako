@@ -14,4 +14,4 @@ ENV CONFIG_DIR=/config
 # Ensure the config directory exists (will be replaced if mounted)
 RUN mkdir -p /config
 
-RUN python3 trippyMako.py
+CMD ["python3", "trippyMako.py"]
