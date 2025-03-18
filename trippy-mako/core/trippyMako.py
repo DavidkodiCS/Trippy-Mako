@@ -48,6 +48,8 @@ def generalSetup():
         print("Invalid command...")
         generalSetup()
         
+    v = input("Would you like to enter verbose mode? (y/n)")
+    info.append(True if v == "y" else False)
     return info
                 
 # -----------------------#
@@ -240,10 +242,10 @@ def main():
                 start_file_listener(turnInfo[0], turnInfo[1])
             case "connect": ## get a shell
                 turnInfo = generalSetup()
-                start_shell_client(turnInfo[0], turnInfo[1])
+                start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2])
             case "listen -s" | "listen -shell":
                 turnInfo = generalSetup()
-                start_shell_listener(turnInfo[0], turnInfo[1])
+                start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case "message":
                 turnInfo = generalSetup()
                 start_quick_message_client(turnInfo[0], turnInfo[1])
