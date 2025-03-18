@@ -249,7 +249,7 @@ def main():
             case "message":
                 turnInfo = generalSetup()
                 start_quick_message_client(turnInfo[0], turnInfo[1])
-            case "message -l" | "message -listen":
+            case "listen -m" | "listen -message":
                 turnInfo = generalSetup()
                 start_message_listener(turnInfo[0], turnInfo[1])
             case _:
