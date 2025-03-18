@@ -7,9 +7,20 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 ## Charlie
 
 1. What have you done since last meeting?
+
+Working to better understand how allocations are connected on the turn server so we can get a packet from the turn server to a client.
+
 2. What will you accomplish today / until the next daily scrum?
+
+I am going to fix the allocation process so that we can easily identify the RTA of the server, client, and peers.
+
 3. What impediments or obstacles are in your way?
+
+None.
+
 4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+
+4/10
 
 ## David
 
