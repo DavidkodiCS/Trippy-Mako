@@ -190,44 +190,31 @@ def start_send_file_client(turn_server, turn_port):
     file_path = input("Enter in the path of the file to be sent: ")
     try:
         with open(file_path, "r") as f:
-            print(f.read())
+            print("File read...")
+        
+            while True:        
+                data = f.read(1024).encode("utf-8")
+                if not data:
+                    break
+                channel_data_packet = packetBuilder.build_channelData(channel_number, data)
+                sock.sendto(channel_data_packet, TURN_SERVER)
+
+                # Send refresh packet if needed
+                if time.time() - last_refresh_time >= refresh_interval:
+                    refresh_packet = packetBuilder.build_refresh()
+                    sock.sendto(refresh_packet, TURN_SERVER)
+                    channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+                    print(f"Sending Channel Bind Request (Channel {channel_number})...")
+                    sock.sendto(channel_bind_packet, TURN_SERVER)
+                    print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+                    last_refresh_time = time.time()
+
+            print("File successfully sent!")
+    except Exception as e:
+        print(f"Error sending file: {e}")
     except FileNotFoundError:
         print("Error: File not found...")
         return
-    
-    while True:
-        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
-        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
-        
-        if sock in ready:
-            try:
-                while True:
-                    data = f.read(1024)
-                    if not data:
-                        break
-                    sock.sendall(data)
-                print("File successfully sent!")
-            except Exception as e:
-                print(f"Error sending file: {e}")
-        
-        if sys.stdin in ready:
-            user_input = sys.stdin.readline().strip()
-            if user_input == "q":
-                print("Exiting client...")
-                break
-            else:
-                send_packet = packetBuilder.build_send_indication(RTA_TUP[0], RTA_TUP[1], user_input)
-                sock.sendto(send_packet, TURN_SERVER)
-        
-        # Send refresh packet if needed
-        if time.time() - last_refresh_time >= refresh_interval:
-            refresh_packet = packetBuilder.build_refresh()
-            sock.sendto(refresh_packet, TURN_SERVER)
-            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
-            sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-            last_refresh_time = time.time()
 
 # ------------------
 # Send File Listener
@@ -253,39 +240,30 @@ def start_file_listener(turn_server, turn_port):
     # Start listening loop
     last_refresh_time = time.time()
     refresh_interval = 60  # Refresh interval (1 minute)
-    print("Listening for incoming file data. Press 'q' to quit.")
+    print("Listening for incoming file data.")
     
     while True:
-        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
-        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
-        
-        if sock in ready:
-            try:
-                with open(filename, 'wb') as f:
-                    while True:
-                        data = sock.recv(1024)
-                        if not data:
-                            break
-                        f.write(data)
-                print(f"Received and saved file as {filename}")
-            except Exception as e:
-                print(f"Socket error: {e}")
-        
-        if sys.stdin in ready:
-            user_input = sys.stdin.readline().strip().lower()
-            if user_input == "q":
-                print("Exiting listener...")
-                break
-        
-        # Send refresh packet if needed
-        if time.time() - last_refresh_time >= refresh_interval:
-            refresh_packet = packetBuilder.build_refresh()
-            sock.sendto(refresh_packet, TURN_SERVER)
-            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
-            sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-            last_refresh_time = time.time()
+        try:
+            with open(filename, 'wb') as f:
+                while True:
+                    data = sock.recv(1024)
+                    if not data:
+                        break
+                    f.write(data)
+
+                    # Send refresh packet if needed
+                    if time.time() - last_refresh_time >= refresh_interval:
+                        refresh_packet = packetBuilder.build_refresh()
+                        sock.sendto(refresh_packet, TURN_SERVER)
+                        channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+                        print(f"Sending Channel Bind Request (Channel {channel_number})...")
+                        sock.sendto(channel_bind_packet, TURN_SERVER)
+                        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+                        last_refresh_time = time.time()
+            print(f"Received and saved file as {filename}")
+            break
+        except Exception as e:
+            print(f"Socket error: {e}")
   
 # --------------------
 # Remote Shell Feature
