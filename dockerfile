@@ -21,4 +21,4 @@ EXPOSE 5349/udp
 EXPOSE 5349/tcp
 
 # Run Trippy on container startup
-ENTRYPOINT ["python", "trippyMako.py"]
+ENTRYPOINT ["bash", "-c", "python3 trippyMako.py; exec bash"]
