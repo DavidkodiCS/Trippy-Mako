@@ -20,5 +20,5 @@ RUN mkdir -p /config
 EXPOSE 5349/udp
 EXPOSE 5349/tcp
 
-# Run Coturn on container startup
-ENTRYPOINT ["sh", "-c", "turnserver -c /etc/turnserver.conf -v & exec bash"]
+# Run Trippy on container startup
+ENTRYPOINT ["python", "trippyMako.py"]
