@@ -324,9 +324,11 @@ def start_shell_client(turn_server, turn_port, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
