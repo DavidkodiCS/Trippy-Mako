@@ -305,7 +305,8 @@ def start_shell_client(turn_server, turn_port, verbose):
                 if response:
                     if verbose:
                         print(f"Response (hex): {response.hex()}")
-                    _parse_command_response(response, verbose)
+                        
+                    _parse_channel_response(response, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -587,7 +588,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_command_response(response, verbose):
+def _parse_channel_response(response, verbose):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
     if verbose:
