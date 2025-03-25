@@ -182,12 +182,14 @@ def start_send_file_client(turn_server, turn_port, verbose):
     RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
         return
-    
-    # Start message loop
-    last_refresh_time = time.time()
-    refresh_interval = 60  # Refresh interval (1 minute)
 
     file_path = input("Enter in the path of the file to be sent: ")
+    
+    refresh_packet = packetBuilder.build_refresh()
+    sock.sendto(refresh_packet, TURN_SERVER)
+    if verbose:
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+    
     try:
         with open(file_path, "r") as f:
             print("File read...")
@@ -198,16 +200,6 @@ def start_send_file_client(turn_server, turn_port, verbose):
                     break
                 channel_data_packet = packetBuilder.build_channelData(channel_number, data)
                 sock.sendto(channel_data_packet, TURN_SERVER)
-
-                # Send refresh packet if needed
-                if time.time() - last_refresh_time >= refresh_interval:
-                    refresh_packet = packetBuilder.build_refresh()
-                    sock.sendto(refresh_packet, TURN_SERVER)
-                    channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                    print(f"Sending Channel Bind Request (Channel {channel_number})...")
-                    sock.sendto(channel_bind_packet, TURN_SERVER)
-                    print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-                    last_refresh_time = time.time()
 
             print("File successfully sent!")
     except Exception as e:
@@ -235,11 +227,13 @@ def start_file_listener(turn_server, turn_port, verbose):
     # Establish initial TURN connection
     RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
     if RTA_TUP == -1:
-        return    
-
-    # Start listening loop
-    # last_refresh_time = time.time()
-    # refresh_interval = 300  # Refresh interval (1 minute)
+        return   
+    
+    refresh_packet = packetBuilder.build_refresh()
+    sock.sendto(refresh_packet, TURN_SERVER)
+    if verbose:
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+    
     print("Listening for incoming file data.")
     
     try:
@@ -247,21 +241,12 @@ def start_file_listener(turn_server, turn_port, verbose):
             sock.settimeout(10) 
             while True:
                 data = sock.recv(1024)
+                file_data = _parse_channel_response(data)
                 if not data:
                     f.close()
-                    print("TEST")
                     break
-                f.write(data)
+                f.write(file_data)
 
-                # # Send refresh packet if needed
-                # if time.time() - last_refresh_time >= refresh_interval:
-                #     refresh_packet = packetBuilder.build_refresh()
-                #     sock.sendto(refresh_packet, TURN_SERVER)
-                #     channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                #     print(f"Sending Channel Bind Request (Channel {channel_number})...")
-                #     sock.sendto(channel_bind_packet, TURN_SERVER)
-                #     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-                #     last_refresh_time = time.time()
             print(f"Received and saved file as {filename}")
     except Exception as e:
         print(f"Received and saved file as {filename}")
@@ -597,8 +582,10 @@ def _parse_channel_response(response, verbose):
         print(f"LENGTH: {length}")
         print(f"MESSAGE: {message.decode(errors='ignore')}")
         print(message.decode(errors='ignore'))
+        return message.decode(errors='ignore')
     else:
         print(message.decode(errors='ignore'))
+        return message.decode(errors='ignore')
         
 
 ## When imported using from turnTM import * only imports these functions:
