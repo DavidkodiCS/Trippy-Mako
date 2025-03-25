@@ -595,9 +595,9 @@ def _parse_command_response(response, verbose):
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
         print(f"MESSAGE: {message.decode(errors='ignore')}")
-        return message.decode(errors='ignore')
+        print(message.decode(errors='ignore'))
     else:
-        return message.decode(errors='ignore')
+        print(message.decode(errors='ignore'))
         
 
 ## When imported using from turnTM import * only imports these functions:
