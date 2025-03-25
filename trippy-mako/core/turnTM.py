@@ -594,7 +594,6 @@ def _parse_command_response(response, verbose):
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
-        message = response[4:4+length]  # Slice the message portion
         print(f"MESSAGE: {message.decode(errors='ignore')}")
         return message.decode(errors='ignore')
     else:
