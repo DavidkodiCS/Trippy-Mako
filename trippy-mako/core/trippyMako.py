@@ -24,7 +24,7 @@ def help():
 ## General Config Setup for Main Features ##
 def generalSetup():
     print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
+    print("> existing\n> new\n> exit")
     choose = input("Choose: ")
     info = []
     
@@ -43,6 +43,9 @@ def generalSetup():
     elif(choose == "new"):
         config = addConfig()
         info = getConfig(config)     
+
+    elif(choose == "exit"):
+        return -1
 
     else:
         print("Invalid command...")
@@ -223,7 +226,10 @@ def main():
     
     while True:
         command = input("\n> ").strip()
-
+        turnInfo = generalSetup()
+        if turnInfo == -1:
+            break
+        
         match command:
             case "exit":
                 print("Exiting...")
@@ -235,22 +241,16 @@ def main():
             case "proxy":
                 print("Feature not implemented yet")
             case "sendFile":
-                turnInfo = generalSetup()
                 start_send_file_client(turnInfo[0], turnInfo[1])
             case "listen -f" | "listen -file":
-                turnInfo = generalSetup()
                 start_file_listener(turnInfo[0], turnInfo[1])
             case "connect": ## get a shell
-                turnInfo = generalSetup()
                 start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2])
             case "listen -s" | "listen -shell":
-                turnInfo = generalSetup()
                 start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case "message":
-                turnInfo = generalSetup()
                 start_quick_message_client(turnInfo[0], turnInfo[1])
             case "listen -m" | "listen -message":
-                turnInfo = generalSetup()
                 start_message_listener(turnInfo[0], turnInfo[1])
             case _:
                 print("Unrecognized Command...")
