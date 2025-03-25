@@ -1,5 +1,8 @@
 FROM python:3.12
 
+# Install Crypto
+RUN pip install pycryptodome 
+
 # Set the working directory in the container and copy python files
 WORKDIR /app
 COPY trippy-mako/core /app
@@ -14,4 +17,5 @@ ENV CONFIG_DIR=/config
 # Ensure the config directory exists (will be replaced if mounted)
 RUN mkdir -p /config
 
-CMD ["python3", "trippyMako.py"]
+# Run Trippy on container startup
+ENTRYPOINT ["bash", "-c", "python3 trippyMako.py; exec bash"]

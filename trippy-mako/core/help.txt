@@ -6,30 +6,34 @@ Command List:
     > list
     > display
     > exit
+> message
+> listen -m | listen -message
 > connect
-> send
-> proxy
-> demo
-> listen
+> listen -s" | listen -shell
+> sendFile
+> listen -f | listen -file
+> help 
+> exit
 
 configure: Allows the user to enter in the TURN Server's public facing IP address, 
 associated port number, as well as the user's desired protocol to use, and 
 authentication measures. Different settings could affect the speed and size of 
 the packets being sent across the network, which may be important to the user.
 
-connect: Allows the user to initiate a TCP connection over through the TURN 
-server to establish a more permanent connection a peer, like a secure shell.
+connect: Allows the user connect to a peer and send terminal commands that will 
+then be executed on the peer. The results of that command will then be sent back to the user.
 
-send: Allows the user to send a payload using the specified protocol specified 
-in the configuration stage.
+listen -s | listen -shell: Allows the user to act as a listener, which waits 
+for commands from a peer. This listener will then execute the commands and send 
+the results back to the peer.
 
-The tool will check the specified configuration during an action and, if it is 
-incorrect, will highlight to the user what is incorrect and will prompt the user 
-to make the changes with suggestions.
+sendFile: Allows the user to send a file to a peer.
 
-proxy: Using this command will allow the user to create what is essentially an 
-open tunnel to the peer through the TURN server to send data through that the peer 
-will then send to other devices in the network. The tool will listen on a port and 
-provide an interface for the user to send the payload through the tunnel.
+listen -f | listen -file: Allows the user to listen for a file from and peer.
+When the file is received this feature will write the contents to a file name 
+of the user's choice.
 
-listen: This feature allows the client to listen for a peer on the TURN server.
+message: This allows a user to send and receive messages from a peer.
+
+listen -m | listen -message: This feature allows the client to listen for messages
+from a peer.

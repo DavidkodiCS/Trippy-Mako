@@ -23,6 +23,10 @@ Configuration Options:
 
 ## Feautures
 
+### Message Client
+
+With this feature you can send and receive text messages to a peer through the TURN server.
+
 ### Send Client
 
 With this feature you can send files to a peer through the TURN server similar to what the SFTP(Secure File Transport Protocol) does.

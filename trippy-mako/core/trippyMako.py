@@ -2,14 +2,18 @@
 
 ## Imports ##
 import configparser
-import turnTM
+from turnTM import *
 import os
 
 # ------------#
 # Trippy-Mako #
 # ------------#
 
-## Command Functions ##
+# -----------------------#
+# Main Command Functions #
+# -----------------------#
+
+## Display Help ##
 def help():
     try:
         with open("help.txt", "r") as f:
@@ -17,8 +21,8 @@ def help():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
 
-## SEND FILE FEATURE ##
-def sendFile():
+## General Config Setup for Main Features ##
+def generalSetup():
     print("> Choose an existing configuration or create a new one:")
     print("> existing\n> new")
     choose = input("Choose: ")
@@ -27,13 +31,13 @@ def sendFile():
     if(choose == "existing"):
         if len(configuration.sections()) == 0:
             print("You have no saved configurations.")
-            sendPayload()
+            return
         print("Please choose a configuration from the list below: ")
         listConfig()
         config = input("Choose configuration: ")
         if not(configuration.has_section(config)):
             print("That configuration does not exist.")
-            sendPayload()
+            generalSetup()
         info = getConfig(config)
           
     elif(choose == "new"):
@@ -42,151 +46,15 @@ def sendFile():
 
     else:
         print("Invalid command...")
-        sendFile()
-    
-    turnTM.start_send_file_client(info[0], info[1])
-
-## FILE LISTEN ##
-def file_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            sendPayload()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            sendPayload()
-        info = getConfig(config)
+        generalSetup()
         
-    elif(choose == "new"):
-        ##PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        file_listen()
-    
-    channel_number = input("Input channel number: ")
-    turnTM.start_file_listener(info[0], info[1], channel_number)
-#######################
-
-## GET REMOTE SHELL FEATURE ##
-def connect():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-          
-    elif(choose == "new"):
-        config = addConfig()
-        info = getConfig(config)     
-
-    else:
-        print("Invalid command...")
-        connect()
-    
-    turnTM.get_shell_client(info[0], info[1])
-
-## REMOTE SHELL LISTENER ##
-def shell_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            listen()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            listen()
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        shell_listen()
-    
-    channel_number = input("Input channel number: ")
-    turnTM.start_shell_listener(info[0], info[1]), channel_number
-###########################
-
-## QUICK MESSAGE FEATURE ##
-def message():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        message()
-    
-    turnTM.start_quick_message_client(info[0], info[1])
-
-def message_listen():
-    print("> Choose an existing configuration or create a new one:")
-    print("> existing\n> new")
-    choose = input("Choose: ")
-    info = []
-    
-    if(choose == "existing"):
-        if len(configuration.sections()) == 0:
-            print("You have no saved configurations.")
-            demo()
-        print("Please choose a configuration from the list below: ")
-        listConfig()
-        config = input("Choose configuration: ")
-        if not(configuration.has_section(config)):
-            print("That configuration does not exist.")
-            demo()
-        info = getConfig(config)
-        
-    elif(choose == "new"):
-        ## PORT = 5349 or 3478
-        config = addConfig()
-        info = getConfig(config)     
-    else:
-        print("Invalid command...")
-        message_listen()
-    
-    turnTM.start_message_listener(info[0], info[1])
-###########################
-
-## PROXY FEATURE ##
-def proxy():
-    pass
-###################
+    v = input("Would you like to enter verbose mode? (y/n)")
+    info.append(True if v == "y" else False)
+    return info
+                
+# -----------------------#
+# Configuration Commands #
+# -----------------------#
 
 ## Configuration Menu ##
 def config():
@@ -215,7 +83,6 @@ def config():
             case _:
                 print("Unrecognized Command...")
                 
-## Configuration Commands ##
 ## Add configuration to configs.ini ##
 def addConfig():
     name = input("Enter configuration name: ")
@@ -327,13 +194,14 @@ def listConfig():
 def configOptions():
     print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
 
-### Trippy-Mako Main Menu###
+# ----------------------#
+# Trippy-Mako Main Menu #
+# ----------------------#
 def main():
     ## Load Configuration File ##
     global configuration
     global config_path
     configuration = configparser.ConfigParser()
-    configuration.read("configs.ini")
     
     # Get config directory from environment variable
     config_dir = os.getenv("CONFIG_DIR", "/config")
@@ -351,7 +219,7 @@ def main():
     except FileNotFoundError:
         print("Error: Welcome file not found...")
         
-    print("Type help to see the available commands or exit to quit...\n\n")
+    print("Type 'help' to see the available commands or 'exit' to quit...\n\n")
     
     while True:
         command = input("\n> ").strip()
@@ -365,25 +233,25 @@ def main():
             case "config":
                 config()
             case "proxy":
-                proxy()
-            case "send":
-                sendFile()
-            case "listen -f":
-                file_listen()
-            case "listen -file":
-                file_listen()
+                print("Feature not implemented yet")
+            case "sendFile":
+                turnInfo = generalSetup()
+                start_send_file_client(turnInfo[0], turnInfo[1])
+            case "listen -f" | "listen -file":
+                turnInfo = generalSetup()
+                start_file_listener(turnInfo[0], turnInfo[1])
             case "connect": ## get a shell
-                connect()
-            case "listen -s":
-                shell_listen()
-            case "listen -shell":
-                shell_listen()
+                turnInfo = generalSetup()
+                start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2])
+            case "listen -s" | "listen -shell":
+                turnInfo = generalSetup()
+                start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case "message":
-                message()
-            case "message -l":
-                message_listen()
-            case "message -listen":
-                message_listen()
+                turnInfo = generalSetup()
+                start_quick_message_client(turnInfo[0], turnInfo[1])
+            case "listen -m" | "listen -message":
+                turnInfo = generalSetup()
+                start_message_listener(turnInfo[0], turnInfo[1])
             case _:
                 print("Unrecognized Command...")
 

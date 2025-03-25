@@ -2,19 +2,30 @@ import os
 import struct
 import socket
 
-
 # -----------------------------
 # Trippy-Mako Packet Builder
 # -----------------------------
+MAGIC_COOKIE = 0x2112A442
+
+def build_stun_header(MESSAGE_TYPE, MESSAGE_LENGTH):
+    STUN_HEADER_FORMAT = "!HHI12s"
+    TRANSACTION_ID = os.urandom(12)
+    
+    header = struct.pack(
+        STUN_HEADER_FORMAT,
+        MESSAGE_TYPE,
+        MESSAGE_LENGTH,
+        MAGIC_COOKIE,
+        TRANSACTION_ID
+    )
+    
+    return header
 
 # -----------------------------
 # Build Allocate Request Packet
 # -----------------------------
 def build_alloc():
-    STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x003
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
 
     # Requested Transport Attribute
     REQUESTED_TRANSPORT_TYPE = 0x0019
@@ -32,68 +43,33 @@ def build_alloc():
 
     message_length = len(requested_transport)
 
-    # STUN Header
-    header = struct.pack(
-        STUN_HEADER_FORMAT,
-        MESSAGE_TYPE,
-        message_length,
-        MAGIC_COOKIE,
-        TRANSACTION_ID
-    )
-
-    return header + requested_transport
+    return build_stun_header(MESSAGE_TYPE, message_length) + requested_transport
 
 # ----------------------------
 # Build Refresh Request Packet
 # ----------------------------
 def build_refresh():
-    STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x004
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
 
-    # STUN Header
-    header = struct.pack(
-        STUN_HEADER_FORMAT,
-        MESSAGE_TYPE,
-        0,  # Message length (no attributes)
-        MAGIC_COOKIE,
-        TRANSACTION_ID
-    )
-
-    return header
+    return build_stun_header(MESSAGE_TYPE, 0)
 
 # ----------------------------------------------------
 # Build Refresh Request with Lifetime 0 (Deallocation)
 # ----------------------------------------------------
 def build_kill_refresh():
-    STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x004
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
 
     # Lifetime Attribute (Set to 0 for deallocation)
     lifetime_attr = struct.pack("!HHI", 0x000D, 4, 0)
     message_length = len(lifetime_attr)
 
-    # STUN Header
-    header = struct.pack(
-        STUN_HEADER_FORMAT,
-        MESSAGE_TYPE,
-        message_length,
-        MAGIC_COOKIE,
-        TRANSACTION_ID
-    )
-
-    return header + lifetime_attr
+    return build_stun_header(MESSAGE_TYPE, message_length) + lifetime_attr
 
 # -------------------------------
 # Build Create Permission Request
 # -------------------------------
 def build_createPerm(ip, port):
-    MAGIC_COOKIE = 0x2112A442
     MESSAGE_TYPE = 0x008  # CreatePermission Request
-    TRANSACTION_ID = os.urandom(12)
 
     # XOR-Peer-Address Attribute
     xor_port = port ^ (MAGIC_COOKIE >> 16)
@@ -112,17 +88,14 @@ def build_createPerm(ip, port):
     )
 
     message_length = len(xor_peer_address)
-    stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
 
-    return stun_header + xor_peer_address
+    return build_stun_header(MESSAGE_TYPE, message_length) + xor_peer_address
 
 # ----------------------------
-# Build Send Indication Packet
+# Build Send Indication Packet - NOT USED
 # ----------------------------
 def build_send_indication(ip, port, payload):
-    MAGIC_COOKIE = 0x2112A442
-    MESSAGE_TYPE = 0x0016  # Correct STUN Send Indication type
-    TRANSACTION_ID = os.urandom(12)
+    MESSAGE_TYPE = 0x0016  #Send Indication Message
 
     # XOR-Peer-Address Attribute
     xor_port = port ^ (MAGIC_COOKIE >> 16)
@@ -146,20 +119,17 @@ def build_send_indication(ip, port, payload):
     padding = b"\x00" * (data_length_padded - len(data))
     data_attribute = struct.pack("!HH", 0x0013, len(data)) + data + padding
 
-    # STUN Header
+    # Length
     message_length = len(xor_peer_address) + len(data_attribute)
-    stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
 
-    return stun_header + xor_peer_address + data_attribute
+    return build_stun_header(MESSAGE_TYPE, message_length) + xor_peer_address + data_attribute
 
 
 # --------------------------
 # Build Channel Bind Request
 # --------------------------
 def build_channelBind(ip, port, channel_number):
-    MAGIC_COOKIE = 0x2112A442
     MESSAGE_TYPE = 0x009  # Channel Bind Request
-    TRANSACTION_ID = os.urandom(12)
 
     # XOR-Peer-Address Attribute
     xor_port = port ^ (MAGIC_COOKIE >> 16)
@@ -185,10 +155,10 @@ def build_channelBind(ip, port, channel_number):
         b'\x00\x00'  # Reserved
     )
 
+    # Length
     message_length = len(xor_peer_address) + len(channel_attribute)
-    stun_header = struct.pack("!HHI12s", MESSAGE_TYPE, message_length, MAGIC_COOKIE, TRANSACTION_ID)
 
-    return stun_header + xor_peer_address + channel_attribute
+    return build_stun_header(MESSAGE_TYPE, message_length) + xor_peer_address + channel_attribute
 
 # --------------------------
 # Build Channel Data Message
@@ -203,20 +173,9 @@ def build_channelData(channel_number, data):
     return header + data_bytes
 
 # -----------------------
-# Build STUN Bind Request
+# Build STUN Bind Request - NOT USED
 # -----------------------
 def build_stun_bind():
-    STUN_HEADER_FORMAT = "!HHI12s"
     MESSAGE_TYPE = 0x0001  # STUN Bind Request
-    MAGIC_COOKIE = 0x2112A442
-    TRANSACTION_ID = os.urandom(12)
 
-    header = struct.pack(
-        STUN_HEADER_FORMAT,
-        MESSAGE_TYPE,
-        0,  # No attributes
-        MAGIC_COOKIE,
-        TRANSACTION_ID
-    )
-
-    return header
+    return build_stun_header(MESSAGE_TYPE, 0)
