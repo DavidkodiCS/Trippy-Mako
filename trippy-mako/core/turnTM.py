@@ -238,33 +238,33 @@ def start_file_listener(turn_server, turn_port):
         return    
 
     # Start listening loop
-    last_refresh_time = time.time()
-    refresh_interval = 60  # Refresh interval (1 minute)
+    # last_refresh_time = time.time()
+    # refresh_interval = 300  # Refresh interval (1 minute)
     print("Listening for incoming file data.")
     
-    while True:
-        try:
-            with open(filename, 'wb') as f:
-                sock.settimeout(5)
-                while True:
-                    data = sock.recv(1024)
-                    if not data:
-                        break
-                    f.write(data)
+    try:
+        with open(filename, 'wb') as f:
+            sock.settimeout(10) 
+            while True:
+                data = sock.recv(1024)
+                if not data:
+                    f.close()
+                    print("TEST")
+                    break
+                f.write(data)
 
-                    # Send refresh packet if needed
-                    if time.time() - last_refresh_time >= refresh_interval:
-                        refresh_packet = packetBuilder.build_refresh()
-                        sock.sendto(refresh_packet, TURN_SERVER)
-                        channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                        print(f"Sending Channel Bind Request (Channel {channel_number})...")
-                        sock.sendto(channel_bind_packet, TURN_SERVER)
-                        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-                        last_refresh_time = time.time()
+                # # Send refresh packet if needed
+                # if time.time() - last_refresh_time >= refresh_interval:
+                #     refresh_packet = packetBuilder.build_refresh()
+                #     sock.sendto(refresh_packet, TURN_SERVER)
+                #     channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+                #     print(f"Sending Channel Bind Request (Channel {channel_number})...")
+                #     sock.sendto(channel_bind_packet, TURN_SERVER)
+                #     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+                #     last_refresh_time = time.time()
             print(f"Received and saved file as {filename}")
-            break
-        except Exception as e:
-            print(f"Socket error: {e}")
+    except Exception as e:
+        print(f"Received and saved file as {filename}")
   
 # --------------------
 # Remote Shell Feature
