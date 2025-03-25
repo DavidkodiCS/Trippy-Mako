@@ -1,3 +1,6 @@
+#ignore config changes
+*.ini
+
 # Template pythone gitignore file from: https://github.com/github/gitignore/blob/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -160,7 +163,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-#ignore config changes
-configs.ini
-config.ini

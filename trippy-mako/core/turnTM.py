@@ -1,10 +1,8 @@
-import random
 import socket
 import struct
 import sys
 import time
 import packetBuilder
-import os
 import subprocess
 import select
 
@@ -45,91 +43,20 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 # Quick Message Client
 # ------------------------------------
-def start_quick_message_client(ip, port):
-    turn_server = ip  # TURN server's IP
-    turn_port = int(port)  # Default TURN port most likely
-    TURN_SERVER = (turn_server, turn_port)
-
+def start_quick_message_client(turn_server, turn_port):
+    TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
 
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
     channel_number = 0x4001
 
-    # Allocate Request
-    alloc_packet = packetBuilder.build_alloc()
-    print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-    sock.sendto(alloc_packet, TURN_SERVER)
-
-    # Wait for a response
-    ready, _, _ = select.select([sock], [], [], 5)
-    if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-
-    # Get Peer Information
-    peer_ip = input("TURN IP of RTA: ")
-    peer_port = int(input("RTA PORT:"))
-
-    # Create Permission Request
-    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
-    print(f"Sending Create Permission packet to {turn_server}:{turn_port}")
-    sock.sendto(create_perm_packet, TURN_SERVER)
-
-    # Wait for a response
-    ready, _, _ = select.select([sock], [], [], 5)
-    if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-
-    # peer_ip = input("RTA IP of Peer: ")
-    # peer_port = int(input("RTA PORT of Peer: "))
-
-    #Send Channel Bind Request
-    channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
-    print(f"Sending Channel Bind Request (Channel {channel_number})...")
-    sock.sendto(channel_bind_packet, TURN_SERVER)
-
-    # Wait for a response
-    ready, _, _ = select.select([sock], [], [], 5)
-    if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-
-    # Refresh Allocation
-    try:
-        refresh_packet = packetBuilder.build_refresh()
-        print(f"Sending Refresh packet to {turn_server}:{turn_port}")
-        sock.sendto(refresh_packet, TURN_SERVER)
-
-        # Wait for a response
-        ready, _, _ = select.select([sock], [], [], 5)
-        if sock in ready:
-            response, addr = sock.recvfrom(4096)
-            print(f"Received response from {addr}")
-            if response:
-                print("Response (hex):", response.hex())
-                read_server_response(response)
-        else:
-            print("No response received from TURN server.")
-    except Exception as e:
-        print(f"Error: {e}")
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return
 
     # Start Message Loop
     last_refresh_time = time.time()
@@ -151,7 +78,7 @@ def start_quick_message_client(ip, port):
 
                 if response:
                     print("Response (hex):", response.hex())
-                    read_server_response(response)
+                    _read_server_response(response)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -170,7 +97,7 @@ def start_quick_message_client(ip, port):
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
-            channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
+            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
             print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
@@ -179,37 +106,19 @@ def start_quick_message_client(ip, port):
 # ----------------------
 # Quick Message Listener
 # ----------------------
-def start_message_listener(ip, port):
-    turn_server = ip  # TURN server's IP
-    turn_port = int(port)  # TURN server's port
-    TURN_SERVER = (turn_server, turn_port)
-
-    # Build Allocate Packet
-    alloc_packet = packetBuilder.build_alloc()
-
-    # Create and configure socket
+def start_message_listener(turn_server, turn_port):
+    TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setblocking(False)  # Non-blocking socket
     sock.settimeout(None)  # No timeout
+    sock.setblocking(False)  # Non-blocking socket
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
+    channel_number = 0x4001
 
-    try:
-        # Send Allocate request to the TURN server
-        print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-
-        # Wait for response
-        ready, _, _ = select.select([sock], [], [], 5)
-        if sock in ready:
-            response, addr = sock.recvfrom(4096)
-            print(f"Received response from {addr}")
-            if response:
-                print("Response (hex):", response.hex())
-                read_server_response(response)
-        else:
-            print("No response received from TURN server.")
-
-    except Exception as e:
-        print(f"Error: {e}")
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return
 
     # Start Listening Loop
     last_refresh_time = time.time()
@@ -231,7 +140,7 @@ def start_message_listener(ip, port):
 
                 if response:
                     print("Response (hex):", response.hex())
-                    read_server_response(response)
+                    _read_server_response(response)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -245,8 +154,12 @@ def start_message_listener(ip, port):
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
+            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            sock.sendto(channel_bind_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
+
 
 # -----------------
 # Send File Feature
@@ -255,43 +168,20 @@ def start_message_listener(ip, port):
 # -------------------
 # Sending File Client
 # -------------------
-def start_send_file_client(ip, port):
-    turn_server = ip  # TURN server's IP
-    turn_port = int(port)  # Default TURN port
-    peer_ip = input("IP of Peer: ")
-    peer_port = int(input("Port of peer: "))
-    TURN_SERVER = (turn_server, turn_port)
-
-    # Build necessary TURN packets
-    alloc_packet = packetBuilder.build_alloc()
-    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
-    
+def start_send_file_client(turn_server, turn_port):
+    TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
-    
-    try:
-        # Allocate relay on TURN server
-        print(f"Sending allocation request to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-        
-        # Create permission for peer communication
-        print(f"Sending Create Permission request to {turn_server}:{turn_port}")
-        sock.sendto(create_perm_packet, TURN_SERVER)
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-        print(f"Error: {e}")
+    sock.setblocking(False)
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
+    channel_number = 0x4001
+
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return
     
     # Start message loop
     last_refresh_time = time.time()
@@ -300,99 +190,81 @@ def start_send_file_client(ip, port):
     file_path = input("Enter in the path of the file to be sent: ")
     try:
         with open(file_path, "r") as f:
-            print(f.read())
+            print("File read...")
+        
+            while True:        
+                data = f.read(1024)
+                if not data:
+                    break
+                channel_data_packet = packetBuilder.build_channelData(channel_number, data)
+                sock.sendto(channel_data_packet, TURN_SERVER)
+
+                # Send refresh packet if needed
+                if time.time() - last_refresh_time >= refresh_interval:
+                    refresh_packet = packetBuilder.build_refresh()
+                    sock.sendto(refresh_packet, TURN_SERVER)
+                    channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+                    print(f"Sending Channel Bind Request (Channel {channel_number})...")
+                    sock.sendto(channel_bind_packet, TURN_SERVER)
+                    print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+                    last_refresh_time = time.time()
+
+            print("File successfully sent!")
+    except Exception as e:
+        print(f"Error sending file: {e}")
     except FileNotFoundError:
         print("Error: File not found...")
         return
-    
-    while True:
-        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
-        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
-        
-        if sock in ready:
-            try:
-                response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
-                if response:
-                    print("Response (hex):", response.hex())
-                    read_server_response(response)
-            except Exception as e:
-                print(f"Socket error: {e}")
-        
-        if sys.stdin in ready:
-            user_input = sys.stdin.readline().strip()
-            if user_input == "q":
-                print("Exiting client...")
-                break
-            else:
-                send_packet = packetBuilder.build_send_indication(peer_ip, peer_port, user_input)
-                sock.sendto(send_packet, TURN_SERVER)
-        
-        if time.time() - last_refresh_time >= refresh_interval:
-            refresh_packet = packetBuilder.build_refresh()
-            sock.sendto(refresh_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-            last_refresh_time = time.time()
 
 # ------------------
 # Send File Listener
 # ------------------
-def start_file_listener(ip, port):
-    turn_server = ip  # TURN server's IP
-    turn_port = int(port)  # Default TURN port
-    TURN_SERVER = (turn_server, turn_port)
-    
-    # Build allocation packet
-    alloc_packet = packetBuilder.build_alloc()
-    
+def start_file_listener(turn_server, turn_port):
+    TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setblocking(False)
-    sock.settimeout(None)
+    sock.settimeout(None)    
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
+    channel_number = 0x4001
+    
+    ## Filename
+    filename = input("Please choose a filename or file to be written to: ")
+
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return    
+
+    # Start listening loop
+    # last_refresh_time = time.time()
+    # refresh_interval = 300  # Refresh interval (1 minute)
+    print("Listening for incoming file data.")
     
     try:
-        # Send allocation request
-        print(f"Sending allocation request to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            read_server_response(response)
-    except socket.timeout:
-        print("No response received (timeout).")
+        with open(filename, 'wb') as f:
+            sock.settimeout(10) 
+            while True:
+                data = sock.recv(1024)
+                if not data:
+                    f.close()
+                    print("TEST")
+                    break
+                f.write(data)
+
+                # # Send refresh packet if needed
+                # if time.time() - last_refresh_time >= refresh_interval:
+                #     refresh_packet = packetBuilder.build_refresh()
+                #     sock.sendto(refresh_packet, TURN_SERVER)
+                #     channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+                #     print(f"Sending Channel Bind Request (Channel {channel_number})...")
+                #     sock.sendto(channel_bind_packet, TURN_SERVER)
+                #     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+                #     last_refresh_time = time.time()
+            print(f"Received and saved file as {filename}")
     except Exception as e:
-        print(f"Error: {e}")
-    
-    # Start listening loop
-    last_refresh_time = time.time()
-    refresh_interval = 60  # Refresh interval (1 minute)
-    print("Listening for incoming file data. Press 'q' to quit.")
-    
-    while True:
-        time_until_refresh = max(0, refresh_interval - (time.time() - last_refresh_time))
-        ready, _, _ = select.select([sock, sys.stdin], [], [], time_until_refresh)
-        
-        # TODO: Implement file receiving functionality here
-        # if sock in ready:
-        #     try:
-        #         response, addr = sock.recvfrom(4096)
-        #         print(f"Received data from {addr} at {time.strftime('%H:%M:%S')}")
-        #         # Process received file chunks
-        #     except Exception as e:
-        #         print(f"Socket error: {e}")
-        
-        if sys.stdin in ready:
-            user_input = sys.stdin.readline().strip().lower()
-            if user_input == "q":
-                print("Exiting listener...")
-                break
-        
-        if time.time() - last_refresh_time >= refresh_interval:
-            refresh_packet = packetBuilder.build_refresh()
-            sock.sendto(refresh_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-            last_refresh_time = time.time()
+        print(f"Received and saved file as {filename}")
   
 # --------------------
 # Remote Shell Feature
@@ -401,62 +273,19 @@ def start_file_listener(ip, port):
 # ------------------------------------
 # Remote Shell Client
 # ------------------------------------
-def get_shell_client(ip, port):
-    turn_server = ip  
-    turn_port = int(port)  
-    peer_ip = input("IP of Peer: ")
-    peer_port = int(input("Port of peer: "))
-    TURN_SERVER = (turn_server, turn_port)
-
-    # Build necessary packets
-    alloc_packet = packetBuilder.build_alloc()
-    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
-
+def start_shell_client(turn_server, turn_port, verbose):
+    TURN_SERVER = (turn_server, int(turn_port))    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
+    sock.setblocking(False)
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
+    channel_number = 0x4001
 
-    try:
-        # Send Allocate packet
-        print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-
-        # Receive response
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-
-        if response:
-            print(f"Response (hex): {response.hex()}")
-            read_server_response(response)
-
-        # Send Create Permission packet
-        print(f"Sending Create Permission packet to {turn_server}:{turn_port}")
-        sock.sendto(create_perm_packet, TURN_SERVER)
-
-        # Receive response
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-
-        if response:
-            print(f"Response (hex): {response.hex()}")
-            read_server_response(response)
-
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-        print(f"Error: {e}")
-
-    # Start Channel Binding
-    channel_number = random.randint(0x4000, 0x7FFF)
-    print(f"CHANNEL NUMBER: {channel_number}")
-    channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
-    sock.sendto(channel_bind_packet, TURN_SERVER)
-
-    response, addr = sock.recvfrom(4096)
-    print(f"Received response from {addr}")
-
-    if response:
-        print(f"Response (hex): {response.hex()}")
-        read_server_response(response)
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return
 
     last_refresh_time = time.time()
     refresh_interval = 60  # Refresh every minute
@@ -474,8 +303,9 @@ def get_shell_client(ip, port):
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print(f"Response (hex): {response.hex()}")
-                    read_server_response(response)
+                    if verbose:
+                        print(f"Response (hex): {response.hex()}")
+                    _parse_command_response(response, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -486,51 +316,35 @@ def get_shell_client(ip, port):
                 print("Exiting client...")
                 break
             else:
-                send_packet = packetBuilder.build_channelData(channel_number, command)
+                send_packet = packetBuilder.build_channelData(channel_number, command.strip())
                 sock.sendto(send_packet, TURN_SERVER)
 
+        # Send refresh packet if needed
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
+            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            sock.sendto(channel_bind_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
 # Remote Shell Listener
 # ------------------------------------
-def start_shell_listener(ip, port, channel_number):
-    turn_server = ip  
-    turn_port = int(port)  
-    TURN_SERVER = (turn_server, turn_port)
-    client_ip = input("IP of Client: ")
-    client_port = int(input("Port of Client: "))
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setblocking(False)
+def start_shell_listener(turn_server, turn_port, verbose):
+    TURN_SERVER = (turn_server, int(turn_port))
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.settimeout(None)
+    sock.setblocking(False)
+    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # HARDCODED VALUE
+    channel_number = 0x4001
 
-    try:
-        # Send Allocate packet
-        alloc_packet = packetBuilder.build_alloc()
-        print(f"Sending Allocate packet to {turn_server}:{turn_port}")
-        sock.sendto(alloc_packet, TURN_SERVER)
-
-        # Receive response
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-
-        if response:
-            print(f"Response (hex): {response.hex()}")
-            read_server_response(response)
-
-    except socket.timeout:
-        print("No response received (timeout).")
-    except Exception as e:
-        print(f"Error: {e}")
-
-    # Bind Channel
-    channel_bind_packet = packetBuilder.build_channelBind(client_ip, client_port, channel_number)
-    sock.sendto(channel_bind_packet, TURN_SERVER)
+    # Establish initial TURN connection
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    if RTA_TUP == -1:
+        return   
 
     last_refresh_time = time.time()
     refresh_interval = 60  # Refresh every minute
@@ -545,9 +359,29 @@ def start_shell_listener(ip, port, channel_number):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+                if response:
+                    print(f"Response (hex): {response.hex()}")
+                    command = _parse_command_response(response, verbose)
+
+                    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                    output = result.stdout if result.stdout else result.stderr
+                    output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
+
+                    # Send output back
+                    send_data_packet = packetBuilder.build_channelData(channel_number, output)
+                    sock.sendto(send_data_packet, TURN_SERVER)
+                    print("Sent command output back to client.")
+            except Exception as e:
+                print(f"Socket error: {e}")
+
+        if sock in ready:
+            try:
+                response, addr = sock.recvfrom(4096)
                 print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
-                command = response.decode("utf-8").strip()
+                command = response.strip()
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 output = result.stdout if result.stdout else result.stderr
                 output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
@@ -557,7 +391,7 @@ def start_shell_listener(ip, port, channel_number):
                 sock.sendto(send_data_packet, TURN_SERVER)
                 print("Sent command output back to client.")
             except Exception as e:
-                print(f"Socket error: {e}")
+                pass
 
         if sys.stdin in ready:
             user_input = sys.stdin.readline().strip().lower()
@@ -565,25 +399,22 @@ def start_shell_listener(ip, port, channel_number):
                 print("Exiting listener...")
                 break
 
+        # Send refresh packet if needed
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
+            channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
+            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            sock.sendto(channel_bind_packet, TURN_SERVER)
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
-# Helper Function: Parse Server Response
+# Helper Function: Parse Server Response (Will likely only be used in a verbose mode)
 # ------------------------------------
-def read_server_response(response):    
-    
-
+def _read_server_response(response):    
     # Unpack the STUN header
     try:
-        channel_number, length = struct.unpack_from("!HH", response, 0)
-        print(f"CHANNEL NUMBER: {channel_number}")
-        print(f"LENGTH: {length}")
-        message = response[4:4+length]  # Slice the message portion
-        print(f"MESSAGE: {message.decode(errors='ignore')}")  # Decode safely
         msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
         offset = 20  # Start of attributes
 
@@ -633,7 +464,7 @@ def read_server_response(response):
                 case 0x0013:  # DATA
                     data = attr_value
                     print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
-                    print(f"\tDecoded: {data.decode()}")
+                    print(f"\tDecoded: {data.decode(errors="ignore")}")
 
                 case 0x0012:  # XOR-PEER-ADDRESS (PEER)
                     reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Proper unpacking
@@ -676,10 +507,118 @@ def read_server_response(response):
                 case _:
                     print(f"Unknown Type: {hex(attr_type)}")
     except:
+        print("CHANNEL DATA MESSAGE\n")
         channel_number, length = struct.unpack_from("!HH", response, 0)
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
         message = response[4:4+length]  # Slice the message portion
-        print(f"MESSAGE: {message.decode(errors='ignore')}")  # Decode safely
-    
-    
+        print(f"MESSAGE: {message.decode(errors='ignore')}")
+        return message.decode(errors='ignore')
+
+# ------------------------------------
+# Helper Function: Establish Connection to Turn Server
+# ------------------------------------
+def _create_turn_connection(sock, TURN_SERVER, channel_number):
+    # Allocate Request
+    alloc_packet = packetBuilder.build_alloc()
+    print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+    sock.sendto(alloc_packet, TURN_SERVER)
+
+    # Wait for a response
+    ready, _, _ = select.select([sock], [], [], 5)
+    if sock in ready:
+        response, addr = sock.recvfrom(4096)
+        print(f"Received response from {addr}")
+        if response:
+            print("Response (hex):", response.hex())
+            _read_server_response(response)
+    else:
+        print("No response received from TURN server.")
+        return -1
+
+    # Get Peer Information
+    print("Please enter the following information before allocation timeout (1 minute)...")
+    peer_ip = input("TURN Server IP (RTA): ")
+    peer_port = int(input("TURN PORT (RTA):"))
+
+    # Create Permission Request
+    create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
+    print(f"Sending Create Permission packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+    sock.sendto(create_perm_packet, TURN_SERVER)
+
+    # Wait for a response
+    ready, _, _ = select.select([sock], [], [], 5)
+    if sock in ready:
+        response, addr = sock.recvfrom(4096)
+        print(f"Received response from {addr}")
+        if response:
+            print("Response (hex):", response.hex())
+            _read_server_response(response)
+    else:
+        print("No response received from TURN server.")
+        return -1
+
+    #Send Channel Bind Request
+    channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
+    print(f"Sending Channel Bind Request (Channel {channel_number})...")
+    sock.sendto(channel_bind_packet, TURN_SERVER)
+
+    # Wait for a response
+    ready, _, _ = select.select([sock], [], [], 5)
+    if sock in ready:
+        response, addr = sock.recvfrom(4096)
+        print(f"Received response from {addr}")
+        if response:
+            print("Response (hex):", response.hex())
+            _read_server_response(response)
+    else:
+        print("No response received from TURN server.")
+        return -1
+
+    # Refresh Allocation
+    try:
+        refresh_packet = packetBuilder.build_refresh()
+        print(f"Sending Refresh packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+        sock.sendto(refresh_packet, TURN_SERVER)
+
+        # Wait for a response
+        ready, _, _ = select.select([sock], [], [], 5)
+        if sock in ready:
+            response, addr = sock.recvfrom(4096)
+            print(f"Received response from {addr}")
+            if response:
+                print("Response (hex):", response.hex())
+                _read_server_response(response)
+        else:
+            print("No response received from TURN server.")
+            return -1
+    except Exception as e:
+        print(f"Error: {e}")
+
+    return (peer_ip, peer_port)
+
+# ------------------------------------
+# Helper Function: Parse Command Response
+# ------------------------------------
+def _parse_command_response(response, verbose):
+    channel_number, length = struct.unpack_from("!HH", response, 0)
+    message = response[4:4+length]  # Slice the message portion
+    if verbose:
+        print("CHANNEL DATA MESSAGE\n")
+        print(f"CHANNEL NUMBER: {channel_number}")
+        print(f"LENGTH: {length}")
+        message = response[4:4+length]  # Slice the message portion
+        print(f"MESSAGE: {message.decode(errors='ignore')}")
+        return message.decode(errors='ignore')
+    else:
+        return message.decode(errors='ignore')
+        
+
+## When imported using from turnTM import * only imports these functions:
+__all__ = ["start_send_file_client", 
+           "start_file_listener", 
+           "start_shell_client", 
+           "start_shell_listener", 
+           "start_quick_message_client",
+            "start_message_listener"
+        ]

@@ -1,8 +1,7 @@
 FROM python:3.12
 
-# Install and set up Coturn configuration
-RUN apt-get update && apt-get install -y coturn
-RUN echo "listening-port=5349\nfingerprint\nno-auth\nno-tls\nno-dtls\nno-tcp-relay" | tee /etc/turnserver.conf > /dev/null
+# Install Crypto
+RUN pip install pycryptodome 
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
@@ -21,5 +20,5 @@ RUN mkdir -p /config
 EXPOSE 5349/udp
 EXPOSE 5349/tcp
 
-# Run Coturn on container startup
-ENTRYPOINT ["sh", "-c", "turnserver -c /etc/turnserver.conf -v & exec bash"]
+# Run Trippy on container startup
+ENTRYPOINT ["bash", "-c", "python3 trippyMako.py; exec bash"]
