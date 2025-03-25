@@ -241,17 +241,17 @@ def main():
             case "proxy":
                 print("Feature not implemented yet")
             case "sendFile":
-                start_send_file_client(turnInfo[0], turnInfo[1])
+                start_send_file_client(turnInfo[0], turnInfo[1], turnInfo[2])
             case "listen -f" | "listen -file":
-                start_file_listener(turnInfo[0], turnInfo[1])
+                start_file_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case "connect": ## get a shell
                 start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2])
             case "listen -s" | "listen -shell":
                 start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case "message":
-                start_quick_message_client(turnInfo[0], turnInfo[1])
+                start_quick_message_client(turnInfo[0], turnInfo[1], turnInfo[2])
             case "listen -m" | "listen -message":
-                start_message_listener(turnInfo[0], turnInfo[1])
+                start_message_listener(turnInfo[0], turnInfo[1], turnInfo[2])
             case _:
                 print("Unrecognized Command...")
 
