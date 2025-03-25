@@ -18,8 +18,8 @@
 ---
 
 ### Team Sprint Velocity
-- **Previous Sprint Velocity:** [See Sprint Review](sprints\sprint4\Sprint-Review.md)
-- **Current Sprint Velocity:** [See Sprint Review](sprints\sprint4\Sprint-Review.md)
+- **Previous Sprint Velocity:** [See Sprint Review](sprints\sprint5\Sprint-Review.md)
+- **Current Sprint Velocity:** [See Sprint Review](sprints\sprint5\Sprint-Review.md)
 
 ---
 
