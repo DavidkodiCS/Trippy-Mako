@@ -108,13 +108,13 @@ def addConfig():
     ## Enter in fields about server configuration ##
     turnIP = input("Enter TURN server IP address: ")
     turnPort = input("Enter TURN server port number: ")
-    protocol = input("Enter desired protocol: ")
+    encrypt = input("Encrypted? (y/n ): ")
 
     # add configuration to the file 
     configuration.add_section(name)
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
-    configuration[name]['protocol'] = protocol
+    configuration[name]['encrypted'] = True if encrypt == "y" else False
 
     with open(config_path, 'w') as configfile:
         configuration.write(configfile)
@@ -146,7 +146,7 @@ def editConfig():
     section = input("Choose configuration to edit: ")
     
     if configuration.has_section(section):
-        print("Sections:\n\tturnIP\n\tturnPort\n\tprotocol")
+        print("Sections:\n\tturnIP\n\tturnPort\n\encrypted")
         
         while True:
             field = input("Choose field to edit: ")
@@ -156,8 +156,8 @@ def editConfig():
                     configuration[section]['turnIP'] = input("New turnIp: ")
                 case "turnPort":
                     configuration[section]['turnPort'] = input("New turnPort: ")
-                case "protocol":
-                    configuration[section]['protocol'] = input("New protocol: ")
+                case "encrypted":
+                    configuration[section]['encrypted'] = True if input("Encrypted? (y/n ): ") == "y" else False
                 case _:
                     print("Invalid Field...")
 
@@ -182,13 +182,13 @@ def displayConfig():
     if configuration.has_section(display):
         print("TURN IP: " + configuration[display]['turnIP'])
         print("TURN Port: " + configuration[display]['turnPort'])
-        print("Protocol: " + configuration[display]['protocol'])
+        print("Encrypted: " + configuration[display]['encrypted'])
     else:
         print("Section does not exist...")
     
 ## Returns array containing all of the chosen configurations fields ##
 def getConfig(config):
-    return [configuration[config]['turnIP'], configuration[config]['turnPort'], configuration[config]['protocol']]    
+    return [configuration[config]['turnIP'], configuration[config]['turnPort'], configuration[config]['encrypted']]    
 
 ## Lists the configuration names currently in config.ini ##
 def listConfig():
@@ -242,17 +242,17 @@ def main():
             case "proxy":
                 print("Feature not implemented yet")
             case "sendFile":
-                start_send_file_client(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_send_file_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -f" | "listen -file":
-                start_file_listener(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_file_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "connect": ## get a shell
-                start_shell_client(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -s" | "listen -shell":
-                start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "message":
-                start_quick_message_client(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_quick_message_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -m" | "listen -message":
-                start_message_listener(turnInfo[0], turnInfo[1], turnInfo[3])
+                start_message_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case _:
                 print("Unrecognized Command...")
 

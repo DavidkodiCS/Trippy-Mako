@@ -3,6 +3,7 @@ import struct
 import sys
 import time
 import packetBuilder
+import security
 import subprocess
 import select
 
@@ -43,7 +44,7 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 # Quick Message Client
 # ------------------------------------
-def start_quick_message_client(turn_server, turn_port, verbose):
+def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -81,7 +82,7 @@ def start_quick_message_client(turn_server, turn_port, verbose):
                     if verbose:
                         print("Response (hex):", response.hex())
                         _read_server_response(response)
-                    _parse_channel_response(response, verbose)
+                    _parse_channel_response(response, encrypted, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -92,6 +93,8 @@ def start_quick_message_client(turn_server, turn_port, verbose):
                 break
             else:
                 #Send message via ChannelData instead of Send Indication
+                if encrypted:
+                    security.encrypt_message(user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
                 if verbose:
@@ -112,7 +115,7 @@ def start_quick_message_client(turn_server, turn_port, verbose):
 # ----------------------
 # Quick Message Listener
 # ----------------------
-def start_message_listener(turn_server, turn_port, verbose):
+def start_message_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -179,7 +182,7 @@ def start_message_listener(turn_server, turn_port, verbose):
 # -------------------
 # Sending File Client
 # -------------------
-def start_send_file_client(turn_server, turn_port, verbose):
+def start_send_file_client(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -222,7 +225,7 @@ def start_send_file_client(turn_server, turn_port, verbose):
 # ------------------
 # Send File Listener
 # ------------------
-def start_file_listener(turn_server, turn_port, verbose):
+def start_file_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -269,7 +272,7 @@ def start_file_listener(turn_server, turn_port, verbose):
 # ------------------------------------
 # Remote Shell Client
 # ------------------------------------
-def start_shell_client(turn_server, turn_port, verbose):
+def start_shell_client(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
@@ -332,7 +335,7 @@ def start_shell_client(turn_server, turn_port, verbose):
 # ------------------------------------
 # Remote Shell Listener
 # ------------------------------------
-def start_shell_listener(turn_server, turn_port, verbose):
+def start_shell_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.settimeout(None)
@@ -601,9 +604,11 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_channel_response(response, verbose):
+def _parse_channel_response(response, encrypted, verbose):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
+    if encrypted:
+        security.decrypt_message(message)
     if verbose:
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")

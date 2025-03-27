@@ -2,6 +2,20 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import os
     
+def encrypt_message(key, plaintext):
+    iv = os.urandom(12)  # AES-GCM requires a 12-byte IV
+    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
+    encryptor = cipher.encryptor()
+    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+    return iv + ciphertext  # Include IV for decryption
+
+def decrypt_message(key, encrypted_data):
+    iv = encrypted_data[:12]
+    ciphertext = encrypted_data[12:]
+    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
+    decryptor = cipher.decryptor()
+    return decryptor.update(ciphertext) + decryptor.finalize()
+
 ## Encrypt / Decrypt
 def encrypt_cbc(in_plain_file, out_cipher_file, key, iv):
     plain = ""
@@ -82,17 +96,3 @@ def unpad2(data):
         return
         
     return data[:-paddingLen]
-
-def encrypt_message(key, plaintext):
-    iv = os.urandom(12)  # AES-GCM requires a 12-byte IV
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
-    return iv + ciphertext  # Include IV for decryption
-
-def decrypt_message(key, encrypted_data):
-    iv = encrypted_data[:12]
-    ciphertext = encrypted_data[12:]
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
-    decryptor = cipher.decryptor()
-    return decryptor.update(ciphertext) + decryptor.finalize()
