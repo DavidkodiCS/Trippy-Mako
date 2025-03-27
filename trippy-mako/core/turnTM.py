@@ -3,6 +3,7 @@ import struct
 import sys
 import time
 import packetBuilder
+import security
 import subprocess
 import select
 
@@ -43,7 +44,8 @@ STUN_MESSAGE_TYPES = {
 # ------------------------------------
 # Quick Message Client
 # ------------------------------------
-def start_quick_message_client(turn_server, turn_port):
+def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
+    key = input("Please choose a secure key that you and your peer know about: ")
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -54,7 +56,7 @@ def start_quick_message_client(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return
 
@@ -74,11 +76,14 @@ def start_quick_message_client(turn_server, turn_port):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+                if verbose:
+                    print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    if verbose:
+                        print("Response (hex):", response.hex())
+                        _read_server_response(response)
+                    _parse_channel_response(response, encrypted, key, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -89,24 +94,29 @@ def start_quick_message_client(turn_server, turn_port):
                 break
             else:
                 #Send message via ChannelData instead of Send Indication
+                # if encrypted:
+                #     security.encrypt_message(key, user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
-                print(f"Sent message via Channel {channel_number}")
+                if verbose:
+                    print(f"Sent message via Channel {channel_number}")
 
         # Send refresh packet if needed
         if time.time() - last_refresh_time >= refresh_interval:
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ----------------------
 # Quick Message Listener
 # ----------------------
-def start_message_listener(turn_server, turn_port):
+def start_message_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -116,7 +126,7 @@ def start_message_listener(turn_server, turn_port):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return
 
@@ -136,11 +146,14 @@ def start_message_listener(turn_server, turn_port):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+                if verbose:
+                    print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    if verbose:
+                        print("Response (hex):", response.hex())
+                        _read_server_response(response)
+                    _parse_channel_response(response, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -155,9 +168,11 @@ def start_message_listener(turn_server, turn_port):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 
@@ -168,26 +183,28 @@ def start_message_listener(turn_server, turn_port):
 # -------------------
 # Sending File Client
 # -------------------
-def start_send_file_client(turn_server, turn_port):
+def start_send_file_client(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
     sock.setblocking(False)
-    # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
+    # Generate a random valid channel number (RFC 8656: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return
-    
-    # Start message loop
-    last_refresh_time = time.time()
-    refresh_interval = 60  # Refresh interval (1 minute)
 
     file_path = input("Enter in the path of the file to be sent: ")
+    
+    refresh_packet = packetBuilder.build_refresh()
+    sock.sendto(refresh_packet, TURN_SERVER)
+    if verbose:
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+    
     try:
         with open(file_path, "r") as f:
             print("File read...")
@@ -199,16 +216,6 @@ def start_send_file_client(turn_server, turn_port):
                 channel_data_packet = packetBuilder.build_channelData(channel_number, data)
                 sock.sendto(channel_data_packet, TURN_SERVER)
 
-                # Send refresh packet if needed
-                if time.time() - last_refresh_time >= refresh_interval:
-                    refresh_packet = packetBuilder.build_refresh()
-                    sock.sendto(refresh_packet, TURN_SERVER)
-                    channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                    print(f"Sending Channel Bind Request (Channel {channel_number})...")
-                    sock.sendto(channel_bind_packet, TURN_SERVER)
-                    print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-                    last_refresh_time = time.time()
-
             print("File successfully sent!")
     except Exception as e:
         print(f"Error sending file: {e}")
@@ -219,7 +226,7 @@ def start_send_file_client(turn_server, turn_port):
 # ------------------
 # Send File Listener
 # ------------------
-def start_file_listener(turn_server, turn_port):
+def start_file_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     # Create and configure socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -233,13 +240,15 @@ def start_file_listener(turn_server, turn_port):
     filename = input("Please choose a filename or file to be written to: ")
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
-        return    
-
-    # Start listening loop
-    # last_refresh_time = time.time()
-    # refresh_interval = 300  # Refresh interval (1 minute)
+        return   
+    
+    refresh_packet = packetBuilder.build_refresh()
+    sock.sendto(refresh_packet, TURN_SERVER)
+    if verbose:
+        print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+    
     print("Listening for incoming file data.")
     
     try:
@@ -247,21 +256,12 @@ def start_file_listener(turn_server, turn_port):
             sock.settimeout(10) 
             while True:
                 data = sock.recv(1024)
+                ##file_data = _parse_channel_response(data, verbose)
                 if not data:
                     f.close()
-                    print("TEST")
                     break
                 f.write(data)
 
-                # # Send refresh packet if needed
-                # if time.time() - last_refresh_time >= refresh_interval:
-                #     refresh_packet = packetBuilder.build_refresh()
-                #     sock.sendto(refresh_packet, TURN_SERVER)
-                #     channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                #     print(f"Sending Channel Bind Request (Channel {channel_number})...")
-                #     sock.sendto(channel_bind_packet, TURN_SERVER)
-                #     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
-                #     last_refresh_time = time.time()
             print(f"Received and saved file as {filename}")
     except Exception as e:
         print(f"Received and saved file as {filename}")
@@ -273,7 +273,7 @@ def start_file_listener(turn_server, turn_port):
 # ------------------------------------
 # Remote Shell Client
 # ------------------------------------
-def start_shell_client(turn_server, turn_port, verbose):
+def start_shell_client(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))    
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)
@@ -283,7 +283,7 @@ def start_shell_client(turn_server, turn_port, verbose):
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return
 
@@ -305,7 +305,9 @@ def start_shell_client(turn_server, turn_port, verbose):
                 if response:
                     if verbose:
                         print(f"Response (hex): {response.hex()}")
-                    _parse_command_response(response, verbose)
+                        _read_server_response(response)
+                        
+                    _parse_channel_response(response, verbose, encrypted, "NULL")
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -324,25 +326,28 @@ def start_shell_client(turn_server, turn_port, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
 # Remote Shell Listener
 # ------------------------------------
-def start_shell_listener(turn_server, turn_port, verbose):
+def start_shell_listener(turn_server, turn_port, encrypted, verbose):
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     sock.settimeout(None)
     sock.setblocking(False)
+    
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
     channel_number = 0x4001
 
     # Establish initial TURN connection
-    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number)
+    RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return   
 
@@ -359,29 +364,9 @@ def start_shell_listener(turn_server, turn_port, verbose):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
-
-                if response:
-                    print(f"Response (hex): {response.hex()}")
-                    command = _parse_command_response(response, verbose)
-
-                    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-                    output = result.stdout if result.stdout else result.stderr
-                    output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
-
-                    # Send output back
-                    send_data_packet = packetBuilder.build_channelData(channel_number, output)
-                    sock.sendto(send_data_packet, TURN_SERVER)
-                    print("Sent command output back to client.")
-            except Exception as e:
-                print(f"Socket error: {e}")
-
-        if sock in ready:
-            try:
-                response, addr = sock.recvfrom(4096)
                 print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
-                command = response.strip()
+                command = _parse_channel_response(response, verbose, encrypted, "NULL")
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 output = result.stdout if result.stdout else result.stderr
                 output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
@@ -389,7 +374,9 @@ def start_shell_listener(turn_server, turn_port, verbose):
                 # Send output back
                 send_data_packet = packetBuilder.build_channelData(channel_number, output)
                 sock.sendto(send_data_packet, TURN_SERVER)
-                print("Sent command output back to client.")
+                
+                if verbose:
+                    print("Sent command output back to client.")
             except Exception as e:
                 pass
 
@@ -404,9 +391,11 @@ def start_shell_listener(turn_server, turn_port, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            print(f"Sending Channel Bind Request (Channel {channel_number})...")
+            if verbose:
+                print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
+            if verbose:
+                print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
@@ -416,201 +405,220 @@ def _read_server_response(response):
     # Unpack the STUN header
     try:
         msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
-        offset = 20  # Start of attributes
+    except: 
+        print("Channel Data Message...")
+        return
+        
+    offset = 20  # Start of attributes
 
-        print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
-        print(f"MSG_LENGTH: {msg_length}")
-        print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
-        print(f"TRANSACTION_ID: {transaction_id.hex()}")
+    print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
+    print(f"MSG_LENGTH: {msg_length}")
+    print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
+    print(f"TRANSACTION_ID: {transaction_id.hex()}")
 
-        offset = 20  # Start of attributes
-        MAGIC_COOKIE = 0x2112A442  # STUN Magic Cookie
+    offset = 20  # Start of attributes
+    MAGIC_COOKIE = 0x2112A442  # STUN Magic Cookie
 
-        # Parse Attributes
-        while offset < len(response):
-            attr_type, attr_length = struct.unpack_from("!HH", response, offset)
-            offset += 4  # Move past type and length
+    # Parse Attributes
+    while offset < len(response):
+        attr_type, attr_length = struct.unpack_from("!HH", response, offset)
+        offset += 4  # Move past type and length
 
-            attr_value = response[offset : offset + attr_length]
-            offset += attr_length  # Move past value
+        attr_value = response[offset : offset + attr_length]
+        offset += attr_length  # Move past value
 
-            match attr_type:
-                case 0x000D:  # LIFETIME
-                    lifetime = struct.unpack("!I", attr_value)[0]
-                    print(f"Lifetime\n\tValue: {lifetime} seconds")
+        match attr_type:
+            case 0x000D:  # LIFETIME
+                lifetime = struct.unpack("!I", attr_value)[0]
+                print(f"Lifetime\n\tValue: {lifetime} seconds")
 
-                case 0x0020:  # XOR-MAPPED-ADDRESS
-                    family, xor_port = struct.unpack("!HH", attr_value[:4])
-                    xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
-                    ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-                    port = xor_port ^ 0x2112
-                    print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x0020:  # XOR-MAPPED-ADDRESS
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
 
-                case 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
-                    family, xor_port = struct.unpack("!HH", attr_value[:4])
-                    xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
-                    ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
-                    port = xor_port ^ 0x2112
-                    print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+            case 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
+                family, xor_port = struct.unpack("!HH", attr_value[:4])
+                xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
+                ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
+                port = xor_port ^ 0x2112
+                print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
 
-                case 0x8022:  # SOFTWARE
-                    software_version = attr_value.decode(errors="ignore")
-                    print(f"Software\n\tValue: {software_version}")
+            case 0x8022:  # SOFTWARE
+                software_version = attr_value.decode(errors="ignore")
+                print(f"Software\n\tValue: {software_version}")
 
-                case 0x8028:  # FINGERPRINT
-                    fingerprint = struct.unpack("!I", attr_value)[0]
-                    print(f"Fingerprint\n\tValue: {fingerprint}")
+            case 0x8028:  # FINGERPRINT
+                fingerprint = struct.unpack("!I", attr_value)[0]
+                print(f"Fingerprint\n\tValue: {fingerprint}")
 
-                case 0x0013:  # DATA
-                    data = attr_value
-                    print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
-                    print(f"\tDecoded: {data.decode(errors="ignore")}")
+            case 0x0013:  # DATA
+                data = attr_value
+                print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
+                print(f"\tDecoded: {data.decode(errors="ignore")}")
 
-                case 0x0012:  # XOR-PEER-ADDRESS (PEER)
-                    reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Proper unpacking
-                    if family == 0x01:  # IPv4
-                        xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
-                        xor_ip = bytes([
-                            xor_ip_bytes[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) 
-                            for i in range(4)
-                        ])  
-                        peer_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
+            case 0x0012:  # XOR-PEER-ADDRESS (PEER)
+                reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Proper unpacking
+                if family == 0x01:  # IPv4
+                    xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
+                    xor_ip = bytes([
+                        xor_ip_bytes[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) 
+                        for i in range(4)
+                    ])  
+                    peer_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
 
-                    peer_port = xor_port ^ 0x2112  # XOR the port with the top 16 bits of the magic cookie
-                    print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
-                case 0x0001:  # Mapped Address Attribute
-                    family, xor_port = struct.unpack_from("!BH", response, offset)
-                    xor_port ^= (magic_cookie >> 16)  # Decode port
-                    
-                    if family == 0x01:  # IPv4
-                        xor_ip = struct.unpack_from("!I", response, offset)[0]
-                        xor_ip ^= magic_cookie  # Decode IPv4 address
-                        mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
+                peer_port = xor_port ^ 0x2112  # XOR the port with the top 16 bits of the magic cookie
+                print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
+            
+            case 0x0001:  # Mapped Address Attribute
+                family, xor_port = struct.unpack_from("!BH", response, offset)
+                xor_port ^= (magic_cookie >> 16)  # Decode port
+                
+                if family == 0x01:  # IPv4
+                    xor_ip = struct.unpack_from("!I", response, offset)[0]
+                    xor_ip ^= magic_cookie  # Decode IPv4 address
+                    mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
 
-                    print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
-                case 0x007:  # DATA INDICATION
-                    print("Received Data Indication")
-                case 0x0016:
-                    print("Relayed Transport Address (RTA)")
-                    reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])
+                print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
+            
+            case 0x007:  # DATA INDICATION
+                print("Received Data Indication")
+            
+            case 0x0016:
+                print("Relayed Transport Address (RTA)")
+                reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])
 
-                    if family == 0x01:  # IPv4
-                        xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
-                        xor_ip = bytes([
-                            xor_ip_bytes[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) 
-                            for i in range(4)
-                        ])  
-                        relayed_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
+                if family == 0x01:  # IPv4
+                    xor_ip_bytes = attr_value[4:8]  # Extract XOR'ed IP
+                    xor_ip = bytes([
+                        xor_ip_bytes[i] ^ ((MAGIC_COOKIE >> (8 * (3 - i))) & 0xFF) 
+                        for i in range(4)
+                    ])  
+                    relayed_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
 
-                    relayed_port = xor_port ^ 0x2112  # Decode port
-                    print(f"🔹 XOR-RELAYED-ADDRESS (RTA)\n\tIP: {relayed_ip}\n\tPORT: {relayed_port}")
-                case _:
-                    print(f"Unknown Type: {hex(attr_type)}")
-    except:
-        print("CHANNEL DATA MESSAGE\n")
-        channel_number, length = struct.unpack_from("!HH", response, 0)
-        print(f"CHANNEL NUMBER: {channel_number}")
-        print(f"LENGTH: {length}")
-        message = response[4:4+length]  # Slice the message portion
-        print(f"MESSAGE: {message.decode(errors='ignore')}")
-        return message.decode(errors='ignore')
+                relayed_port = xor_port ^ 0x2112  # Decode port
+                ##print(f"🔹 XOR-RELAYED-ADDRESS (RTA)\n\tIP: {relayed_ip}\n\tPORT: {relayed_port}")
+                print(f"SEND THIS TO PEER VIA OTHER MEAN: {relayed_port}")
+            
+            case _:
+                print(f"Unknown Type: {hex(attr_type)}")
 
 # ------------------------------------
 # Helper Function: Establish Connection to Turn Server
 # ------------------------------------
-def _create_turn_connection(sock, TURN_SERVER, channel_number):
+def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
-    print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+    if verbose:
+        print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
     sock.sendto(alloc_packet, TURN_SERVER)
 
     # Wait for a response
     ready, _, _ = select.select([sock], [], [], 5)
+    
     if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            _read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-        return -1
+        try:
+            response, addr = sock.recvfrom(4096)
+            if verbose:
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+            if response:
+                print("Response (hex):", response.hex())
+                _read_server_response(response)
+
+        except Exception as e:
+            print(f"Socket error: {e}")
 
     # Get Peer Information
     print("Please enter the following information before allocation timeout (1 minute)...")
-    peer_ip = input("TURN Server IP (RTA): ")
+    peer_ip = TURN_SERVER[0]
     peer_port = int(input("TURN PORT (RTA):"))
 
     # Create Permission Request
     create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
-    print(f"Sending Create Permission packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+    if verbose:
+        print(f"Sending Create Permission packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
     sock.sendto(create_perm_packet, TURN_SERVER)
 
     # Wait for a response
     ready, _, _ = select.select([sock], [], [], 5)
+    
     if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            _read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-        return -1
+        try:
+            response, addr = sock.recvfrom(4096)
+            if verbose:
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+            if response:
+                print("Response (hex):", response.hex())
+                _read_server_response(response)
+
+        except Exception as e:
+            print(f"Socket error: {e}")
 
     #Send Channel Bind Request
     channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
-    print(f"Sending Channel Bind Request (Channel {channel_number})...")
+    if verbose:
+        print(f"Sending Channel Bind Request (Channel {channel_number})...")
     sock.sendto(channel_bind_packet, TURN_SERVER)
 
     # Wait for a response
     ready, _, _ = select.select([sock], [], [], 5)
+    
     if sock in ready:
-        response, addr = sock.recvfrom(4096)
-        print(f"Received response from {addr}")
-        if response:
-            print("Response (hex):", response.hex())
-            _read_server_response(response)
-    else:
-        print("No response received from TURN server.")
-        return -1
-
-    # Refresh Allocation
-    try:
-        refresh_packet = packetBuilder.build_refresh()
-        print(f"Sending Refresh packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
-        sock.sendto(refresh_packet, TURN_SERVER)
-
-        # Wait for a response
-        ready, _, _ = select.select([sock], [], [], 5)
-        if sock in ready:
+        try:
             response, addr = sock.recvfrom(4096)
-            print(f"Received response from {addr}")
+            if verbose:
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
             if response:
                 print("Response (hex):", response.hex())
                 _read_server_response(response)
-        else:
-            print("No response received from TURN server.")
-            return -1
-    except Exception as e:
-        print(f"Error: {e}")
+
+        except Exception as e:
+            print(f"Socket error: {e}")
+
+    # Refresh Allocation
+    refresh_packet = packetBuilder.build_refresh()
+    print(f"Sending Refresh packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+    sock.sendto(refresh_packet, TURN_SERVER)
+
+    ready, _, _ = select.select([sock], [], [], 5)
+    
+    if sock in ready:
+        try:
+            response, addr = sock.recvfrom(4096)
+            if verbose:
+                print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
+
+            if response:
+                print("Response (hex):", response.hex())
+                _read_server_response(response)
+
+        except Exception as e:
+            print(f"Socket error: {e}")
 
     return (peer_ip, peer_port)
 
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_command_response(response, verbose):
+def _parse_channel_response(response,verbose, encrypted, key):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
+    # if encrypted:
+    #     security.decrypt_message(key, message)
     if verbose:
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
-        message = response[4:4+length]  # Slice the message portion
         print(f"MESSAGE: {message.decode(errors='ignore')}")
+        print(message.decode(errors='ignore'))
         return message.decode(errors='ignore')
     else:
+        print(message.decode(errors='ignore'))
         return message.decode(errors='ignore')
         
 

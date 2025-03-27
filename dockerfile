@@ -1,7 +1,7 @@
 FROM python:3.12
 
 # Install Crypto
-RUN pip install pycryptodome 
+RUN pip install cryptography 
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
