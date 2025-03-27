@@ -94,8 +94,8 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
                 break
             else:
                 #Send message via ChannelData instead of Send Indication
-                if encrypted:
-                    security.encrypt_message(key, user_input)
+                # if encrypted:
+                #     security.encrypt_message(key, user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
                 if verbose:
@@ -256,11 +256,11 @@ def start_file_listener(turn_server, turn_port, encrypted, verbose):
             sock.settimeout(10) 
             while True:
                 data = sock.recv(1024)
-                file_data = _parse_channel_response(data, verbose)
+                ##file_data = _parse_channel_response(data, verbose)
                 if not data:
                     f.close()
                     break
-                f.write(file_data)
+                f.write(data)
 
             print(f"Received and saved file as {filename}")
     except Exception as e:
@@ -307,7 +307,7 @@ def start_shell_client(turn_server, turn_port, encrypted, verbose):
                         print(f"Response (hex): {response.hex()}")
                         _read_server_response(response)
                         
-                    _parse_channel_response(response, verbose)
+                    print(_parse_channel_response(response, verbose))
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -605,11 +605,11 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_channel_response(response, encrypted, key, verbose):
+def _parse_channel_response(response,verbose, one, two):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
-    if encrypted:
-        security.decrypt_message(key, message)
+    # if encrypted:
+    #     security.decrypt_message(key, message)
     if verbose:
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
