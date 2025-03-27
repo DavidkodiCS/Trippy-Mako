@@ -1,5 +1,6 @@
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+# from Crypto.Cipher import AES
+# from Crypto.Util.Padding import pad, unpad
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
     
 def encrypt_message(key, plaintext):
@@ -16,83 +17,83 @@ def decrypt_message(key, encrypted_data):
     decryptor = cipher.decryptor()
     return decryptor.update(ciphertext) + decryptor.finalize()
 
-## Encrypt / Decrypt
-def encrypt_cbc(in_plain_file, out_cipher_file, key, iv):
-    plain = ""
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    with open(in_plain_file, "rb") as f:
-        plain = bytes(f.read())
+# ## Encrypt / Decrypt
+# def encrypt_cbc(in_plain_file, out_cipher_file, key, iv):
+#     plain = ""
+#     cipher = AES.new(key, AES.MODE_CBC, iv)
+#     with open(in_plain_file, "rb") as f:
+#         plain = bytes(f.read())
 
-    plain = pad(plain, 16)
-    ciphertext = cipher.encrypt(plain)
+#     plain = pad(plain, 16)
+#     ciphertext = cipher.encrypt(plain)
 
-    with open(out_cipher_file, "wb") as f:
-        f.write(ciphertext)
+#     with open(out_cipher_file, "wb") as f:
+#         f.write(ciphertext)
 
-def decrypt_cbc(in_cipher_file, out_plain_file, key, iv):
-    cipherT = ""
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    with open(in_cipher_file, "rb") as f:
-        cipherT = bytes(f.read())
+# def decrypt_cbc(in_cipher_file, out_plain_file, key, iv):
+#     cipherT = ""
+#     cipher = AES.new(key, AES.MODE_CBC, iv)
+#     with open(in_cipher_file, "rb") as f:
+#         cipherT = bytes(f.read())
 
-    plaintext = cipher.decrypt(cipherT)
-    plaintext = unpad(plaintext, 16)
+#     plaintext = cipher.decrypt(cipherT)
+#     plaintext = unpad(plaintext, 16)
 
-    with open(out_plain_file, "wb") as f:
-        f.write(plaintext)
+#     with open(out_plain_file, "wb") as f:
+#         f.write(plaintext)
 
-def encrypt_ctr(in_plain_file, out_cipher_file, key, ctr):
-    plain = ""
+# def encrypt_ctr(in_plain_file, out_cipher_file, key, ctr):
+#     plain = ""
 
-    cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
-    with open(in_plain_file, "rb") as f:
-        plain = bytes(f.read())
+#     cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
+#     with open(in_plain_file, "rb") as f:
+#         plain = bytes(f.read())
 
-    ciphertext = cipher.encrypt(plain)
+#     ciphertext = cipher.encrypt(plain)
 
-    with open(out_cipher_file, "wb") as f:
-        f.write(ciphertext)
+#     with open(out_cipher_file, "wb") as f:
+#         f.write(ciphertext)
 
-def decrypt_ctr(in_cipher, out_plain, key, ctr):
-    cipherT = ""
+# def decrypt_ctr(in_cipher, out_plain, key, ctr):
+#     cipherT = ""
 
-    cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
-    with open(in_cipher, "rb") as f:
-        cipherT = bytes(f.read())
+#     cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
+#     with open(in_cipher, "rb") as f:
+#         cipherT = bytes(f.read())
 
-    plaintext = cipher.decrypt(cipherT)
+#     plaintext = cipher.decrypt(cipherT)
 
-    with open(out_plain, "wb") as f:
-        f.write(plaintext)
+#     with open(out_plain, "wb") as f:
+#         f.write(plaintext)
 
-## PART 3 ##
-def pad2(data):
-    l = len(data)
-    pad = 0
+# ## PART 3 ##
+# def pad2(data):
+#     l = len(data)
+#     pad = 0
     
-    if(l < 16):
-        pad = 16 - l
-    elif(l > 16):
-        while (pad + l) % 16 != 0:
-            pad += 1
-    else:
-        pad = 16
+#     if(l < 16):
+#         pad = 16 - l
+#     elif(l > 16):
+#         while (pad + l) % 16 != 0:
+#             pad += 1
+#     else:
+#         pad = 16
     
-    for _ in range(pad):
-        data += bytes.fromhex(f"{pad:02x}")
+#     for _ in range(pad):
+#         data += bytes.fromhex(f"{pad:02x}")
         
-    return data
+#     return data
     
-def unpad2(data):
-    if (len(data) % 16) != 0:
-        print("padding error!")
-        return
+# def unpad2(data):
+#     if (len(data) % 16) != 0:
+#         print("padding error!")
+#         return
     
-    paddingLen = data[-1]
-    padding = data[-paddingLen:]
+#     paddingLen = data[-1]
+#     padding = data[-paddingLen:]
     
-    if len(set(padding)) != 1:
-        print("padding error!")
-        return
+#     if len(set(padding)) != 1:
+#         print("padding error!")
+#         return
         
-    return data[:-paddingLen]
+#     return data[:-paddingLen]

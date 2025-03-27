@@ -51,6 +51,11 @@ def generalSetup():
     else:
         print("Invalid command...")
         generalSetup()
+
+    if info[2] == "True":
+        info[2] = True
+    else:
+        info[2] = False
         
     v = input("Would you like to enter verbose mode? (y/n): ")
     info.append(True if v == "y" else False)
@@ -114,7 +119,7 @@ def addConfig():
     configuration.add_section(name)
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
-    configuration[name]['encrypted'] = True if encrypt == "y" else False
+    configuration[name]['encrypted'] = "True" if encrypt == "y" else "False"
 
     with open(config_path, 'w') as configfile:
         configuration.write(configfile)
@@ -226,32 +231,47 @@ def main():
     print("Type 'help' to see the available commands or 'exit' to quit...\n\n")
     
     while True:
-        command = input("\n> ").strip()
-        if command == "exit":
-                print("Exiting...")
-                break            
-        turnInfo = generalSetup()
-        if turnInfo == -1:
-            continue
-        
+        command = input("\n> ").strip()             
+
         match command:
+            case "exit":
+                print("Exiting...")
+                break
             case "help":
                 help()
             case "config":
-                config()
+                config() 
             case "proxy":
                 print("Feature not implemented yet")
             case "sendFile":
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_send_file_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -f" | "listen -file":
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_file_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "connect": ## get a shell
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -s" | "listen -shell":
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "message":
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_quick_message_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case "listen -m" | "listen -message":
+                turnInfo = generalSetup()
+                if turnInfo == -1:
+                    continue
                 start_message_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
             case _:
                 print("Unrecognized Command...")
