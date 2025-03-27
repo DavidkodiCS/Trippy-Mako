@@ -51,11 +51,6 @@ def generalSetup():
     else:
         print("Invalid command...")
         generalSetup()
-
-    if info[2] == "True":
-        info[2] = True
-    else:
-        info[2] = False
         
     v = input("Would you like to enter verbose mode? (y/n): ")
     info.append(True if v == "y" else False)
@@ -119,7 +114,7 @@ def addConfig():
     configuration.add_section(name)
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
-    configuration[name]['encrypted'] = "True" if encrypt == "y" else "False"
+    configuration[name]['encrypted'] = 1 if encrypt == "y" else 0
 
     with open(config_path, 'w') as configfile:
         configuration.write(configfile)

