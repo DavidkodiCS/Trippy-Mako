@@ -1,99 +1,71 @@
 # from Crypto.Cipher import AES
 # from Crypto.Util.Padding import pad, unpad
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import serialization, hashes
 import os
+import configparser
+
+## Saved Public Keys
+pub_keys = []
+## Load Configuration File ##
+global configuration
+global config_path
+configuration = configparser.ConfigParser()
+
+# Get config directory from environment variable
+config_dir = os.getenv("CONFIG_DIR", "/peers")
+config_path = os.path.join(config_dir, "peers.ini")
+os.makedirs(config_dir, exist_ok=True)
+
+# Read existing configurations if the file exists
+if os.path.exists(config_path):
+    configuration.read(config_path)
     
-def encrypt_message(key, plaintext):
-    iv = os.urandom(12)  # AES-GCM requires a 12-byte IV
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
-    encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(plaintext) + encryptor.finalize()
-    return iv + ciphertext  # Include IV for decryption
+# Encrypt Message
+def encrypt_message(message):
+    public_key = load_public_key()
+    ciphertext = public_key.encrypt(
+        message.encode(),
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return ciphertext
 
-def decrypt_message(key, encrypted_data):
-    iv = encrypted_data[:12]
-    ciphertext = encrypted_data[12:]
-    cipher = Cipher(algorithms.AES(key), modes.GCM(iv))
-    decryptor = cipher.decryptor()
-    return decryptor.update(ciphertext) + decryptor.finalize()
+# Decrypt Message
+def decrypt_message(ciphertext):
+    private_key = load_private_key()
+    plaintext = private_key.decrypt(
+        ciphertext,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    return plaintext.decode()
 
-# ## Encrypt / Decrypt
-# def encrypt_cbc(in_plain_file, out_cipher_file, key, iv):
-#     plain = ""
-#     cipher = AES.new(key, AES.MODE_CBC, iv)
-#     with open(in_plain_file, "rb") as f:
-#         plain = bytes(f.read())
-
-#     plain = pad(plain, 16)
-#     ciphertext = cipher.encrypt(plain)
-
-#     with open(out_cipher_file, "wb") as f:
-#         f.write(ciphertext)
-
-# def decrypt_cbc(in_cipher_file, out_plain_file, key, iv):
-#     cipherT = ""
-#     cipher = AES.new(key, AES.MODE_CBC, iv)
-#     with open(in_cipher_file, "rb") as f:
-#         cipherT = bytes(f.read())
-
-#     plaintext = cipher.decrypt(cipherT)
-#     plaintext = unpad(plaintext, 16)
-
-#     with open(out_plain_file, "wb") as f:
-#         f.write(plaintext)
-
-# def encrypt_ctr(in_plain_file, out_cipher_file, key, ctr):
-#     plain = ""
-
-#     cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
-#     with open(in_plain_file, "rb") as f:
-#         plain = bytes(f.read())
-
-#     ciphertext = cipher.encrypt(plain)
-
-#     with open(out_cipher_file, "wb") as f:
-#         f.write(ciphertext)
-
-# def decrypt_ctr(in_cipher, out_plain, key, ctr):
-#     cipherT = ""
-
-#     cipher = AES.new(key, AES.MODE_CTR, initial_value=ctr[-8:], nonce=ctr[:8])
-#     with open(in_cipher, "rb") as f:
-#         cipherT = bytes(f.read())
-
-#     plaintext = cipher.decrypt(cipherT)
-
-#     with open(out_plain, "wb") as f:
-#         f.write(plaintext)
-
-# ## PART 3 ##
-# def pad2(data):
-#     l = len(data)
-#     pad = 0
+## Get Key
+def get_my_key():
+    file_path = "/keys/id_rsa.pub"
     
-#     if(l < 16):
-#         pad = 16 - l
-#     elif(l > 16):
-#         while (pad + l) % 16 != 0:
-#             pad += 1
-#     else:
-#         pad = 16
+    try:
+        with open(file_path, "r") as f:
+            return f
+    except FileNotFoundError:
+        print("Error: File not found...")
+        return
     
-#     for _ in range(pad):
-#         data += bytes.fromhex(f"{pad:02x}")
-        
-#     return data
+## Retrieve Peer Key
+def save_peer_key(pub_key):
+    name = input("Please enter a name for this peer: ")
     
-# def unpad2(data):
-#     if (len(data) % 16) != 0:
-#         print("padding error!")
-#         return
+    configuration.add_section(name)
+    configuration[name]['pub_key'] = pub_key
     
-#     paddingLen = data[-1]
-#     padding = data[-paddingLen:]
+    with open(config_path, 'w') as configfile:
+        configuration.write(configfile)
     
-#     if len(set(padding)) != 1:
-#         print("padding error!")
-#         return
-        
-#     return data[:-paddingLen]
+    print("Peer successfully added!")

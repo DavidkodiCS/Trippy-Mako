@@ -45,7 +45,6 @@ STUN_MESSAGE_TYPES = {
 # Quick Message Client
 # ------------------------------------
 def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
-    key = input("Please choose a secure key that you and your peer know about: ")
     TURN_SERVER = (turn_server, int(turn_port))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
@@ -509,6 +508,8 @@ def _read_server_response(response):
 # Helper Function: Establish Connection to Turn Server
 # ------------------------------------
 def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
+    ## LOAD key
+    key = security.get_key()
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
     if verbose:

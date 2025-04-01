@@ -1,7 +1,11 @@
 FROM python:3.12
 
 # Install Crypto
-RUN pip install cryptography 
+RUN pip install cryptography
+
+## Generate Public/Private Key Pair
+RUN apt-get update && apt-get install -y openssh-client
+RUN ssh-keygen -t rsa -b 4096 -f /keys/id_rsa -N ""
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
