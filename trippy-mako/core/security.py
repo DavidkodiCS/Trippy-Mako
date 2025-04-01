@@ -48,12 +48,22 @@ def decrypt_message(ciphertext):
     return plaintext.decode()
 
 ## Get Key
-def get_my_key():
+def get_my_pub_key():
     file_path = "/keys/id_rsa.pub"
     
     try:
-        with open(file_path, "r") as f:
-            return f
+        with open(file_path, "r") as key:
+            return key
+    except FileNotFoundError:
+        print("Error: File not found...")
+        return
+    
+def get_my_private_key():
+    file_path = "/keys/id_rsa"
+    
+    try:
+        with open(file_path, "r") as key:
+            return key
     except FileNotFoundError:
         print("Error: File not found...")
         return
