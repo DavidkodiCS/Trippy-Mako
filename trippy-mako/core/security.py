@@ -68,6 +68,11 @@ def get_my_private_key():
         print("Error: File not found...")
         return
     
+def get_peer_public_key():
+    print(configuration.sections)
+    peer = input("Please choose a peer from the list above: ")
+    
+
 ## Retrieve Peer Key
 def save_peer_key(pub_key):
     name = input("Please enter a name for this peer: ")
