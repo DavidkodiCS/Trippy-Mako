@@ -508,8 +508,6 @@ def _read_server_response(response):
 # Helper Function: Establish Connection to Turn Server
 # ------------------------------------
 def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
-    ## LOAD key
-    key = security.get_key()
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
     if verbose:

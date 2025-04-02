@@ -23,7 +23,7 @@ if os.path.exists(config_path):
     
 # Encrypt Message
 def encrypt_message(message):
-    public_key = load_public_key()
+    public_key = get_my_pub_key()
     ciphertext = public_key.encrypt(
         message.encode(),
         padding.OAEP(
@@ -36,7 +36,7 @@ def encrypt_message(message):
 
 # Decrypt Message
 def decrypt_message(ciphertext):
-    private_key = load_private_key()
+    private_key = get_my_private_key()
     plaintext = private_key.decrypt(
         ciphertext,
         padding.OAEP(
@@ -71,6 +71,12 @@ def get_my_private_key():
 def get_peer_public_key():
     print(configuration.sections)
     peer = input("Please choose a peer from the list above: ")
+    
+    if configuration.has_section(peer):
+        return configuration.get(peer)
+    else:
+        print("Invalid Selection")
+        return ""
     
 
 ## Retrieve Peer Key
