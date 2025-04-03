@@ -62,5 +62,5 @@ listen: This feature allows the client to listen for a peer on the TURN server.
 3. [Developer Documentation](docs-dev/README.md)
 4. [User Documentation](docs-user/README.md)
 5. [Sprints](sprints/README.md)
-6. [Poster](https://docs.google.com/presentation/d/1Ua0MMuqRZ-b5kbvC48WoUsahLcg4EEjAxT-er4XbvGA/edit?usp=sharing)
+6. [Poster](https://docs.google.com/presentation/d/15vX1Sx2uotJdCwXHGU7jTiEqNvDkot7u/edit?usp=sharing&ouid=118076866767137996333&rtpof=true&sd=true)
 7. [Capstone Presentation](https://docs.google.com/presentation/d/1M-JNfSg8ggkpjUakGgC8-kMq2XTXgGCr4LDxTzpvLao/edit?usp=sharing)
