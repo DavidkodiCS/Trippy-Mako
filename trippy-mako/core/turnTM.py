@@ -37,6 +37,8 @@ STUN_MESSAGE_TYPES = {
     0x0119: "ChannelBind Error Response",
 }
 
+PEER_PUBLIC_KEY = ""
+
 # ------------------------------------
 # Quick Message Feature
 # ------------------------------------
@@ -58,6 +60,10 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
     RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
     if RTA_TUP == -1:
         return
+    
+    ## Perform Key Exchange
+    if PEER_PUBLIC_KEY == "":
+        PEER_PUBLIC_KEY = _key_exchange(sock, TURN_SERVER, channel_number)
 
     # Start Message Loop
     last_refresh_time = time.time()
@@ -619,7 +625,12 @@ def _parse_channel_response(response,verbose, encrypted, key):
     else:
         print(message.decode(errors='ignore'))
         return message.decode(errors='ignore')
-        
+    
+# ------------------------------------
+# Helper Function: Perform Key Exchange
+# ------------------------------------
+def _key_exchange(sock, TURN_SERVER, channel_number):
+    
 
 ## When imported using from turnTM import * only imports these functions:
 __all__ = ["start_send_file_client", 
