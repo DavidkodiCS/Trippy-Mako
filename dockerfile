@@ -5,7 +5,7 @@ RUN pip install cryptography
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
-COPY trippy-mako/core /app
+COPY trippy-mako /app
 
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
