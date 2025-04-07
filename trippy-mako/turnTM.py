@@ -76,11 +76,11 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                if verbose:
+                if verbose :
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    if verbose:
+                    if verbose :
                         print("Response (hex):", response.hex())
                         _read_server_response(response)
                     _parse_channel_response(response, encrypted, key, verbose)
@@ -94,11 +94,11 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
                 break
             else:
                 #Send message via ChannelData instead of Send Indication
-                # if encrypted:
+                # if encrypted : bool:
                 #     security.encrypt_message(key, user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
-                if verbose:
+                if verbose :
                     print(f"Sent message via Channel {channel_number}")
 
         # Send refresh packet if needed
@@ -106,10 +106,10 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            if verbose:
+            if verbose :
                 print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            if verbose:
+            if verbose :
                 print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
@@ -146,11 +146,11 @@ def start_message_listener(turn_server, turn_port, encrypted, verbose):
         if sock in ready:
             try:
                 response, addr = sock.recvfrom(4096)
-                if verbose:
+                if verbose :
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    if verbose:
+                    if verbose :
                         print("Response (hex):", response.hex())
                         _read_server_response(response)
                     _parse_channel_response(response, verbose)
@@ -168,10 +168,10 @@ def start_message_listener(turn_server, turn_port, encrypted, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            if verbose:
+            if verbose :
                 print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            if verbose:
+            if verbose :
                 print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
@@ -202,7 +202,7 @@ def start_send_file_client(turn_server, turn_port, encrypted, verbose):
     
     refresh_packet = packetBuilder.build_refresh()
     sock.sendto(refresh_packet, TURN_SERVER)
-    if verbose:
+    if verbose :
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
     
     try:
@@ -246,7 +246,7 @@ def start_file_listener(turn_server, turn_port, encrypted, verbose):
     
     refresh_packet = packetBuilder.build_refresh()
     sock.sendto(refresh_packet, TURN_SERVER)
-    if verbose:
+    if verbose :
         print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
     
     print("Listening for incoming file data.")
@@ -303,7 +303,7 @@ def start_shell_client(turn_server, turn_port, encrypted, verbose):
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    if verbose:
+                    if verbose :
                         print(f"Response (hex): {response.hex()}")
                         _read_server_response(response)
                         
@@ -326,10 +326,10 @@ def start_shell_client(turn_server, turn_port, encrypted, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            if verbose:
+            if verbose :
                 print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            if verbose:
+            if verbose :
                 print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
@@ -375,7 +375,7 @@ def start_shell_listener(turn_server, turn_port, encrypted, verbose):
                 send_data_packet = packetBuilder.build_channelData(channel_number, output)
                 sock.sendto(send_data_packet, TURN_SERVER)
                 
-                if verbose:
+                if verbose :
                     print("Sent command output back to client.")
             except Exception as e:
                 pass
@@ -391,15 +391,15 @@ def start_shell_listener(turn_server, turn_port, encrypted, verbose):
             refresh_packet = packetBuilder.build_refresh()
             sock.sendto(refresh_packet, TURN_SERVER)
             channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-            if verbose:
+            if verbose :
                 print(f"Sending Channel Bind Request (Channel {channel_number})...")
             sock.sendto(channel_bind_packet, TURN_SERVER)
-            if verbose:
+            if verbose :
                 print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
             last_refresh_time = time.time()
 
 # ------------------------------------
-# Helper Function: Parse Server Response (Will likely only be used in a verbose mode)
+# Helper Function: Parse Server Response (Will likely only be used in a verbose : bool mode)
 # ------------------------------------
 def _read_server_response(response):    
     # Unpack the STUN header
@@ -511,7 +511,7 @@ def _read_server_response(response):
 def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     # Allocate Request
     alloc_packet = packetBuilder.build_alloc()
-    if verbose:
+    if verbose :
         print(f"Sending Allocate packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
     sock.sendto(alloc_packet, TURN_SERVER)
 
@@ -521,7 +521,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     if sock in ready:
         try:
             response, addr = sock.recvfrom(4096)
-            if verbose:
+            if verbose :
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
             if response:
@@ -538,7 +538,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 
     # Create Permission Request
     create_perm_packet = packetBuilder.build_createPerm(peer_ip, peer_port)
-    if verbose:
+    if verbose :
         print(f"Sending Create Permission packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
     sock.sendto(create_perm_packet, TURN_SERVER)
 
@@ -548,7 +548,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     if sock in ready:
         try:
             response, addr = sock.recvfrom(4096)
-            if verbose:
+            if verbose : bool:
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
             if response:
@@ -560,7 +560,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 
     #Send Channel Bind Request
     channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
-    if verbose:
+    if verbose :
         print(f"Sending Channel Bind Request (Channel {channel_number})...")
     sock.sendto(channel_bind_packet, TURN_SERVER)
 
@@ -570,7 +570,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     if sock in ready:
         try:
             response, addr = sock.recvfrom(4096)
-            if verbose:
+            if verbose :
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
             if response:
@@ -605,12 +605,12 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_channel_response(response,verbose, encrypted, key):
+def _parse_channel_response(response,verbose : bool, encrypted, key):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
-    # if encrypted:
+    # if encrypted : bool:
     #     security.decrypt_message(key, message)
-    if verbose:
+    if verbose :
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
         print(f"LENGTH: {length}")
