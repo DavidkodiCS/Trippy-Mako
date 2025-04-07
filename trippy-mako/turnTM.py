@@ -548,7 +548,7 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
     if sock in ready:
         try:
             response, addr = sock.recvfrom(4096)
-            if verbose : bool:
+            if verbose :
                 print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
             if response:

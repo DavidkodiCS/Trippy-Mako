@@ -35,9 +35,9 @@ def generalSetup(configManager):
         print("Please choose a configuration from the list below: ")
         configManager.listConfig()
         config = input("Choose configuration: ")
-        if not(configManager.has_section(config)):
+        if not(configManager.hasSection(config)):
             print("That configuration does not exist.")
-            generalSetup()
+            generalSetup(configManager)
         info = configManager.getConfig(config)
           
     elif(choose == "new"):
@@ -49,7 +49,7 @@ def generalSetup(configManager):
 
     else:
         print("Invalid command...")
-        generalSetup()
+        generalSetup(configManager)
         
     v = input("Would you like to enter verbose mode? (y/n): ")
     info.append(True if v == "y" else False)
