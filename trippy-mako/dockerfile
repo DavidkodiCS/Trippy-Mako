@@ -2,7 +2,7 @@ FROM python:3.12
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
-COPY trippy-mako /app
+COPY . /app
 
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
