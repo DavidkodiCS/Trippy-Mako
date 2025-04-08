@@ -1,0 +1,50 @@
+services:
+  server:
+    build:
+      context: ./test-server
+      dockerfile: Dockerfile
+    ports:
+      - "3478:3478" # Accessible on the host's IP on port 3478
+    networks:
+      public-net:
+        ipv4_address: 172.20.0.10
+
+  client:
+    build:
+      context: ./trippy-mako
+      dockerfile: Dockerfile
+    networks:
+      client-net:
+        ipv4_address: 192.168.1.10
+    depends_on:
+      - server
+    stdin_open: true
+    tty: true
+
+  peer:
+    build:
+      context: ./trippy-mako
+      dockerfile: Dockerfile
+    networks:
+      peer-net:
+        ipv4_address: 192.168.2.10
+    depends_on:
+      - server
+    stdin_open: true
+    tty: true
+
+networks:
+  public-net:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+  client-net:
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+
+  peer-net:
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24

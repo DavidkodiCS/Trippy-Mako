@@ -1,0 +1,21 @@
+FROM ubuntu:latest
+
+# Update package lists
+RUN apt-get update && apt-get upgrade -y
+
+# Install coturn
+RUN apt-get install -y coturn
+
+# Create coturn configuration file
+RUN mkdir -p /etc/coturn
+COPY turnserver.conf /etc/coturn/turnserver.conf
+
+# Expose the necessary ports for TURN
+EXPOSE 3478/udp
+EXPOSE 3478/tcp
+EXPOSE 5349/udp
+EXPOSE 5349/tcp
+EXPOSE 10000-20000/udp
+
+# Start the coturn server
+CMD ["turnserver", "-c", "/etc/coturn/turnserver.conf", "-v"]
