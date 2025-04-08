@@ -114,7 +114,7 @@ def addConfig():
     configuration.add_section(name)
     configuration[name]['turnIP'] = turnIP
     configuration[name]['turnPort'] = turnPort
-    configuration[name]['encrypted'] = 1 if encrypt == "y" else 0
+    configuration[name]['encrypted'] = "1" if encrypt == "y" else "0"
 
     with open(config_path, 'w') as configfile:
         configuration.write(configfile)
