@@ -1,2 +1,3 @@
 # Utility libraries
 pytest
+cryptography
