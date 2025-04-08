@@ -7,7 +7,7 @@ services:
       - "3478:3478" # Accessible on the host's IP on port 3478
     networks:
       public-net:
-        ipv4_address: 10.0.1.10 # Update IP to be within the new subnet
+        ipv4_address: 10.0.1.10
 
   client:
     build:
@@ -37,7 +37,7 @@ networks:
   public-net:
     ipam:
       config:
-        - subnet: 10.0.1.0/24 # Changed subnet
+        - subnet: 10.0.1.0/24
 
   client-net:
     ipam:
