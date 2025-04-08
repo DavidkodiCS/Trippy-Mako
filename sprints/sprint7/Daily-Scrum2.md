@@ -7,9 +7,13 @@ This will be filled out by us when we meet in person or over Google Meet. Basica
 ## Charlie
 
 1. What have you done since last meeting?
+Put lots of work into presentation/ poster
 2. What will you accomplish today / until the next daily scrum?
+Need to finish poster in format that works for MSC
 3. What impediments or obstacles are in your way?
+None
 4. What is your confidence on a scale of 1 to 10 that you will accomplish what you want to do.
+10
 
 ## David
 
