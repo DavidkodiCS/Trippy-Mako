@@ -51,14 +51,11 @@ def decrypt_message(ciphertext):
 
 ## Get Key
 def get_my_pub_key():
-    file_path = "/keys/id_rsa.pub"
-    
-    try:
-        with open(file_path, "r") as key:
-            return key
-    except FileNotFoundError:
-        print("Error: File not found...")
-        return
+    with open("keys/id_rsa.pub", "rb") as key_file:
+        return serialization.load_pem_public_key(
+            key_file.read(),
+            backend=default_backend()
+        )
     
 # def get_my_private_key():
 #     file_path = "/keys/id_rsa"

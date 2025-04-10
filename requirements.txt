@@ -1,2 +1,5 @@
 # Utility libraries
 pytest
+
+# Install Crypto
+RUN pip install cryptography

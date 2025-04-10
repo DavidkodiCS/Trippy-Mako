@@ -1,7 +1,12 @@
 FROM python:3.12
 
-# Install Crypto
-RUN pip install cryptography
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 ## Generate Public/Private Key Pair
 # RUN apt-get update && apt-get install -y openssh-client \

@@ -51,7 +51,6 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
-    key = security.get_my_pub_key()
 
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
@@ -89,7 +88,7 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
                     if verbose:
                         print("Response (hex):", response.hex())
                         _read_server_response(response)
-                    _parse_channel_response(response, encrypted, key, verbose)
+                    _parse_channel_response(response, encrypted, verbose)
             except Exception as e:
                 print(f"Socket error: {e}")
 
@@ -101,7 +100,7 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
             else:
                 #Send message via ChannelData instead of Send Indication
                 if encrypted:
-                    security.encrypt_message(key, user_input)
+                    security.encrypt_message(user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
                 if verbose:
@@ -611,11 +610,11 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 # ------------------------------------
 # Helper Function: Parse Command Response
 # ------------------------------------
-def _parse_channel_response(response,verbose, encrypted, key):
+def _parse_channel_response(response,verbose, encrypted):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
     if encrypted:
-        security.decrypt_message(key, message)
+        security.decrypt_message(message)
     if verbose:
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
