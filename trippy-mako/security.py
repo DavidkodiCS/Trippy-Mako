@@ -38,7 +38,7 @@ def encrypt_message(message):
 
 # Decrypt Message
 def decrypt_message(ciphertext):
-    private_key = get_my_private_key()
+    private_key = get_my_priv_key()
     plaintext = private_key.decrypt(
         ciphertext,
         padding.OAEP(
@@ -53,8 +53,13 @@ def decrypt_message(ciphertext):
 def get_my_pub_key():
     with open("keys/id_rsa.pub", "rb") as key_file:
         return serialization.load_pem_public_key(
-            key_file.read(),
-            backend=default_backend()
+            key_file.read(),     
+        )
+        
+def get_my_priv_key():
+    with open("keys/id_rsa.pub", "rb") as key_file:
+        return serialization.load_pem_public_key(
+            key_file.read(),     
         )
     
 # def get_my_private_key():
