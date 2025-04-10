@@ -51,13 +51,13 @@ def decrypt_message(ciphertext):
 
 ## Get Key
 def get_my_pub_key():
-    with open("keys/id_rsa.pub", "rb") as key_file:
+    with open("keys/public_key.pem", "rb") as key_file:
         return serialization.load_pem_public_key(
             key_file.read(),     
         )
         
 def get_my_priv_key():
-    with open("keys/id_rsa.pub", "rb") as key_file:
+    with open("keys/private_key.pem", "rb") as key_file:
         return serialization.load_pem_public_key(
             key_file.read(),     
         )
