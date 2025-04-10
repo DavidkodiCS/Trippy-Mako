@@ -1,5 +1,7 @@
 # from Crypto.Cipher import AES
 # from Crypto.Util.Padding import pad, unpad
+
+## RSA
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 import os
@@ -58,15 +60,15 @@ def get_my_pub_key():
         print("Error: File not found...")
         return
     
-def get_my_private_key():
-    file_path = "/keys/id_rsa"
+# def get_my_private_key():
+#     file_path = "/keys/id_rsa"
     
-    try:
-        with open(file_path, "r") as key:
-            return key
-    except FileNotFoundError:
-        print("Error: File not found...")
-        return
+#     try:
+#         with open(file_path, "r") as key:
+#             return key
+#     except FileNotFoundError:
+#         print("Error: File not found...")
+#         return
     
 def get_peer_public_key():
     print(configuration.sections)
@@ -79,14 +81,15 @@ def get_peer_public_key():
         return ""
     
 
-## Retrieve Peer Key
-def save_peer_key(pub_key):
-    name = input("Please enter a name for this peer: ")
+## FOR NOW WE ARE ASSUMING THAT THE PEERS KNOW EACH OTHER'S KEYS
+# ## Retrieve Peer Key
+# def save_peer_key(pub_key):
+#     name = input("Please enter a name for this peer: ")
     
-    configuration.add_section(name)
-    configuration[name]['pub_key'] = pub_key
+#     configuration.add_section(name)
+#     configuration[name]['pub_key'] = pub_key
     
-    with open(config_path, 'w') as configfile:
-        configuration.write(configfile)
+#     with open(config_path, 'w') as configfile:
+#         configuration.write(configfile)
     
-    print("Peer successfully added!")
+#     print("Peer successfully added!")

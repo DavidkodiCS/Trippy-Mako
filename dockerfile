@@ -4,11 +4,11 @@ FROM python:3.12
 RUN pip install cryptography
 
 ## Generate Public/Private Key Pair
-RUN apt-get update && apt-get install -y openssh-client \
-    && mkdir -p /keys && chmod 700 /keys \
-    && ssh-keygen -t rsa -b 4096 -f /keys/id_rsa -N "" \
-    && chmod 600 /keys/id_rsa \
-    && chmod 644 /keys/id_rsa.pub
+# RUN apt-get update && apt-get install -y openssh-client \
+#     && mkdir -p /keys && chmod 700 /keys \
+#     && ssh-keygen -t rsa -b 4096 -f /keys/id_rsa -N "" \
+#     && chmod 600 /keys/id_rsa \
+#     && chmod 644 /keys/id_rsa.pub
 
 # Set the working directory in the container and copy python files
 WORKDIR /app

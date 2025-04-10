@@ -51,6 +51,7 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.settimeout(None)  # No timeout
     sock.setblocking(False)  # Non-blocking socket
+    key = security.get_my_pub_key()
 
     # Generate a random valid channel number (RFC 5766: between 0x4000 - 0x7FFF)
     # HARDCODED VALUE
@@ -61,9 +62,9 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
     if RTA_TUP == -1:
         return
     
-    ## Perform Key Exchange
-    if PEER_PUBLIC_KEY == "":
-        PEER_PUBLIC_KEY = _key_exchange(sock, TURN_SERVER, channel_number)
+    # ## Perform Key Exchange
+    # if PEER_PUBLIC_KEY == "":
+    #     PEER_PUBLIC_KEY = _key_exchange(sock, TURN_SERVER, channel_number)
 
     # Start Message Loop
     last_refresh_time = time.time()
@@ -99,8 +100,8 @@ def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
                 break
             else:
                 #Send message via ChannelData instead of Send Indication
-                # if encrypted:
-                #     security.encrypt_message(key, user_input)
+                if encrypted:
+                    security.encrypt_message(key, user_input)
                 channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                 sock.sendto(channel_data_packet, TURN_SERVER)
                 if verbose:
@@ -613,8 +614,8 @@ def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
 def _parse_channel_response(response,verbose, encrypted, key):
     channel_number, length = struct.unpack_from("!HH", response, 0)
     message = response[4:4+length]  # Slice the message portion
-    # if encrypted:
-    #     security.decrypt_message(key, message)
+    if encrypted:
+        security.decrypt_message(key, message)
     if verbose:
         print("CHANNEL DATA MESSAGE\n")
         print(f"CHANNEL NUMBER: {channel_number}")
@@ -629,7 +630,7 @@ def _parse_channel_response(response,verbose, encrypted, key):
 # ------------------------------------
 # Helper Function: Perform Key Exchange
 # ------------------------------------
-def _key_exchange(sock, TURN_SERVER, channel_number):
+# def _key_exchange(sock, TURN_SERVER, channel_number):
     
 
 ## When imported using from turnTM import * only imports these functions:
