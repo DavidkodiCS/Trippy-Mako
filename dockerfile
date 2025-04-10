@@ -1,12 +1,12 @@
 FROM python:3.12
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update && apt-get install -y \
+#     build-essential \
+#     libssl-dev \
+#     libffi-dev \
+#     python3-dev \
+#     && rm -rf /var/lib/apt/lists/*
 
 ## Generate Public/Private Key Pair
 # RUN apt-get update && apt-get install -y openssh-client \
@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 # Set the working directory in the container and copy python files
 WORKDIR /app
-COPY trippy-mako/core /app
+COPY trippy-mako/ /app
 
 # Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt

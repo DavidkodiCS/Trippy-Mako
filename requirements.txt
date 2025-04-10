@@ -2,4 +2,4 @@
 pytest
 
 # Install Crypto
-RUN pip install cryptography
+cryptography>=41.0.0
