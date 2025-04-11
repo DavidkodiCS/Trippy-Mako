@@ -15,7 +15,7 @@ EXPOSE 3478/udp
 EXPOSE 3478/tcp
 EXPOSE 5349/udp
 EXPOSE 5349/tcp
-EXPOSE 10000-20000/udp
+EXPOSE 49152-65535/udp
 
 # Start the coturn server
 CMD ["turnserver", "-c", "/etc/coturn/turnserver.conf", "-v"]
