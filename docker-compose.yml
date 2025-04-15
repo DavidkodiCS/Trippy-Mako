@@ -4,7 +4,11 @@ services:
       context: ./test-server
       dockerfile: Dockerfile
     ports:
-      - "3478:3478" # Accessible on the host's IP on port 3478
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      # - "5349:5349/udp"
+      # - "5349:5349/tcp"
+      # - "49152-65535:49152-65535/udp"
     networks:
       public-net:
         ipv4_address: 10.0.1.10
@@ -16,6 +20,8 @@ services:
     networks:
       client-net:
         ipv4_address: 192.168.1.10
+      public-net: # Connect client to the public network as well
+        ipv4_address: 10.0.1.11 # Assign a different IP on the public network
     depends_on:
       - server
     stdin_open: true
@@ -28,6 +34,8 @@ services:
     networks:
       peer-net:
         ipv4_address: 192.168.2.10
+      public-net: # Connect client to the public network as well
+        ipv4_address: 10.0.1.12 # Assign a different IP on the public network
     depends_on:
       - server
     stdin_open: true
