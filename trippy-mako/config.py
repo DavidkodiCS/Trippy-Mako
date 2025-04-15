@@ -32,7 +32,7 @@ class ConfigManager:
         if(choose == "existing"):
             if self.getNumSections() == 0:
                 print("You have no saved configurations.\nPlease create a configuration...\n")
-                self.generalSetup()
+                return None
                     
             print("Please choose a configuration from the list below: ")
             self.listConfig()
@@ -105,13 +105,13 @@ class ConfigManager:
         ## Enter in fields about server configuration ##
         turnIP = input("Enter TURN server IP address: ")
         turnPort = input("Enter TURN server port number: ")
-        encrypt = input("Encrypted? (y/n ): ")
+        encrypt = input("Encrypted? (y/n): ")
 
         # add configuration to the file 
         self.configuration.add_section(name)
         self.configuration[name]['turnIP'] = turnIP
         self.configuration[name]['turnPort'] = turnPort
-        self.configuration[name]['encrypted'] = 1 if encrypt == "y" else 0
+        self.configuration[name]['encrypted'] = "1" if encrypt == "y" else "0"
 
         self._saveConfig()
         
@@ -152,7 +152,7 @@ class ConfigManager:
                     case "turnPort":
                         self.configuration[section]['turnPort'] = input("New turnPort: ")
                     case "encrypted":
-                        self.configuration[section]['encrypted'] = 1 if input("Encrypted? (y/n ): ") == "y" else 0
+                        self.configuration[section]['encrypted'] = "1" if input("Encrypted? (y/n): ") == "y" else "0"
                     case _:
                         print("Invalid Field...")
 

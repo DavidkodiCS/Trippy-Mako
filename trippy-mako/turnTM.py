@@ -42,10 +42,12 @@ PEER_PUBLIC_KEY = ""
 
 class TurnTM:
     def __init__(self, turnInfo):
-        self.turn_server_ip = turnInfo["ip"]
-        self.turn_server_port = turnInfo["port"]
-        self.encrypted = turnInfo["encrypted"]
-        self.verbose = turnInfo["verbose"]
+        ip, port, encrypted, verbose = turnInfo
+        
+        self.turn_server_ip = ip
+        self.turn_server_port = port
+        self.encrypted = encrypted
+        self.verbose = verbose
 
     # ----------------------#
     # Quick Message Feature #
@@ -127,9 +129,9 @@ class TurnTM:
                     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
                 last_refresh_time = time.time()
 
-    # ----------------------
-    # Quick Message Listener
-    # ----------------------
+    # -----------------------#
+    # Quick Message Listener #
+    # -----------------------#
     def start_message_listener(turn_server, turn_port, encrypted, verbose):
         TURN_SERVER = (turn_server, int(turn_port))
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
