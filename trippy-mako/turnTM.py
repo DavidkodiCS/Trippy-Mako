@@ -57,8 +57,8 @@ class TurnTM:
     # Quick Message Client #
     # ---------------------#
     
-    def start_quick_message_client(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))
+    def start_quick_message_client(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(None)  # No timeout
         sock.setblocking(False)  # Non-blocking socket
@@ -68,7 +68,7 @@ class TurnTM:
         channel_number = 0x4001
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return
         
@@ -92,14 +92,14 @@ class TurnTM:
             if sock in ready:
                 try:
                     response, addr = sock.recvfrom(4096)
-                    if verbose :
+                    if self.verbose :
                         print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                     if response:
-                        if verbose :
+                        if self.verbose :
                             print("Response (hex):", response.hex())
-                            _read_server_response(response)
-                        _parse_channel_response(response, encrypted, verbose)
+                            self._read_server_response(response)
+                        self._parse_channel_response(response, self.encrypted, self.verbose)
                 except Exception as e:
                     print(f"Socket error: {e}")
 
@@ -110,11 +110,11 @@ class TurnTM:
                     break
                 else:
                     #Send message via ChannelData instead of Send Indication
-                    if encrypted:
+                    if self.encrypted:
                         security.encrypt_message(user_input)
                     channel_data_packet = packetBuilder.build_channelData(channel_number, user_input)
                     sock.sendto(channel_data_packet, TURN_SERVER)
-                    if verbose :
+                    if self.verbose :
                         print(f"Sent message via Channel {channel_number}")
 
             # Send refresh packet if needed
@@ -122,18 +122,18 @@ class TurnTM:
                 refresh_packet = packetBuilder.build_refresh()
                 sock.sendto(refresh_packet, TURN_SERVER)
                 channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                if verbose :
+                if self.verbose :
                     print(f"Sending Channel Bind Request (Channel {channel_number})...")
                 sock.sendto(channel_bind_packet, TURN_SERVER)
-                if verbose :
+                if self.verbose :
                     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
                 last_refresh_time = time.time()
 
     # -----------------------#
     # Quick Message Listener #
     # -----------------------#
-    def start_message_listener(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))
+    def start_message_listener(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(None)  # No timeout
         sock.setblocking(False)  # Non-blocking socket
@@ -142,7 +142,7 @@ class TurnTM:
         channel_number = 0x4001
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return
 
@@ -162,14 +162,14 @@ class TurnTM:
             if sock in ready:
                 try:
                     response, addr = sock.recvfrom(4096)
-                    if verbose :
+                    if self.verbose :
                         print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                     if response:
-                        if verbose :
+                        if self.verbose :
                             print("Response (hex):", response.hex())
-                            _read_server_response(response)
-                        _parse_channel_response(response, verbose)
+                            self._read_server_response(response)
+                        self._parse_channel_response(response, self.verbose)
                 except Exception as e:
                     print(f"Socket error: {e}")
 
@@ -184,10 +184,10 @@ class TurnTM:
                 refresh_packet = packetBuilder.build_refresh()
                 sock.sendto(refresh_packet, TURN_SERVER)
                 channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                if verbose :
+                if self.verbose :
                     print(f"Sending Channel Bind Request (Channel {channel_number})...")
                 sock.sendto(channel_bind_packet, TURN_SERVER)
-                if verbose :
+                if self.verbose :
                     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
                 last_refresh_time = time.time()
 
@@ -199,8 +199,8 @@ class TurnTM:
     # -------------------
     # Sending File Client
     # -------------------
-    def start_send_file_client(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))
+    def start_send_file_client(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))
         # Create and configure socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(None)
@@ -210,7 +210,7 @@ class TurnTM:
         channel_number = 0x4001
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return
 
@@ -218,7 +218,7 @@ class TurnTM:
         
         refresh_packet = packetBuilder.build_refresh()
         sock.sendto(refresh_packet, TURN_SERVER)
-        if verbose :
+        if self.verbose :
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
         try:
@@ -242,8 +242,8 @@ class TurnTM:
     # ------------------
     # Send File Listener
     # ------------------
-    def start_file_listener(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))
+    def start_file_listener(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))
         # Create and configure socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setblocking(False)
@@ -256,13 +256,13 @@ class TurnTM:
         filename = input("Please choose a filename or file to be written to: ")
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return   
         
         refresh_packet = packetBuilder.build_refresh()
         sock.sendto(refresh_packet, TURN_SERVER)
-        if verbose :
+        if self.verbose :
             print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
         
         print("Listening for incoming file data.")
@@ -289,8 +289,8 @@ class TurnTM:
     # ------------------------------------
     # Remote Shell Client
     # ------------------------------------
-    def start_shell_client(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))    
+    def start_shell_client(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))    
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.settimeout(None)
         sock.setblocking(False)
@@ -299,7 +299,7 @@ class TurnTM:
         channel_number = 0x4001
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return
 
@@ -319,11 +319,11 @@ class TurnTM:
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                     if response:
-                        if verbose :
+                        if self.verbose :
                             print(f"Response (hex): {response.hex()}")
-                            _read_server_response(response)
+                            self._read_server_response(response)
                             
-                        _parse_channel_response(response, verbose, encrypted, "NULL")
+                        self._parse_channel_response(response, self.verbose, self.encrypted, "NULL")
                 except Exception as e:
                     print(f"Socket error: {e}")
 
@@ -342,18 +342,18 @@ class TurnTM:
                 refresh_packet = packetBuilder.build_refresh()
                 sock.sendto(refresh_packet, TURN_SERVER)
                 channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                if verbose :
+                if self.verbose :
                     print(f"Sending Channel Bind Request (Channel {channel_number})...")
                 sock.sendto(channel_bind_packet, TURN_SERVER)
-                if verbose :
+                if self.verbose :
                     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
                 last_refresh_time = time.time()
 
     # ------------------------------------
     # Remote Shell Listener
     # ------------------------------------
-    def start_shell_listener(turn_server, turn_port, encrypted, verbose):
-        TURN_SERVER = (turn_server, int(turn_port))
+    def start_shell_listener(self):
+        TURN_SERVER = (self.turn_server_ip, int(self.turn_server_port))
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
         sock.settimeout(None)
         sock.setblocking(False)
@@ -363,7 +363,7 @@ class TurnTM:
         channel_number = 0x4001
 
         # Establish initial TURN connection
-        RTA_TUP = _create_turn_connection(sock, TURN_SERVER, channel_number, verbose)
+        RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
         if RTA_TUP == -1:
             return   
 
@@ -382,7 +382,7 @@ class TurnTM:
                     response, addr = sock.recvfrom(4096)
                     print(f"Received command from {addr} at {time.strftime('%H:%M:%S')}")
 
-                    command = _parse_channel_response(response, verbose, encrypted, "NULL")
+                    command = self._parse_channel_response(response, self.verbose, self.encrypted, "NULL")
                     result = subprocess.run(command, shell=True, capture_output=True, text=True)
                     output = result.stdout if result.stdout else result.stderr
                     output = output.strip() if output else "EXECUTION WITH NO OUTPUT..."
@@ -391,7 +391,7 @@ class TurnTM:
                     send_data_packet = packetBuilder.build_channelData(channel_number, output)
                     sock.sendto(send_data_packet, TURN_SERVER)
                     
-                    if verbose :
+                    if self.verbose :
                         print("Sent command output back to client.")
                 except Exception as e:
                     pass
@@ -407,10 +407,10 @@ class TurnTM:
                 refresh_packet = packetBuilder.build_refresh()
                 sock.sendto(refresh_packet, TURN_SERVER)
                 channel_bind_packet = packetBuilder.build_channelBind(RTA_TUP[0], RTA_TUP[1], channel_number)
-                if verbose :
+                if self.verbose :
                     print(f"Sending Channel Bind Request (Channel {channel_number})...")
                 sock.sendto(channel_bind_packet, TURN_SERVER)
-                if verbose :
+                if self.verbose :
                     print(f"Sent Refresh packet at {time.strftime('%H:%M:%S')}")
                 last_refresh_time = time.time()
 
@@ -524,7 +524,7 @@ class TurnTM:
     # ------------------------------------
     # Helper Function: Establish Connection to Turn Server
     # ------------------------------------
-    def _create_turn_connection(sock, TURN_SERVER, channel_number, verbose):
+    def _create_turn_connection(self, sock, TURN_SERVER, channel_number, verbose):
         # Allocate Request
         alloc_packet = packetBuilder.build_alloc()
         if verbose :
@@ -542,7 +542,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    self._read_server_response(response)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -569,7 +569,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    self._read_server_response(response)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -591,7 +591,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    self._read_server_response(response)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -611,7 +611,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    _read_server_response(response)
+                    self._read_server_response(response)
 
             except Exception as e:
                 print(f"Socket error: {e}")

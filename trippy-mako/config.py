@@ -39,7 +39,8 @@ class ConfigManager:
             config = input("Choose configuration: ")
             if not(self.hasSection(config)):
                 print("That configuration does not exist.")
-                self.generalSetup()
+                return self.generalSetup()
+                
             info = self.getConfig(config)
             
         elif(choose == "new"):
@@ -51,7 +52,7 @@ class ConfigManager:
 
         else:
             print("Invalid command...")
-            self.generalSetup()
+            return self.generalSetup()
             
         v = input("Would you like to enter verbose mode? (y/n): ")
         info.append(True if v == "y" else False)
