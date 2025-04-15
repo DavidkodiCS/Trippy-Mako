@@ -1,3 +1,5 @@
 # Utility libraries
 pytest
-cryptography
+
+# Install Crypto
+cryptography>=41.0.0
