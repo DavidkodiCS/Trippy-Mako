@@ -625,12 +625,6 @@ def _parse_channel_response(response,verbose, encrypted):
     else:
         print(message.decode(errors='ignore'))
         return message.decode(errors='ignore')
-    
-# ------------------------------------
-# Helper Function: Perform Key Exchange
-# ------------------------------------
-# def _key_exchange(sock, TURN_SERVER, channel_number):
-    
 
 ## When imported using from turnTM import * only imports these functions:
 __all__ = ["start_send_file_client", 
