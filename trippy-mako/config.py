@@ -47,7 +47,7 @@ class ConfigManager:
             info = self.getConfig(config)     
 
         elif(choose == "exit"):
-            return -1
+            return None
 
         else:
             print("Invalid command...")
@@ -201,4 +201,3 @@ class ConfigManager:
     def _saveConfig(self):
         with open(config_path, 'w') as configfile:
             self.configuration.write(configfile)
-            
