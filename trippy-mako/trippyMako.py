@@ -8,9 +8,9 @@ from config import *
 # Trippy-Mako #
 # ------------#
 
-# -----------------------#
-# Main Command Functions #
-# -----------------------#
+#------------------#
+# Helper Functions #
+#------------------#
 
 ## Display Help ##
 def print_help():
@@ -53,20 +53,21 @@ def main():
                 turnInfo = configManager.generalSetup()
                 if turnInfo == None:
                     continue
+                turnTM = TurnTM(turnInfo)
                 
                 match command: 
                     case "sendFile":
-                        start_send_file_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
+                        turnTM.start_send_file_client()
                     case "listen -f" | "listen -file":
-                        start_file_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
-                    case "connect": ## get a shell
-                        start_shell_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
+                        turnTM.start_file_listener()
+                    case "connect":
+                        turnTM.start_shell_client()
                     case "listen -s" | "listen -shell":
-                        start_shell_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
+                        turnTM.start_shell_listener()
                     case "message":
-                        start_quick_message_client(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
+                        turnTM.start_quick_message_client()
                     case "listen -m" | "listen -message":
-                        start_message_listener(turnInfo[0], turnInfo[1], turnInfo[2], turnInfo[3])
+                        turnTM.start_message_listener()
                     case _:
                         print("Unrecognized Command...")
 
