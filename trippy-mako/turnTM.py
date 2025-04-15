@@ -46,7 +46,10 @@ class TurnTM:
         
         self.turn_server_ip = ip
         self.turn_server_port = port
-        self.encrypted = encrypted
+        
+        if encrypted == "0": self.encrypted = False 
+        else: self.encrypted = True
+        
         self.verbose = verbose
 
     # ----------------------#
@@ -417,7 +420,7 @@ class TurnTM:
     # ------------------------------------
     # Helper Function: Parse Server Response (Will likely only be used in a verbose : bool mode)
     # ------------------------------------
-    def _read_server_response(response):    
+    def _read_server_response(self, response):    
         # Unpack the STUN header
         try:
             msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
@@ -621,7 +624,7 @@ class TurnTM:
     # ------------------------------------
     # Helper Function: Parse Command Response
     # ------------------------------------
-    def _parse_channel_response(response,verbose, encrypted):
+    def _parse_channel_response(self, response,verbose, encrypted):
         channel_number, length = struct.unpack_from("!HH", response, 0)
         message = response[4:4+length]  # Slice the message portion
         if encrypted:
