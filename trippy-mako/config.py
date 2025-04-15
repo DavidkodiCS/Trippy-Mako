@@ -21,6 +21,41 @@ class ConfigManager:
         # Read existing configurations if the file exists
         if os.path.exists(config_path):
             self.configuration.read(config_path)
+            
+    ## General Config Setup for Main Features ##
+    def generalSetup(self):
+        print("> Choose an existing configuration or create a new one:")
+        print("> existing\n> new\n> exit")
+        choose = input("Choose: ")
+        info = []
+        
+        if(choose == "existing"):
+            if self.getNumSections() == 0:
+                print("You have no saved configurations.\nPlease create a configuration...\n")
+                self.generalSetup()
+                    
+            print("Please choose a configuration from the list below: ")
+            self.listConfig()
+            config = input("Choose configuration: ")
+            if not(self.hasSection(config)):
+                print("That configuration does not exist.")
+                self.generalSetup()
+            info = self.getConfig(config)
+            
+        elif(choose == "new"):
+            config = self.addConfig()
+            info = self.getConfig(config)     
+
+        elif(choose == "exit"):
+            return -1
+
+        else:
+            print("Invalid command...")
+            self.generalSetup()
+            
+        v = input("Would you like to enter verbose mode? (y/n): ")
+        info.append(True if v == "y" else False)
+        return info
 
     ## Configuration Menu ##
     def config(self):
@@ -106,7 +141,7 @@ class ConfigManager:
         section = input("Choose configuration to edit: ")
         
         if self.configuration.has_section(section):
-            print("Sections:\n\tturnIP\n\tturnPort\n\encrypted")
+            print("Sections:\n\tturnIP\n\tturnPort\n\tencrypted")
             
             while True:
                 field = input("Choose field to edit: ")
@@ -117,7 +152,7 @@ class ConfigManager:
                     case "turnPort":
                         self.configuration[section]['turnPort'] = input("New turnPort: ")
                     case "encrypted":
-                        self.configuration[section]['encrypted'] = True if input("Encrypted? (y/n ): ") == "y" else False
+                        self.configuration[section]['encrypted'] = 1 if input("Encrypted? (y/n ): ") == "y" else 0
                     case _:
                         print("Invalid Field...")
 
@@ -158,10 +193,10 @@ class ConfigManager:
         print("> create\n> remove\n> edit\n> list\n> display\n> help\n> exit\n")
         
     def getNumSections(self):
-        return self.configuration.sections()
+        return len(self.configuration.sections())
 
     def hasSection(self, config):
-        self.configuration.has_section(config)        
+        return self.configuration.has_section(config)        
         
     def _saveConfig(self):
         with open(config_path, 'w') as configfile:

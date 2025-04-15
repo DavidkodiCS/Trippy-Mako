@@ -3,21 +3,19 @@ from cryptography.hazmat.primitives import serialization, hashes
 import os
 import configparser
 
-# ## Saved Public Keys
-# pub_keys = []
-# ## Load Configuration File ##
-# global configuration
-# global config_path
-# configuration = configparser.ConfigParser()
+## Load Configuration File ##
+global configuration
+global config_path
+configuration = configparser.ConfigParser()
 
-# # Get config directory from environment variable
-# config_dir = os.getenv("CONFIG_DIR", "/peers")
-# config_path = os.path.join(config_dir, "peers.ini")
-# os.makedirs(config_dir, exist_ok=True)
+# Get config directory from environment variable
+config_dir = os.getenv("CONFIG_DIR", "/")
+config_path = os.path.join(config_dir, "peers.ini")
+os.makedirs(config_dir, exist_ok=True)
 
-# # Read existing configurations if the file exists
-# if os.path.exists(config_path):
-#     configuration.read(config_path)
+# Read existing configurations if the file exists
+if os.path.exists(config_path):
+    configuration.read(config_path)
     
 # Encrypt Message
 def encrypt_message(message):
