@@ -47,29 +47,51 @@ def main():
             case "help":
                 print_help()
             case "config":
-                configManager.config()
-            case _:
+                configManager.config() 
+            case "sendFile":
                 ## SET UP ##
                 turnInfo = configManager.generalSetup()
                 if turnInfo == None:
                     continue
                 turnTM = TurnTM(turnInfo)
-                
-                match command: 
-                    case "sendFile":
-                        turnTM.start_send_file_client()
-                    case "listen -f" | "listen -file":
-                        turnTM.start_file_listener()
-                    case "connect":
-                        turnTM.start_shell_client()
-                    case "listen -s" | "listen -shell":
-                        turnTM.start_shell_listener()
-                    case "message":
-                        turnTM.start_quick_message_client()
-                    case "listen -m" | "listen -message":
-                        turnTM.start_message_listener()
-                    case _:
-                        print("Unrecognized Command...")
+                turnTM.start_send_file_client()
+            case "listen -f" | "listen -file":
+                ## SET UP ##
+                turnInfo = configManager.generalSetup()
+                if turnInfo == None:
+                    continue
+                turnTM = TurnTM(turnInfo)
+                turnTM.start_file_listener()
+            case "connect":
+                ## SET UP ##
+                turnInfo = configManager.generalSetup()
+                if turnInfo == None:
+                    continue
+                turnTM = TurnTM(turnInfo)
+                turnTM.start_shell_client()
+            case "listen -s" | "listen -shell":
+                ## SET UP ##
+                turnInfo = configManager.generalSetup()
+                if turnInfo == None:
+                    continue
+                turnTM = TurnTM(turnInfo)
+                turnTM.start_shell_listener()
+            case "message":
+                ## SET UP ##
+                turnInfo = configManager.generalSetup()
+                if turnInfo == None:
+                    continue
+                turnTM = TurnTM(turnInfo)
+                turnTM.start_quick_message_client()
+            case "listen -m" | "listen -message":
+                ## SET UP ##
+                turnInfo = configManager.generalSetup()
+                if turnInfo == None:
+                    continue
+                turnTM = TurnTM(turnInfo)
+                turnTM.start_message_listener()
+            case _:
+                print("Unrecognized Command...")
 
 ################################################################################
 ################################################################################

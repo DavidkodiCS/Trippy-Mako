@@ -72,7 +72,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return
         
         # ## Perform Key Exchange
@@ -145,7 +145,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return
 
         # Start Listening Loop
@@ -214,7 +214,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return
 
         file_path = input("Enter in the path of the file to be sent: ")
@@ -260,7 +260,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return   
         
         refresh_packet = packetBuilder.build_refresh()
@@ -303,7 +303,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return
 
         last_refresh_time = time.time()
@@ -367,7 +367,7 @@ class TurnTM:
 
         # Establish initial TURN connection
         RTA_TUP = self._create_turn_connection(sock, TURN_SERVER, channel_number, self.verbose)
-        if RTA_TUP == -1:
+        if RTA_TUP == None:
             return   
 
         last_refresh_time = time.time()
@@ -559,6 +559,9 @@ class TurnTM:
 
             except Exception as e:
                 print(f"Socket error: {e}")
+        else:
+            print("No response from Turn Server...")
+            return None
 
         # Get Peer Information
         print("Please enter the following information before allocation timeout (1 minute)...")
@@ -586,6 +589,9 @@ class TurnTM:
 
             except Exception as e:
                 print(f"Socket error: {e}")
+        else:
+            print("No response from Turn Server...")
+            return None
 
         #Send Channel Bind Request
         channel_bind_packet = packetBuilder.build_channelBind(peer_ip, peer_port, channel_number)
