@@ -99,7 +99,8 @@ class TurnTM:
                         print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                     if response:
-                            print("Response (hex):", response.hex())
+                            if self.verbose:
+                                print("Response (hex):", response.hex())
                             self._read_server_response(response, self.verbose)
                             self._parse_channel_response(response, self.encrypted, self.verbose)
                 except Exception as e:
@@ -554,7 +555,8 @@ class TurnTM:
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
+                    if verbose:
+                        print("Response (hex):", response.hex())
                     self._read_server_response(response, verbose)
 
             except Exception as e:
@@ -584,7 +586,8 @@ class TurnTM:
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
+                    if verbose:
+                        print("Response (hex):", response.hex())
                     self._read_server_response(response, verbose)
 
             except Exception as e:
@@ -609,7 +612,8 @@ class TurnTM:
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
+                    if verbose:
+                        print("Response (hex):", response.hex())
                     self._read_server_response(response, verbose)
 
             except Exception as e:
@@ -630,7 +634,8 @@ class TurnTM:
                     print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                 if response:
-                    print("Response (hex):", response.hex())
+                    if verbose:
+                        print("Response (hex):", response.hex())
                     self._read_server_response(response, verbose)
 
             except Exception as e:
