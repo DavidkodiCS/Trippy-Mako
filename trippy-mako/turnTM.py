@@ -99,10 +99,9 @@ class TurnTM:
                         print(f"Received response from {addr} at {time.strftime('%H:%M:%S')}")
 
                     if response:
-                        if self.verbose :
                             print("Response (hex):", response.hex())
-                            self._read_server_response(response)
-                        self._parse_channel_response(response, self.encrypted, self.verbose)
+                            self._read_server_response(response, self.verbose)
+                            self._parse_channel_response(response, self.encrypted, self.verbose)
                 except Exception as e:
                     print(f"Socket error: {e}")
 
@@ -171,7 +170,8 @@ class TurnTM:
                     if response:
                         if self.verbose :
                             print("Response (hex):", response.hex())
-                            self._read_server_response(response)
+                            
+                        self._read_server_response(response, self.verbose)
                         self._parse_channel_response(response, self.verbose)
                 except Exception as e:
                     print(f"Socket error: {e}")
@@ -324,8 +324,8 @@ class TurnTM:
                     if response:
                         if self.verbose :
                             print(f"Response (hex): {response.hex()}")
-                            self._read_server_response(response)
                             
+                        self._read_server_response(response, self.verbose)    
                         self._parse_channel_response(response, self.verbose, self.encrypted, "NULL")
                 except Exception as e:
                     print(f"Socket error: {e}")
@@ -418,9 +418,9 @@ class TurnTM:
                 last_refresh_time = time.time()
 
     # ------------------------------------
-    # Helper Function: Parse Server Response (Will likely only be used in a verbose : bool mode)
+    # Helper Function: Parse Server Response
     # ------------------------------------
-    def _read_server_response(self, response):    
+    def _read_server_response(self, response, verbose):    
         # Unpack the STUN header
         try:
             msg_type, msg_length, magic_cookie, transaction_id = struct.unpack_from("!HHI12s", response, 0)
@@ -430,10 +430,11 @@ class TurnTM:
             
         offset = 20  # Start of attributes
 
-        print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
-        print(f"MSG_LENGTH: {msg_length}")
-        print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
-        print(f"TRANSACTION_ID: {transaction_id.hex()}")
+        if verbose:
+            print(f"MSG_TYPE: {STUN_MESSAGE_TYPES.get(msg_type)}")
+            print(f"MSG_LENGTH: {msg_length}")
+            print(f"MAGIC_COOKIE: {hex(magic_cookie)}")
+            print(f"TRANSACTION_ID: {transaction_id.hex()}")
 
         offset = 20  # Start of attributes
         MAGIC_COOKIE = 0x2112A442  # STUN Magic Cookie
@@ -449,34 +450,40 @@ class TurnTM:
             match attr_type:
                 case 0x000D:  # LIFETIME
                     lifetime = struct.unpack("!I", attr_value)[0]
-                    print(f"Lifetime\n\tValue: {lifetime} seconds")
+                    if verbose:
+                        print(f"Lifetime\n\tValue: {lifetime} seconds")
 
                 case 0x0020:  # XOR-MAPPED-ADDRESS
                     family, xor_port = struct.unpack("!HH", attr_value[:4])
                     xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
                     ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
                     port = xor_port ^ 0x2112
-                    print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+                    if verbose:
+                        print(f"XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
 
                 case 0x0008:  # RESERVED ADDRESS (another XOR-MAPPED-ADDRESS)
                     family, xor_port = struct.unpack("!HH", attr_value[:4])
                     xor_ip = struct.unpack("!I", attr_value[4:])[0] ^ MAGIC_COOKIE
                     ip_addr = ".".join(map(str, xor_ip.to_bytes(4, 'big')))
                     port = xor_port ^ 0x2112
-                    print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
+                    if verbose:
+                        print(f"Reserved XOR-MAPPED-ADDRESS\n\tIP: {ip_addr}\n\tPORT: {port}")
 
                 case 0x8022:  # SOFTWARE
                     software_version = attr_value.decode(errors="ignore")
-                    print(f"Software\n\tValue: {software_version}")
+                    if verbose:
+                        print(f"Software\n\tValue: {software_version}")
 
                 case 0x8028:  # FINGERPRINT
                     fingerprint = struct.unpack("!I", attr_value)[0]
-                    print(f"Fingerprint\n\tValue: {fingerprint}")
+                    if verbose:
+                        print(f"Fingerprint\n\tValue: {fingerprint}")
 
                 case 0x0013:  # DATA
                     data = attr_value
-                    print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
-                    print(f"\tDecoded: {data.decode(errors="ignore")}")
+                    if verbose:
+                        print(f"🔹 DATA (Received from peer):\n\t{data.hex()}") 
+                        print(f"\tDecoded: {data.decode(errors="ignore")}")
 
                 case 0x0012:  # XOR-PEER-ADDRESS (PEER)
                     reserved, family, xor_port = struct.unpack("!BBH", attr_value[:4])  # Proper unpacking
@@ -489,7 +496,8 @@ class TurnTM:
                         peer_ip = ".".join(map(str, xor_ip))  # Convert to IPv4 string
 
                     peer_port = xor_port ^ 0x2112  # XOR the port with the top 16 bits of the magic cookie
-                    print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
+                    if verbose:
+                        print(f"🔹 XOR-PEER-ADDRESS\n\tIP: {peer_ip}\n\tPORT: {peer_port}")
                 
                 case 0x0001:  # Mapped Address Attribute
                     family, xor_port = struct.unpack_from("!BH", response, offset)
@@ -500,10 +508,12 @@ class TurnTM:
                         xor_ip ^= magic_cookie  # Decode IPv4 address
                         mapped_ip = socket.inet_ntoa(struct.pack("!I", xor_ip))
 
-                    print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
+                    if verbose:
+                        print(f"    MAPPED ADDRESS ATTRIBUTE\n\tIP: {mapped_ip}\n\tPORT: {xor_port}")
                 
                 case 0x007:  # DATA INDICATION
-                    print("Received Data Indication")
+                    if verbose:
+                        print("Received Data Indication")
                 
                 case 0x0016:
                     print("Relayed Transport Address (RTA)")
@@ -519,7 +529,7 @@ class TurnTM:
 
                     relayed_port = xor_port ^ 0x2112  # Decode port
                     ##print(f"🔹 XOR-RELAYED-ADDRESS (RTA)\n\tIP: {relayed_ip}\n\tPORT: {relayed_port}")
-                    print(f"SEND THIS TO PEER VIA OTHER MEAN: {relayed_port}")
+                    print(f"SEND THIS TO PEER: {relayed_port}")
                 
                 case _:
                     print(f"Unknown Type: {hex(attr_type)}")
@@ -545,7 +555,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    self._read_server_response(response)
+                    self._read_server_response(response, verbose)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -572,7 +582,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    self._read_server_response(response)
+                    self._read_server_response(response, verbose)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -594,14 +604,15 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    self._read_server_response(response)
+                    self._read_server_response(response, verbose)
 
             except Exception as e:
                 print(f"Socket error: {e}")
 
         # Refresh Allocation
         refresh_packet = packetBuilder.build_refresh()
-        print(f"Sending Refresh packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
+        if verbose:
+            print(f"Sending Refresh packet to {TURN_SERVER[0]}:{TURN_SERVER[1]}")
         sock.sendto(refresh_packet, TURN_SERVER)
 
         ready, _, _ = select.select([sock], [], [], 5)
@@ -614,7 +625,7 @@ class TurnTM:
 
                 if response:
                     print("Response (hex):", response.hex())
-                    self._read_server_response(response)
+                    self._read_server_response(response, verbose)
 
             except Exception as e:
                 print(f"Socket error: {e}")
@@ -625,7 +636,10 @@ class TurnTM:
     # Helper Function: Parse Command Response
     # ------------------------------------
     def _parse_channel_response(self, response,verbose, encrypted):
-        channel_number, length = struct.unpack_from("!HH", response, 0)
+        try:
+            channel_number, length = struct.unpack_from("!HH", response, 0)
+        except:
+            return None
         message = response[4:4+length]  # Slice the message portion
         if encrypted:
             security.decrypt_message(message)
